@@ -4,8 +4,8 @@ use crate::core::logger::ParseLogger;
 
 // Parser trait
 pub trait Parser<S> {
-    type Target;
-    fn parse<'a>(&self, state: &mut S) -> Option<Self::Target>;
+    type ParsedType;
+    fn parse<'a>(&self, state: &mut S) -> Option<Self::ParsedType>;
 }
 
 // Parse state

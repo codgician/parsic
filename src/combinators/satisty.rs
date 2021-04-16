@@ -1,25 +1,27 @@
 use crate::core::parser::{ Parser, ParseState };
 use crate::core::logger::{ Msg, MsgBody };
 
-// Parser builder: Char
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct Char {
-    ch: char
+// Satisfy parser
+#[derive(Clone, Copy, Debug)]
+pub struct Satisfy<F> {
+    func: F,
 }
 
-impl<'a> Parser<ParseState<'a>> for Char {
+impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
+    where F: Fn(&char) -> bool
+{
     type ParsedType = char;
 
     fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
         match state.inp.next() {
             Some(ch) => {
-                if ch == self.ch {
+                if (self.func)(&ch) {
                     Some(ch)
                 } else {
                     state.log.with(Msg::Err(
                         MsgBody {
                             pos: state.pos,
-                            msg: format!("expecting '{}', but got '{}'.", self.ch, ch)
+                            msg: format!("'{}' does not satisfy required conditions.", ch)
                         }
                     ));
                     None
@@ -38,8 +40,10 @@ impl<'a> Parser<ParseState<'a>> for Char {
     }
 }
 
-pub fn char(ch: char) -> Char {
-    Char { ch }
+pub fn satisfy<F>(f: F) -> Satisfy<F>
+    where F: Fn(&char) -> bool
+{
+    Satisfy { func: f }
 }
 
 #[cfg(test)]
@@ -48,11 +52,11 @@ mod test_char {
 
     #[test]
     // Should parse when character satisifies
-    fn test_char_ok() {
+    fn test_satisfy_ok() {
         let mut st = ParseState::new("Hello");
         assert_eq!(
             Some('H'),
-            super::char('H').parse(&mut st)
+            super::satisfy(|&ch| ch.is_uppercase()).parse(&mut st)
         );
         assert_eq!("ello", st.inp.as_str());
         assert_eq!(0, st.log.len());
@@ -60,11 +64,11 @@ mod test_char {
 
     #[test]
     // Should return none when character does not satisfy
-    fn test_char_fail() {
-        let mut st = ParseState::new("Hello");
+    fn test_satisfy_fail() {
+        let mut st = ParseState::new("hello");
         assert_eq!(
             None,
-            super::char('h').parse(&mut st)
+            super::satisfy(|&ch| ch.is_uppercase()).parse(&mut st)
         );
         assert_eq!("ello", st.inp.as_str());
         assert_eq!(1, st.log.len());
