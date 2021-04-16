@@ -47,12 +47,12 @@ pub fn satisfy<F>(f: F) -> Satisfy<F>
 }
 
 #[cfg(test)]
-mod test_char {
+mod test_satisfy {
     use crate::core::parser::{ Parser, ParseState };
 
     #[test]
     // Should parse when character satisifies
-    fn test_satisfy_ok() {
+    fn ok() {
         let mut st = ParseState::new("Hello");
         assert_eq!(
             Some('H'),
@@ -64,7 +64,7 @@ mod test_char {
 
     #[test]
     // Should return none when character does not satisfy
-    fn test_satisfy_fail() {
+    fn fail() {
         let mut st = ParseState::new("hello");
         assert_eq!(
             None,
