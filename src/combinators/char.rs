@@ -43,11 +43,11 @@ pub fn char(ch: char) -> Char {
 }
 
 #[cfg(test)]
-mod test_char {
+mod test {
     use crate::core::parser::{ Parser, ParseState };
 
+    // Should parse when character matches
     #[test]
-    // Should parse when character satisifies
     fn ok() {
         let mut st = ParseState::new("Hello");
         assert_eq!(
@@ -58,8 +58,8 @@ mod test_char {
         assert_eq!(0, st.log.len());
     }
 
+    // Should return none when character does not match
     #[test]
-    // Should return none when character does not satisfy
     fn fail() {
         let mut st = ParseState::new("Hello");
         assert_eq!(

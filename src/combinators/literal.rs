@@ -31,11 +31,11 @@ pub fn literal(s: &str) -> Literal {
 }
 
 #[cfg(test)]
-mod test_literal {
+mod test {
     use crate::core::parser::{ Parser, ParseState };
 
+    // Should parse when literal matches
     #[test]
-    // Should parse when character satisifies
     fn ok() {
         let mut st = ParseState::new("Hello!");
         assert_eq!(
@@ -46,8 +46,8 @@ mod test_literal {
         assert_eq!(0, st.log.len());
     }
 
+    // Should return none when literal does not match
     #[test]
-    // Should return none when character does not satisfy
     fn fail() {
         let mut st = ParseState::new("Hell");
         assert_eq!(

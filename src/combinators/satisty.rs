@@ -5,13 +5,13 @@ use crate::core::logger::{ Msg, MsgBody };
 #[derive(Clone, Copy, Debug)]
 pub struct Satisfy<F> {
     func: F,
+    // err_msg: Option<&'a str>
 }
 
 impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
     where F: Fn(&char) -> bool
 {
     type ParsedType = char;
-
     fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
         match state.inp.next() {
             Some(ch) => {
@@ -40,18 +40,18 @@ impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
     }
 }
 
-pub fn satisfy<F>(f: F) -> Satisfy<F>
+pub fn satisfy< F>(f: F) -> Satisfy<F>
     where F: Fn(&char) -> bool
 {
     Satisfy { func: f }
 }
 
 #[cfg(test)]
-mod test_satisfy {
+mod test {
     use crate::core::parser::{ Parser, ParseState };
 
     #[test]
-    // Should parse when character satisifies
+    // Should parse when character satisifies given condition
     fn ok() {
         let mut st = ParseState::new("Hello");
         assert_eq!(
@@ -63,7 +63,7 @@ mod test_satisfy {
     }
 
     #[test]
-    // Should return none when character does not satisfy
+    // Should return none when character does not satisfy given condition
     fn fail() {
         let mut st = ParseState::new("hello");
         assert_eq!(
