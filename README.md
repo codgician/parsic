@@ -16,14 +16,12 @@
     - [x] `literal`: Consumes given literal string
     - [x] `pure`: A parser that consumes nothing and always succeeds
     - [x] `empty`: A parser that always fails
+    - [ ] `fix`: Fixed-point combinator to support recursive syntax
     - [ ] `fmap`: Monadic fmap
     - [ ] `bind`: Monadic bind
-    - [ ] `and`
-    - [ ] `or`
-    - [ ] `left`
-    - [ ] `right`
-    - [ ] `some`
-    - [ ] `many`
+    - [ ] `and`: Sequential combinators
+    - [x] `or`: Alternative combinators
+    - [ ] `some`, `many`: Replicative combinators
 - [ ] Enhancements
     - [ ] Support returning multiple results
     - [ ] Customizable error messages

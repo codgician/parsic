@@ -1,17 +1,17 @@
 use std::marker::PhantomData;
 
-use crate::core::parser::Parser;
+use crate::core::parser::{ Parser, ParseState };
 
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Empty<T> {
     __marker: PhantomData<fn() -> Option<T>>
 }
 
-impl<S, T> Parser<S> for Empty<T>
+impl<'a, T> Parser<ParseState<'a>> for Empty<T>
 {
     type ParsedType = T;
 
-    fn parse(&self, _: &mut S) -> Option<Self::ParsedType> {
+    fn parse(&self, _: &mut ParseState<'a>) -> Option<Self::ParsedType> {
         None
     }
 }
