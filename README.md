@@ -19,7 +19,7 @@
     - [ ] `fix`: Fixed-point combinator to support recursive syntax
     - [ ] `fmap`: Monadic fmap
     - [ ] `bind`: Monadic bind
-    - [ ] `and`: Sequential combinators
+    - [x] `and`: Sequential combinators
     - [x] `or`: Alternative combinators
     - [ ] `some`, `many`: Replicative combinators
 - [ ] Enhancements
