@@ -6,3 +6,4 @@ pub mod empty;
 pub mod fix;
 pub mod and;
 pub mod or;
+pub mod map;
