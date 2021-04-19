@@ -7,6 +7,16 @@ pub struct Fix<'a, T> {
         -> Box<dyn Parser<ParseState<'a>, ParsedType = T>> + 'a>,
 }
 
+impl<'a, T> Fix<'a, T>
+{
+    pub fn new<F>(fix: F) -> Fix<'a, T> 
+        where F: Fn(&Fix<'a, T>) 
+        -> Box<dyn Parser<ParseState<'a>, ParsedType = T>> + 'a,
+    {
+        Self { fix: Rc::new(fix) }
+    }
+}
+
 impl<'a, T> Parser<ParseState<'a>> for Fix<'a, T> {
     type ParsedType = T;
 
@@ -15,12 +25,12 @@ impl<'a, T> Parser<ParseState<'a>> for Fix<'a, T> {
     }
 }
 
-pub fn fix<'a, T, F>(f: F) -> Fix<'a, T>
+pub fn fix<'a, T, F>(fix: F) -> Fix<'a, T>
     where
         F: Fn(&Fix<'a, T>) 
             -> Box<dyn Parser<ParseState<'a>, ParsedType = T>> + 'a,
 {
-    Fix { fix: Rc::new(f) }
+    Fix::new(fix)
 }
 
 /*

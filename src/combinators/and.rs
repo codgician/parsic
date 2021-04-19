@@ -6,6 +6,12 @@ pub struct And<PA, PB> {
     pb: PB
 }
 
+impl<PA, PB> And<PA, PB> {
+    pub fn new(pa: PA, pb: PB) -> Self {
+        Self { pa: pa, pb: pb }
+    }
+}
+
 impl<'a, PA:, PB> Parser<ParseState<'a>> for And<PA, PB>
     where
         PA: Parser<ParseState<'a>>, 
@@ -27,7 +33,7 @@ impl<'a, PA:, PB> Parser<ParseState<'a>> for And<PA, PB>
 }
 
 pub fn and<PA, PB>(pa: PA, pb: PB) -> And<PA, PB> {
-    And { pa: pa, pb: pb }
+    And::new(pa, pb)
 }
 
 #[cfg(test)]

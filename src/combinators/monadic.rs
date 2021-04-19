@@ -5,6 +5,12 @@ pub struct Pure<F> {
     x: F,
 }
 
+impl<F> Pure<F> {
+    pub fn new(x: F) -> Pure<F> {
+        Self { x: x }
+    }
+}
+
 impl<F, S, T> Parser<S> for Pure<F>
     where F: Fn() -> T
 {
@@ -18,7 +24,7 @@ impl<F, S, T> Parser<S> for Pure<F>
 pub fn pure<F, T>(x: F) -> Pure<F>
     where F: Fn() -> T
 {
-    Pure { x }
+    Pure::new(x)
 }
 
 #[cfg(test)]

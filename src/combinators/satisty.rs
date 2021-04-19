@@ -8,6 +8,12 @@ pub struct Satisfy<F> {
     // err_msg: Option<&'a str>
 }
 
+impl<F> Satisfy<F> {
+    pub fn new(func: F) -> Satisfy<F> {
+        Self { func: func }
+    } 
+}
+
 impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
     where F: Fn(&char) -> bool
 {
@@ -43,7 +49,7 @@ impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
 pub fn satisfy< F>(f: F) -> Satisfy<F>
     where F: Fn(&char) -> bool
 {
-    Satisfy { func: f }
+    Satisfy::new(f)
 }
 
 #[cfg(test)]

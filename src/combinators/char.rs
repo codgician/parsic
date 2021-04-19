@@ -7,6 +7,12 @@ pub struct Char {
     ch: char
 }
 
+impl Char {
+    pub fn new(ch: char) -> Self {
+        Self { ch: ch }
+    } 
+}
+
 impl<'a> Parser<ParseState<'a>> for Char {
     type ParsedType = char;
 
@@ -39,7 +45,7 @@ impl<'a> Parser<ParseState<'a>> for Char {
 }
 
 pub fn char(ch: char) -> Char {
-    Char { ch }
+    Char::new(ch)
 }
 
 #[cfg(test)]

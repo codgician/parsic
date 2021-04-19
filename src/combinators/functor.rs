@@ -1,12 +1,18 @@
 use crate::core::parser::{ Parser, ParseState };
 
 #[derive(Clone, Copy, Debug)]
-pub struct Map<P, F> {
+pub struct Map<F, P> {
     func: F,
     parser: P
 }
 
-impl<'a, A, B, F, P> Parser<ParseState<'a>> for Map<P, F> 
+impl<F, P> Map<F, P> {
+    pub fn new(func: F, parser: P) -> Map<F, P> {
+        Self { func: func, parser: parser }
+    }
+}
+
+impl<'a, A, B, F, P> Parser<ParseState<'a>> for Map<F, P> 
     where 
         F: Fn(A) -> B,
         P: Parser<ParseState<'a>, ParsedType = A>
@@ -18,12 +24,12 @@ impl<'a, A, B, F, P> Parser<ParseState<'a>> for Map<P, F>
     }
 }
 
-pub fn map<'a, A, B, F, P>(func: F, parser: P) -> Map<P, F>
+pub fn map<'a, A, B, F, P>(func: F, parser: P) -> Map<F, P>
     where
         F: Fn(A) -> B,
         P: Parser<ParseState<'a>, ParsedType = A>
 {
-    Map { func: func, parser: parser }
+    Map::new(func, parser)
 }
 
 #[cfg(test)]

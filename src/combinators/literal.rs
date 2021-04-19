@@ -6,6 +6,12 @@ pub struct Literal {
     expected: String
 }
 
+impl Literal {
+    pub fn new(expected: String) -> Literal {
+        Self { expected: expected }
+    }
+}
+
 impl<'a> Parser<ParseState<'a>> for Literal {
     type ParsedType = &'a str;
 
@@ -27,7 +33,7 @@ impl<'a> Parser<ParseState<'a>> for Literal {
 }
 
 pub fn literal(s: &str) -> Literal {
-    Literal { expected: s.to_owned() }
+    Literal::new(s.to_owned())
 }
 
 #[cfg(test)]

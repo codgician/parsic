@@ -3,10 +3,22 @@ use std::marker::PhantomData;
 use crate::core::parser::{ Parser, ParseState };
 
 // Empty
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug)]
 pub struct Empty<T> {
     __marker: PhantomData<fn() -> Option<T>>
 }
+
+impl<T> Empty<T> {
+    pub fn new() -> Self {
+        Self { __marker: PhantomData }
+    }
+}
+
+impl<T> Default for Empty<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+} 
 
 impl<'a, T> Parser<ParseState<'a>> for Empty<T>
 {
@@ -18,12 +30,18 @@ impl<'a, T> Parser<ParseState<'a>> for Empty<T>
 }
 
 pub fn empty<T>() -> Empty<T> {
-    Empty { __marker: PhantomData }
+    Empty::new()
 }
 
 // Many
 pub struct Many<P> {
     parser: P
+}
+
+impl<P> Many<P> {
+    pub fn new(parser: P) -> Self {
+        Self { parser: parser }
+    }
 }
 
 impl<'a, P, T> Parser<ParseState<'a>> for Many<P>
@@ -48,12 +66,18 @@ impl<'a, P, T> Parser<ParseState<'a>> for Many<P>
 pub fn many<'a, P, T>(parser: P) -> Many<P> 
     where P: Parser<ParseState<'a>, ParsedType = T>
 {
-    Many { parser: parser }
+    Many::new(parser)
 }
 
 // Some
 pub struct Some<P> {
     parser: P
+}
+
+impl<P> Some<P> {
+    pub fn new(parser: P) -> Self {
+        Self { parser: parser }
+    }
 }
 
 impl<'a, P, T> Parser<ParseState<'a>> for Some<P>
@@ -78,7 +102,7 @@ impl<'a, P, T> Parser<ParseState<'a>> for Some<P>
 pub fn some<'a, P, T>(parser: P) -> Some<P> 
     where P: Parser<ParseState<'a>, ParsedType = T>
 {
-    Some { parser: parser }
+    Some::new(parser)
 }
 
 #[cfg(test)]

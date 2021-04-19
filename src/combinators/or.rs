@@ -6,6 +6,12 @@ pub struct Or<PA, PB> {
     pb: PB
 }
 
+impl<PA, PB> Or<PA, PB> {
+    pub fn new(pa: PA, pb: PB) -> Or<PA, PB> {
+        Self { pa: pa, pb: pb }
+    }
+}
+
 impl<'a, PA, PB> Parser<ParseState<'a>> for Or<PA, PB>
     where
         PA: Parser<ParseState<'a>>,
@@ -26,7 +32,7 @@ impl<'a, PA, PB> Parser<ParseState<'a>> for Or<PA, PB>
 }
 
 pub fn or<PA, PB>(pa: PA, pb: PB) -> Or<PA, PB> {
-    Or { pa: pa, pb: pb }
+    Or::new(pa, pb)
 }
 
 #[cfg(test)]
