@@ -17,11 +17,11 @@
     - [x] `pure`: A parser that consumes nothing and always succeeds
     - [x] `empty`: A parser that always fails
     - [ ] `fix`: Fixed-point combinator to support recursive syntax
-    - [ ] `fmap`: Monadic fmap
-    - [ ] `bind`: Monadic bind
+    - [x] `map`: Monadic fmap
     - [x] `and`: Sequential combinators
     - [x] `or`: Alternative combinators
-    - [ ] `some`, `many`: Replicative combinators
+    - [x] `some`, `many`: Replicative combinators
 - [ ] Enhancements
+    - [ ] Implement iterator-style interface
     - [ ] Support returning multiple results
     - [ ] Customizable error messages
