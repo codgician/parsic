@@ -21,6 +21,9 @@
     - [x] `and`: Sequential combinators
     - [x] `or`: Alternative combinators
     - [x] `some`, `many`: Replicative combinators
+- [ ] Tests
+    - [ ] Arthimetic calculator
+    - [ ] Markdown parser
 - [ ] Enhancements
     - [ ] Implement iterator-style interface
     - [ ] Support returning multiple results

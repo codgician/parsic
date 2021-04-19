@@ -1,9 +1,9 @@
 pub mod char;
 pub mod satisty;
 pub mod literal;
-pub mod pure;
+pub mod functor;
 pub mod applicative;
+pub mod monadic;
 pub mod fix;
 pub mod and;
 pub mod or;
-pub mod map;
