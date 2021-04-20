@@ -145,6 +145,7 @@ mod test_empty {
 mod test_many {
     use crate::core::parser::{ Parser, ParseState };
     use crate::combinators::*;
+    use crate::primitives::*;
 
     #[test]
     fn ok_nonempty() {
@@ -169,6 +170,7 @@ mod test_many {
 mod test_some {
     use crate::core::parser::{ Parser, ParseState };
     use crate::combinators::*;
+    use crate::primitives::*;
 
     #[test]
     fn ok() {

@@ -1,6 +1,3 @@
-pub mod char;
-pub mod satisty;
-pub mod literal;
 pub mod functor;
 pub mod applicative;
 pub mod monadic;
@@ -12,11 +9,8 @@ pub use crate::combinators::{
     self,
     and::*,
     applicative::*,
-    char::*,
     fix::*,
     functor::*,
-    literal::*,
     monadic::*,
     or::*,
-    satisty::*
 };

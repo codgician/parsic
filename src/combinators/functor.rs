@@ -49,6 +49,7 @@ impl<S, P: Parser<S>> FunctorExt<S> for P {}
 mod test {
     use crate::core::parser::{ Parser, ParseState };
     use crate::combinators::*;
+    use crate::primitives::*;
 
     #[test]
     fn ok() {

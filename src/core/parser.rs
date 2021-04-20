@@ -1,7 +1,4 @@
-use std::str::Chars;
-
 use crate::core::logger::ParseLogger;
-use crate::combinators::*;
 
 // Parser trait
 pub trait Parser<S> {
@@ -15,7 +12,7 @@ pub trait Parser<S> {
 // Parse state
 #[derive(Clone, Debug)]
 pub struct ParseState<'a> {
-    pub inp: Chars<'a>,
+    pub inp: std::str::Chars<'a>,
     pub pos: Pos,
     pub len: usize,
     pub idx: usize,
