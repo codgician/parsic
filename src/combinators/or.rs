@@ -1,4 +1,4 @@
-use crate::core::parser::{ Parser, ParseState };
+use crate::core::parser::Parser;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Or<PA, PB> {
@@ -12,14 +12,14 @@ impl<PA, PB> Or<PA, PB> {
     }
 }
 
-impl<'a, PA, PB> Parser<ParseState<'a>> for Or<PA, PB>
+impl<S: Clone, PA, PB> Parser<S> for Or<PA, PB>
     where
-        PA: Parser<ParseState<'a>>,
-        PB: Parser<ParseState<'a>, ParsedType = PA::ParsedType>
+        PA: Parser<S>,
+        PB: Parser<S, ParsedType = PA::ParsedType>
 {
     type ParsedType = PA::ParsedType;
 
-    fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
         let st0 = state.clone();
         match self.pa.parse(state) {
             None => {
@@ -35,18 +35,30 @@ pub fn or<PA, PB>(pa: PA, pb: PB) -> Or<PA, PB> {
     Or::new(pa, pb)
 }
 
+pub trait OrExt<S> : Parser<S> {
+    /// Or Combinator
+    fn or<PB>(self, pb: PB) -> Or<Self, PB>
+        where
+            Self: Sized,
+            PB: Parser<S, ParsedType = Self::ParsedType>
+    {
+        Or::new(self, pb)
+    }
+}
+
+impl<S, P: Parser<S>> OrExt<S> for P {}
+
 #[cfg(test)]
 mod test {
     use crate::core::parser::{ Parser, ParseState };
-    use crate::combinators::char::char;
+    use crate::combinators::*;
 
     #[test]
     fn left_ok() {
         let mut st = ParseState::new("Ahhh");
-        let parser = super::or(char('A'), char('B'));
         assert_eq!(
             Some('A'),
-            parser.parse(&mut st)
+            char('A').or(char('B')).parse(&mut st)
         );
         assert_eq!("hhh", st.inp.as_str());
         assert_eq!(0, st.log.len());
@@ -55,10 +67,9 @@ mod test {
     #[test]
     fn right_ok() {
         let mut st = ParseState::new("Ahhh");
-        let parser = super::or(char('B'), char('A'));
         assert_eq!(
             Some('A'),
-            parser.parse(&mut st)
+            char('B').or(char('A')).parse(&mut st)
         );
         assert_eq!("hhh", st.inp.as_str());
         assert_eq!(0, st.log.len());
@@ -67,10 +78,9 @@ mod test {
     #[test]
     fn both_ok() {
         let mut st = ParseState::new("Ahhh");
-        let parser = super::or(char('A'), char('A'));
         assert_eq!(
             Some('A'),
-            parser.parse(&mut st)
+            char('A').or(char('A')).parse(&mut st)
         );
         assert_eq!("hhh", st.inp.as_str());
         assert_eq!(0, st.log.len());
@@ -79,10 +89,9 @@ mod test {
     #[test]
     fn both_fail() {
         let mut st = ParseState::new("Ahhh");
-        let parser = super::or(char('B'), char('C'));
         assert_eq!(
             None,
-            parser.parse(&mut st)
+            char('B').or(char('C')).parse(&mut st)
         );
         assert_eq!("hhh", st.inp.as_str());
         assert_eq!(1, st.log.len());

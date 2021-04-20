@@ -1,10 +1,14 @@
 use std::str::Chars;
 
 use crate::core::logger::ParseLogger;
+use crate::combinators::*;
 
 // Parser trait
 pub trait Parser<S> {
+    /// Type of parsed result.
     type ParsedType;
+
+    /// The parsing function 
     fn parse<'a>(&self, state: &mut S) -> Option<Self::ParsedType>;
 }
 

@@ -7,3 +7,16 @@ pub mod monadic;
 pub mod fix;
 pub mod and;
 pub mod or;
+
+pub use crate::combinators::{
+    self,
+    and::*,
+    applicative::*,
+    char::*,
+    fix::*,
+    functor::*,
+    literal::*,
+    monadic::*,
+    or::*,
+    satisty::*
+};

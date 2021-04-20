@@ -12,10 +12,10 @@ impl<F, P> Map<F, P> {
     }
 }
 
-impl<'a, A, B, F, P> Parser<ParseState<'a>> for Map<F, P> 
+impl<'a, B, F, P> Parser<ParseState<'a>> for Map<F, P> 
     where 
-        F: Fn(A) -> B,
-        P: Parser<ParseState<'a>, ParsedType = A>
+        F: Fn(P::ParsedType) -> B,
+        P: Parser<ParseState<'a>>
 {
     type ParsedType = B;
 
@@ -24,28 +24,38 @@ impl<'a, A, B, F, P> Parser<ParseState<'a>> for Map<F, P>
     }
 }
 
-pub fn map<'a, A, B, F, P>(func: F, parser: P) -> Map<F, P>
+pub fn map<'a, B, F, P>(func: F, parser: P) -> Map<F, P>
     where
-        F: Fn(A) -> B,
-        P: Parser<ParseState<'a>, ParsedType = A>
+        F: Fn(P::ParsedType) -> B,
+        P: Parser<ParseState<'a>>
 {
     Map::new(func, parser)
 }
 
+pub trait FunctorExt<S> : Parser<S> {
+     /// Map Combinator
+     fn map<B, F>(self, func: F) -> Map<F, Self>
+        where
+            Self: Sized,
+            F: Fn(Self::ParsedType) -> B,
+    {
+        Map::new(func, self)
+    }
+}
+
+impl<S, P: Parser<S>> FunctorExt<S> for P {}
+
 #[cfg(test)]
 mod test {
     use crate::core::parser::{ Parser, ParseState };
-    use crate::combinators::char::char;
-    use crate::combinators::and::and;
-    use crate::combinators::or::or;
+    use crate::combinators::*;
 
     #[test]
     fn ok() {
         let mut st = ParseState::new("Hello");
-        let parser = super::map(
-            |ch: char| -> bool { ch == 'H' }, 
-            or(char('H'), char('W'))
-        );
+        let parser = char('H')
+                    .or(char('W'))
+                    .map(|ch: char| ch == 'H');
         assert_eq!(
             Some(true),
             parser.parse(&mut st)
@@ -57,10 +67,9 @@ mod test {
     #[test]
     fn select_ok() {
         let mut st = ParseState::new("-1");
-        let parser = super::map(
-            |(_, x)| x,
-            and(char('-'), char('1'))
-        );
+        let parser = char('-')
+                    .and(char('1'))
+                    .map(|(_, x)| x);
         assert_eq!(
             Some('1'),
             parser.parse(&mut st)

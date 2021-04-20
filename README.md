@@ -22,6 +22,7 @@
     - [x] `or`: Alternative combinators
     - [x] `some`, `many`: Replicative combinators
 - [ ] Tests
+    - [ ] Property tests
     - [ ] Arthimetic calculator
     - [ ] Markdown parser
 - [ ] Enhancements

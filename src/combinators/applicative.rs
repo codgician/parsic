@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::core::parser::{ Parser, ParseState };
+use crate::core::parser::Parser;
 
 // Empty
 #[derive(Copy, Clone, Debug)]
@@ -20,15 +20,15 @@ impl<T> Default for Empty<T> {
     }
 } 
 
-impl<'a, T> Parser<ParseState<'a>> for Empty<T>
-{
+impl<S, T> Parser<S> for Empty<T> {
     type ParsedType = T;
 
-    fn parse(&self, _: &mut ParseState<'a>) -> Option<Self::ParsedType> {
+    fn parse(&self, _: &mut S) -> Option<Self::ParsedType> {
         None
     }
 }
 
+/// Empty Parser Builder
 pub fn empty<T>() -> Empty<T> {
     Empty::new()
 }
@@ -44,12 +44,12 @@ impl<P> Many<P> {
     }
 }
 
-impl<'a, P, T> Parser<ParseState<'a>> for Many<P>
-    where P: Parser<ParseState<'a>, ParsedType = T>
+impl<S: Clone, P, T> Parser<S> for Many<P>
+    where P: Parser<S, ParsedType = T>
 {
     type ParsedType = Vec<T>;
 
-    fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
         let mut res = vec![];
         let mut st = state.clone();
 
@@ -63,13 +63,13 @@ impl<'a, P, T> Parser<ParseState<'a>> for Many<P>
     }
 }
 
-pub fn many<'a, P, T>(parser: P) -> Many<P> 
-    where P: Parser<ParseState<'a>, ParsedType = T>
+// Many Combinator
+pub fn many<S, P, T>(parser: P) -> Many<P> 
+    where P: Parser<S, ParsedType = T>
 {
     Many::new(parser)
 }
 
-// Some
 pub struct Some<P> {
     parser: P
 }
@@ -80,12 +80,12 @@ impl<P> Some<P> {
     }
 }
 
-impl<'a, P, T> Parser<ParseState<'a>> for Some<P>
-    where P: Parser<ParseState<'a>, ParsedType = T>
+impl<S: Clone, P, T> Parser<S> for Some<P>
+    where P: Parser<S, ParsedType = T>
 {
     type ParsedType = Vec<T>;
 
-    fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
         let mut res = vec![self.parser.parse(state)?];
         let mut st = state.clone();
 
@@ -99,18 +99,36 @@ impl<'a, P, T> Parser<ParseState<'a>> for Some<P>
     }
 }
 
-pub fn some<'a, P, T>(parser: P) -> Some<P> 
-    where P: Parser<ParseState<'a>, ParsedType = T>
+/// Some Combinator
+pub fn some<S, P, T>(parser: P) -> Some<P> 
+    where P: Parser<S, ParsedType = T>
 {
     Some::new(parser)
 }
+
+// Implement iterator-style method for Parser trait
+pub trait ApplicativeExt<S> : Parser<S> {
+    /// Many Combinator
+    fn many(self) -> Many<Self>
+        where Self: Sized
+    {
+        Many::new(self)
+    }
+
+    /// Some combinator
+    fn some(self) -> Some<Self>
+        where Self: Sized
+    {
+        Some::new(self)
+    }
+}
+
+impl<S, P: Parser<S>> ApplicativeExt<S> for P {}
 
 #[cfg(test)]
 mod test_empty {
     use crate::core::parser::{ Parser, ParseState };
 
-    // Constructs a parser that consumes no input
-    // and always fails
     #[test]
     fn fail() {
         let mut st = ParseState::new("Hello");
@@ -126,14 +144,14 @@ mod test_empty {
 #[cfg(test)]
 mod test_many {
     use crate::core::parser::{ Parser, ParseState };
-    use crate::combinators::char::char;
+    use crate::combinators::*;
 
     #[test]
     fn ok_nonempty() {
         let mut st = ParseState::new("yyyyying");
         assert_eq!(
             Some(vec!['y', 'y', 'y', 'y', 'y']),
-            super::many(char('y')).parse(&mut st)
+            char('y').many().parse(&mut st)
         )
     }
 
@@ -150,14 +168,14 @@ mod test_many {
 #[cfg(test)]
 mod test_some {
     use crate::core::parser::{ Parser, ParseState };
-    use crate::combinators::char::char;
+    use crate::combinators::*;
 
     #[test]
     fn ok() {
         let mut st = ParseState::new("yyyyying");
         assert_eq!(
             Some(vec!['y', 'y', 'y', 'y', 'y']),
-            super::some(char('y')).parse(&mut st)
+            char('y').some().parse(&mut st)
         )
     }
 
@@ -166,7 +184,7 @@ mod test_some {
         let mut st = ParseState::new("ing");
         assert_eq!(
             None,
-            super::some(char('y')).parse(&mut st)
+            char('y').some().parse(&mut st)
         )
     }
 }

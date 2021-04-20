@@ -21,6 +21,7 @@ impl<F, S, T> Parser<S> for Pure<F>
     }
 }
 
+/// Pure Combinator
 pub fn pure<F, T>(x: F) -> Pure<F>
     where F: Fn() -> T
 {
