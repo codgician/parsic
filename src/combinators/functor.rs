@@ -1,4 +1,4 @@
-use crate::core::parser::{ Parser, ParseState };
+use crate::core::parser::*;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Map<F, P> {

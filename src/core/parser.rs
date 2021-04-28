@@ -1,22 +1,52 @@
+use std::rc::Rc;
 use crate::core::logger::ParseLogger;
 
 // Parser trait
 pub trait Parser<S> {
-    /// Type of parsed result.
     type ParsedType;
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType>;
+}
 
-    /// The parsing function 
-    fn parse<'a>(&self, state: &mut S) -> Option<Self::ParsedType>;
+// Implement Parser trait for &Parser<_>
+impl<S, P: Parser<S>> Parser<S> for &P {
+    type ParsedType = P::ParsedType;
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
+        (**self).parse(state)
+    }
+}
+
+// Implement Parser trait for &mut Parser<_>
+impl<S, P: Parser<S>> Parser<S> for &mut P {
+    type ParsedType = P::ParsedType;
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
+        (**self).parse(state)
+    }
+}
+
+// Implement Parser trait for Box<Parser<_>>
+impl<S, P: Parser<S>> Parser<S> for Box<P> {
+    type ParsedType = P::ParsedType;
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
+        (**self).parse(state)
+    }
+}
+
+// Implement Parser trait for Rc<Parser<_>>
+impl<S, P: Parser<S>> Parser<S> for Rc<P> {
+    type ParsedType = P::ParsedType;
+    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
+        (**self).parse(state)
+    }
 }
 
 // Parse state
 #[derive(Clone, Debug)]
 pub struct ParseState<'a> {
-    pub inp: std::str::Chars<'a>,
-    pub pos: Pos,
-    pub len: usize,
-    pub idx: usize,
-    pub log: ParseLogger
+    pub(crate) inp: std::str::Chars<'a>,
+    pub(crate) pos: Pos,
+    pub(crate) len: usize,
+    pub(crate) idx: usize,
+    pub(crate) log: ParseLogger
 }
 
 #[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
