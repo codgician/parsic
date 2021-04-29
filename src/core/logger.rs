@@ -1,10 +1,5 @@
 use crate::core::stream::Pos;
 
-#[derive(Clone, Debug, Eq, PartialEq, Default)]
-pub struct ParseLogger {
-    stack: Vec<Msg>
-}
-
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Msg {
     Info(MsgBody),
@@ -15,7 +10,18 @@ pub enum Msg {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MsgBody {
     pub msg: String,
-    pub pos: Pos
+    pub pos: Option<Pos>
+}
+
+impl MsgBody {
+    pub fn new(msg: &str, pos: Option<Pos>) -> Self {
+        Self { msg: msg.to_string(), pos }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Default)]
+pub struct ParseLogger {
+    stack: Vec<Msg>
 }
 
 impl ParseLogger {

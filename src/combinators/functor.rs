@@ -16,9 +16,7 @@ impl<S, T1, T2, F, P> Parsable<S, T2> for Map<F, P, T1>
 }
 
 pub fn map<S, T1, T2, F, P>(func: F, parser: P) -> Map<F, P, T1>
-    where
-        F: Fn(T1) -> T2,
-        P: Parsable<S, T1>
+    where F: Fn(T1) -> T2, P: Parsable<S, T1>
 {
     Map(func, parser, PhantomData)
 }
@@ -26,9 +24,7 @@ pub fn map<S, T1, T2, F, P>(func: F, parser: P) -> Map<F, P, T1>
 pub trait FunctorExt<S, T1> : Parsable<S, T1> {
      /// Map Combinator
      fn map<T2, F>(self, func: F) -> Map<F, Self, T1>
-        where
-            Self: Sized,
-            F: Fn(T1) -> T2,
+        where Self: Sized, F: Fn(T1) -> T2,
     {
         Map(func, self, PhantomData)
     }

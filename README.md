@@ -26,6 +26,6 @@
     - [ ] Arthimetic calculator
     - [ ] Markdown parser
 - [ ] Enhancements
-    - [ ] Implement iterator-style interface
+    - [x] Implement iterator-style interface
     - [ ] Support returning multiple results
     - [ ] Customizable error messages

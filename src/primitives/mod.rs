@@ -13,22 +13,18 @@ impl<'a> Parsable<CharStream<'a>, char> for CharP {
                 if ch == self.0 {
                     Some(ch)
                 } else {
-                    logger.with(Msg::Err(
-                        MsgBody {
-                            pos: stream.pos,
-                            msg: format!("expecting '{}', but got '{}'.", self.0, ch)
-                        }
-                    ));
+                    logger.with(Msg::Err(MsgBody::new(
+                        &format!("expecting '{}', but got '{}'.", self.0, ch)[..],
+                        Some(stream.pos)
+                     )));
                     None
                 }
             }
             None => {
-                logger.with(Msg::Err(
-                    MsgBody {
-                        pos: stream.pos,
-                        msg: format!("unexpected end of input.")
-                    }
-                ));
+                logger.with(Msg::Err(MsgBody::new(
+                    "unexpected end of input.",
+                    Some(stream.pos)
+                )));
                 None
             }
         }
@@ -51,22 +47,18 @@ impl<'a, F> Parsable<CharStream<'a>, char> for SatisfyP<F>
                 if self.0(&ch) {
                     Some(ch)
                 } else {
-                    logger.with(Msg::Err(
-                        MsgBody {
-                            pos: stream.pos,
-                            msg: format!("'{}' does not satisfy required conditions.", ch)
-                        }
-                    ));
+                    logger.with(Msg::Err(MsgBody::new(
+                        &format!("'{}' does not satisfy required conditions.", ch)[..],
+                        Some(stream.pos)
+                    )));
                     None
                 }
             }
             None => {
-                logger.with(Msg::Err(
-                    MsgBody {
-                        pos: stream.pos,
-                        msg: format!("unexpected end of input.")
-                    }
-                ));
+                logger.with(Msg::Err(MsgBody::new(
+                    "unexpected end of input.",
+                    Some(stream.pos)
+                )));
                 None
             }
         }
@@ -87,12 +79,10 @@ impl<'a> Parsable<CharStream<'a>, &'a str> for LiteralP {
             stream.take(self.0.len()).for_each(|_| {});
             Some(ret)
         } else {
-            logger.with(Msg::Err(
-                MsgBody {
-                    pos: stream.pos,
-                    msg: format!("expecting \"{}\".", self.0)
-                }
-            ));
+            logger.with(Msg::Err(MsgBody::new(
+                &format!("expecting \"{}\".", self.0)[..],
+                Some(stream.pos)
+            )));
             None
         }
     }

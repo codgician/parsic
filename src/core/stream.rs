@@ -10,6 +10,21 @@ pub trait ParseStream<T> {
     }
 }
 
+#[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
+pub struct Pos {
+    pub row: usize,
+    pub col: usize
+}
+
+impl Pos {
+    fn new(row: usize, col: usize) -> Self {
+        Self { row, col }
+    }
+    fn add(&self, d_row : usize, d_col: usize) -> Self {
+        Self::new(self.row + d_row, self.col + d_col)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct CharStream<'a> {
     pub(crate) inp: std::str::Chars<'a>,
@@ -18,17 +33,11 @@ pub struct CharStream<'a> {
     pub(crate) idx: usize
 }
 
-#[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
-pub struct Pos {
-    pub row: usize,
-    pub col: usize
-}
-
 impl<'a> ParseStream<&'a str> for CharStream<'a> {
     fn new(inp: &'a str) -> Self {
         Self {
             inp: inp.chars(),
-            pos: Pos { row: 0, col: 0 },
+            pos: Pos::new(0, 0),
             len: inp.len(),
             idx: 0,
         }
@@ -55,14 +64,8 @@ impl<'a> Iterator for CharStream<'a> {
         let ch = self.inp.next()?;
 
         self.pos = match ch {
-            '\n' => Pos {
-                row: self.pos.row + 1,
-                col: 0,
-            },
-            _ => Pos {
-                col: self.pos.col + 1,
-                ..self.pos
-            },
+            '\n' => Pos::new(self.pos.row + 1, 0),
+            _ => self.pos.add(1, 0)
         };
         self.idx += 1;
         Some(ch)

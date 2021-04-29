@@ -1,6 +1,7 @@
 use crate::core::parser::Parsable;
 use crate::core::logger::ParseLogger;
 
+// And combinator
 #[derive(Clone, Copy, Debug)]
 pub struct AndP<PA, PB>(PA, PB);
 
@@ -22,13 +23,13 @@ impl<S, T1, T2, P1, P2> Parsable<S, (T1, T2)> for AndP<P1, P2>
     }
 }
 
-/// And Combinator
+/// And combinator
 pub fn and<T1, T2>(p1: T1, p2: T2) -> AndP<T1, T2> {
     AndP(p1, p2)
 }
 
-pub trait AndPExt<S, T> : Parsable<S, T> {
-    /// And Combinator
+pub trait SequentialPExt<S, T> : Parsable<S, T> {
+    /// And combinator
     fn and<P>(self, parser: P) -> AndP<Self, P>
         where Self: Sized, P: Parsable<S, T>
     {
@@ -36,7 +37,7 @@ pub trait AndPExt<S, T> : Parsable<S, T> {
     }
 }
 
-impl<S, T, P: Parsable<S, T>> AndPExt<S, T> for P {}
+impl<S, T, P: Parsable<S, T>> SequentialPExt<S, T> for P {}
 
 #[cfg(test)]
 mod test {

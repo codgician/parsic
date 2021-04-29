@@ -2,15 +2,17 @@ pub mod functor;
 pub mod applicative;
 pub mod monadic;
 pub mod fix;
-pub mod and;
+pub mod sequential;
 pub mod or;
+pub mod log;
 
 pub use crate::combinators::{
     self,
-    and::*,
+    sequential::*,
     applicative::*,
     fix::*,
     functor::*,
     monadic::*,
     or::*,
+    log::*,
 };
