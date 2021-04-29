@@ -1,192 +1,160 @@
 use std::marker::PhantomData;
-
-use crate::core::parser::Parser;
+use crate::core::parser::Parsable;
+use crate::core::logger::ParseLogger;
 
 // Empty
-#[derive(Copy, Clone, Debug)]
-pub struct Empty<T> {
-    __marker: PhantomData<fn() -> Option<T>>
-}
+#[derive(Copy, Clone, Default, Debug)]
+pub struct EmptyP<T>(PhantomData<fn() -> Option<T>>);
 
-impl<T> Empty<T> {
-    pub fn new() -> Self {
-        Self { __marker: PhantomData }
-    }
-}
-
-impl<T> Default for Empty<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-} 
-
-impl<S, T> Parser<S> for Empty<T> {
-    type ParsedType = T;
-
-    fn parse(&self, _: &mut S) -> Option<Self::ParsedType> {
+impl<S, T> Parsable<S, T> for EmptyP<T> {
+    fn parse(&self, _: &mut S, _: &mut ParseLogger) -> Option<T> {
         None
     }
 }
 
-/// Empty Parser Builder
-pub fn empty<T>() -> Empty<T> {
-    Empty::new()
+/// Empty Parsable Builder
+pub fn empty<T>() -> EmptyP<T> {
+    EmptyP(PhantomData)
 }
 
 // Many
-pub struct Many<P> {
-    parser: P
-}
+pub struct ManyP<P>(P);
 
-impl<P> Many<P> {
-    pub fn new(parser: P) -> Self {
-        Self { parser: parser }
-    }
-}
-
-impl<S: Clone, P, T> Parser<S> for Many<P>
-    where P: Parser<S, ParsedType = T>
+impl<S, T, P> Parsable<S, Vec<T>> for ManyP<P>
+    where S: Clone, P: Parsable<S, T>
 {
-    type ParsedType = Vec<T>;
-
-    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Vec<T>> {
         let mut res = vec![];
-        let mut st = state.clone();
+        let mut st = stream.clone();
 
-        while let Some(r) = self.parser.parse(state) {
+        while let Some(r) = self.0.parse(stream, logger) {
             res.push(r);
-            st = state.clone();
+            st = stream.clone();
         }
 
-        *state = st;
+        *stream = st;
         Some(res)
     }
 }
 
 // Many Combinator
-pub fn many<S, P, T>(parser: P) -> Many<P> 
-    where P: Parser<S, ParsedType = T>
+pub fn many<S, T, P>(parser: P) -> ManyP<P>
+    where P: Parsable<S, T> 
 {
-    Many::new(parser)
+    ManyP(parser)
 }
 
-pub struct Some<P> {
-    parser: P
-}
+// Some Combinator
+pub struct SomeP<P>(P);
 
-impl<P> Some<P> {
-    pub fn new(parser: P) -> Self {
-        Self { parser: parser }
-    }
-}
+impl<S: Clone, T, P: Parsable<S, T>> Parsable<S, Vec<T>> for SomeP<P> {
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Vec<T>> {
+        let mut res = vec![self.0.parse(stream, logger)?];
+        let mut st = stream.clone();
 
-impl<S: Clone, P, T> Parser<S> for Some<P>
-    where P: Parser<S, ParsedType = T>
-{
-    type ParsedType = Vec<T>;
-
-    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
-        let mut res = vec![self.parser.parse(state)?];
-        let mut st = state.clone();
-
-        while let Some(r) = self.parser.parse(state) {
+        while let Some(r) = self.0.parse(stream, logger) {
             res.push(r);
-            st = state.clone();
+            st = stream.clone();
         }
 
-        *state = st;
+        *stream = st;
         Some(res)
     }
 }
 
 /// Some Combinator
-pub fn some<S, P, T>(parser: P) -> Some<P> 
-    where P: Parser<S, ParsedType = T>
-{
-    Some::new(parser)
+pub fn some<S, T, P: Parsable<S, T>>(parser: P) -> SomeP<P> {
+    SomeP(parser)
 }
 
-// Implement iterator-style method for Parser trait
-pub trait ApplicativeExt<S> : Parser<S> {
+// Implement iterator-style method for Parsable trait
+pub trait ApplicativeExt<S, T> : Parsable<S, T> {
     /// Many Combinator
-    fn many(self) -> Many<Self>
-        where Self: Sized
-    {
-        Many::new(self)
+    fn many(self) -> ManyP<Self> where Self: Sized {
+        ManyP(self)
     }
 
     /// Some combinator
-    fn some(self) -> Some<Self>
-        where Self: Sized
-    {
-        Some::new(self)
+    fn some(self) -> SomeP<Self> where Self: Sized {
+        SomeP(self)
     }
 }
 
-impl<S, P: Parser<S>> ApplicativeExt<S> for P {}
+impl<S, T, P: Parsable<S, T>> ApplicativeExt<S, T> for P {}
 
 #[cfg(test)]
 mod test_empty {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::ParseLogger;
 
     #[test]
     fn fail() {
-        let mut st = ParseState::new("Hello");
+        let mut st = CharStream::new("Hello");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None as Option<String>,
-            super::empty().parse(&mut st)
+            super::empty().parse(&mut st, &mut log)
         );
-        assert_eq!("Hello", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("Hello", st.as_stream());
+        assert_eq!(0, log.len());
     }
 }
 
 #[cfg(test)]
 mod test_many {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok_nonempty() {
-        let mut st = ParseState::new("yyyyying");
+        let mut st = CharStream::new("yyyyying");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some(vec!['y', 'y', 'y', 'y', 'y']),
-            char('y').many().parse(&mut st)
+            char('y').many().parse(&mut st, &mut log)
         )
     }
 
     #[test]
     fn ok_empty() {
-        let mut st = ParseState::new("ing");
+        let mut st = CharStream::new("ing");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some(vec![]),
-            super::many(char('y')).parse(&mut st)
+            super::many(char('y')).parse(&mut st, &mut log)
         )
     }
 }
 
 #[cfg(test)]
 mod test_some {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok() {
-        let mut st = ParseState::new("yyyyying");
+        let mut st = CharStream::new("yyyyying");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some(vec!['y', 'y', 'y', 'y', 'y']),
-            char('y').some().parse(&mut st)
+            char('y').some().parse(&mut st, &mut log)
         )
     }
 
     #[test]
     fn fail() {
-        let mut st = ParseState::new("ing");
+        let mut st = CharStream::new("ing");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            char('y').some().parse(&mut st)
+            char('y').some().parse(&mut st, &mut log)
         )
     }
 }

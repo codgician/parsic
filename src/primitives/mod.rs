@@ -1,40 +1,31 @@
-use crate::core::parser::{ Parser, ParseState };
-use crate::core::logger::{ Msg, MsgBody };
+use crate::core::parser::*;
+use crate::core::stream::*;
+use crate::core::logger::*;
 
-// Parser builder: Char
+// Char parser builder
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct Char {
-    ch: char
-}
+pub struct CharP(char);
 
-impl Char {
-    pub fn new(ch: char) -> Self {
-        Self { ch: ch }
-    } 
-}
-
-impl<'a> Parser<ParseState<'a>> for Char {
-    type ParsedType = char;
-
-    fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
-        match state.inp.next() {
+impl<'a> Parsable<CharStream<'a>, char> for CharP {
+    fn parse(&self, stream: &mut CharStream<'a>, logger: &mut ParseLogger) -> Option<char> {
+        match stream.inp.next() {
             Some(ch) => {
-                if ch == self.ch {
+                if ch == self.0 {
                     Some(ch)
                 } else {
-                    state.log.with(Msg::Err(
+                    logger.with(Msg::Err(
                         MsgBody {
-                            pos: state.pos,
-                            msg: format!("expecting '{}', but got '{}'.", self.ch, ch)
+                            pos: stream.pos,
+                            msg: format!("expecting '{}', but got '{}'.", self.0, ch)
                         }
                     ));
                     None
                 }
             }
             None => {
-                state.log.with(Msg::Err(
+                logger.with(Msg::Err(
                     MsgBody {
-                        pos: state.pos,
+                        pos: stream.pos,
                         msg: format!("unexpected end of input.")
                     }
                 ));
@@ -44,36 +35,25 @@ impl<'a> Parser<ParseState<'a>> for Char {
     }
 }
 
-pub fn char(ch: char) -> Char {
-    Char::new(ch)
+pub fn char(ch: char) -> CharP {
+    CharP(ch)
 }
 
-// Satisfy parser
+// Satisfy parser builder
 #[derive(Clone, Copy, Debug)]
-pub struct Satisfy<F> {
-    func: F,
-    // err_msg: Option<&'a str>
-}
-
-impl<F> Satisfy<F> {
-    pub fn new(func: F) -> Satisfy<F> {
-        Self { func: func }
-    } 
-}
-
-impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
+pub struct SatisfyP<F>(F);
+impl<'a, F> Parsable<CharStream<'a>, char> for SatisfyP<F>
     where F: Fn(&char) -> bool
 {
-    type ParsedType = char;
-    fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
-        match state.inp.next() {
+    fn parse(&self, stream: &mut CharStream<'a>, logger: &mut ParseLogger) -> Option<char> {
+        match stream.inp.next() {
             Some(ch) => {
-                if (self.func)(&ch) {
+                if self.0(&ch) {
                     Some(ch)
                 } else {
-                    state.log.with(Msg::Err(
+                    logger.with(Msg::Err(
                         MsgBody {
-                            pos: state.pos,
+                            pos: stream.pos,
                             msg: format!("'{}' does not satisfy required conditions.", ch)
                         }
                     ));
@@ -81,9 +61,9 @@ impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
                 }
             }
             None => {
-                state.log.with(Msg::Err(
+                logger.with(Msg::Err(
                     MsgBody {
-                        pos: state.pos,
+                        pos: stream.pos,
                         msg: format!("unexpected end of input.")
                     }
                 ));
@@ -93,36 +73,24 @@ impl<'a, F> Parser<ParseState<'a>> for Satisfy<F>
     }
 }
 
-pub fn satisfy< F>(f: F) -> Satisfy<F>
-    where F: Fn(&char) -> bool
-{
-    Satisfy::new(f)
+pub fn satisfy< F>(f: F) -> SatisfyP<F> where F: Fn(&char) -> bool {
+    SatisfyP(f)
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Literal {
-    expected: String
-}
+pub struct LiteralP(String);
 
-impl Literal {
-    pub fn new(expected: String) -> Literal {
-        Self { expected: expected }
-    }
-}
-
-impl<'a> Parser<ParseState<'a>> for Literal {
-    type ParsedType = &'a str;
-
-    fn parse(&self, state: &mut ParseState<'a>) -> Option<Self::ParsedType> {
-        if state.inp.as_str().starts_with(&self.expected[..]) {
-            let ret = &state.inp.as_str()[0 .. self.expected.len()];
-            state.take(self.expected.len()).for_each(|_| {});
+impl<'a> Parsable<CharStream<'a>, &'a str> for LiteralP {
+    fn parse(&self, stream: &mut CharStream<'a>, logger: &mut ParseLogger) -> Option<&'a str> {
+        if stream.as_stream().starts_with(&self.0[..]) {
+            let ret = &stream.as_stream()[0 .. self.0.len()];
+            stream.take(self.0.len()).for_each(|_| {});
             Some(ret)
         } else {
-            state.log.with(Msg::Err(
+            logger.with(Msg::Err(
                 MsgBody {
-                    pos: state.pos,
-                    msg: format!("expecting \"{}\".", self.expected)
+                    pos: stream.pos,
+                    msg: format!("expecting \"{}\".", self.0)
                 }
             ));
             None
@@ -130,96 +98,108 @@ impl<'a> Parser<ParseState<'a>> for Literal {
     }
 }
 
-pub fn literal(s: &str) -> Literal {
-    Literal::new(s.to_owned())
+pub fn literal(s: &str) -> LiteralP {
+    LiteralP(s.to_owned())
 }
 
 #[cfg(test)]
 mod test_char {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::*;
     use super::char;
 
     // Should parse when character matches
     #[test]
     fn ok() {
-        let mut st = ParseState::new("Hello");
+        let mut st = CharStream::new("Hello");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some('H'),
-            char('H').parse(&mut st)
+            char('H').parse(&mut st, &mut log)
         );
-        assert_eq!("ello", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("ello", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     // Should return none when character does not match
     #[test]
     fn fail() {
-        let mut st = ParseState::new("Hello");
+        let mut st = CharStream::new("Hello");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            char('h').parse(&mut st)
+            char('h').parse(&mut st, &mut log)
         );
-        assert_eq!("ello", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("ello", st.as_stream());
+        assert_eq!(1, log.len());
     }
 }
 
 #[cfg(test)]
 mod test_satisfy {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::*;
     use super::satisfy;
 
     // Should parse when character satisifies given condition
     #[test]
     fn ok() {
-        let mut st = ParseState::new("Hello");
+        let mut st = CharStream::new("Hello");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some('H'),
-            satisfy(|&ch| ch.is_uppercase()).parse(&mut st)
+            satisfy(|&ch| ch.is_uppercase()).parse(&mut st, &mut log)
         );
-        assert_eq!("ello", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("ello", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     // Should return none when character does not satisfy given condition
     #[test]
     fn fail() {
-        let mut st = ParseState::new("hello");
+        let mut st = CharStream::new("hello");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            satisfy(|&ch| ch.is_uppercase()).parse(&mut st)
+            satisfy(|&ch| ch.is_uppercase()).parse(&mut st, &mut log)
         );
-        assert_eq!("ello", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("ello", st.as_stream());
+        assert_eq!(1, log.len());
     }
 }
 
 #[cfg(test)]
 mod test_literal {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::*;
     use super::literal;
 
     // Should parse when literal matches
     #[test]
     fn ok() {
-        let mut st = ParseState::new("Hello!");
+        let mut st = CharStream::new("Hello!");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some("Hello"),
-            literal("Hello").parse(&mut st)
+            literal("Hello").parse(&mut st, &mut log)
         );
-        assert_eq!("!", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("!", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     // Should return none when literal does not match
     #[test]
     fn fail() {
-        let mut st = ParseState::new("Hell");
+        let mut st = CharStream::new("Hell");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            literal("Hello").parse(&mut st)
+            literal("Hello").parse(&mut st, &mut log)
         );
-        assert_eq!("Hell", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("Hell", st.as_stream());
+        assert_eq!(1, log.len());
     }
 }

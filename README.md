@@ -7,7 +7,7 @@
 ## To-do
 
 - [ ] Core
-    - [x] Parser
+    - [x] Parsable
     - [x] ParseState
     - [x] Logger
 - [ ] Combinators

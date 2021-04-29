@@ -1,29 +1,19 @@
-use crate::core::parser::Parser;
+use crate::core::parser::Parsable;
+use crate::core::logger::ParseLogger;
 
 #[derive(Clone, Copy, Debug)]
-pub struct And<PA, PB> {
-    pa: PA,
-    pb: PB
-}
+pub struct AndP<PA, PB>(PA, PB);
 
-impl<PA, PB> And<PA, PB> {
-    pub fn new(pa: PA, pb: PB) -> Self {
-        Self { pa: pa, pb: pb }
-    }
-}
-
-impl<S, PA:, PB> Parser<S> for And<PA, PB>
-    where
-        PA: Parser<S>, 
-        PB: Parser<S>
+impl<S, T1, T2, P1, P2> Parsable<S, (T1, T2)> for AndP<P1, P2>
+    where P1: Parsable<S, T1>, P2: Parsable<S, T2>
 {
-    type ParsedType = (PA::ParsedType, PB::ParsedType);
-
-    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
-        match self.pa.parse(state) {
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger)
+        -> Option<(T1, T2)>
+    {
+        match self.0.parse(stream, logger) {
             None => None,
             Some(r1) => {
-                match self.pb.parse(state) {
+                match self.1.parse(stream, logger) {
                     None => None,
                     Some(r2) => Some((r1, r2))
                 }
@@ -33,70 +23,82 @@ impl<S, PA:, PB> Parser<S> for And<PA, PB>
 }
 
 /// And Combinator
-pub fn and<PA, PB>(pa: PA, pb: PB) -> And<PA, PB> {
-    And::new(pa, pb)
+pub fn and<T1, T2>(p1: T1, p2: T2) -> AndP<T1, T2> {
+    AndP(p1, p2)
 }
 
-pub trait AndExt<S> : Parser<S> {
+pub trait AndPExt<S, T> : Parsable<S, T> {
     /// And Combinator
-    fn and<PB>(self, pb: PB) -> And<Self, PB>
-        where
-            Self: Sized,
-            PB: Parser<S, ParsedType = Self::ParsedType>
+    fn and<P>(self, parser: P) -> AndP<Self, P>
+        where Self: Sized, P: Parsable<S, T>
     {
-        And::new(self, pb)
+        AndP(self, parser)
     }
 }
 
-impl<S, P: Parser<S>> AndExt<S> for P {}
+impl<S, T, P: Parsable<S, T>> AndPExt<S, T> for P {}
 
 #[cfg(test)]
 mod test {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::logger::ParseLogger;
+    use crate::core::stream::*;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok() {
-        let mut st = ParseState::new("ABC");        
+        let mut st = CharStream::new("ABC");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some(('A', 'B')),
-            char('A').and(char('B')).parse(&mut st)
+            char('A')
+                .and(char('B'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("C", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("C", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     #[test]
     fn left_fail() {
-        let mut st = ParseState::new("BBC");
+        let mut st = CharStream::new("BBC");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            char('A').and(char('B')).parse(&mut st)
+            char('A')
+                .and(char('B'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("BC", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("BC", st.as_stream());
+        assert_eq!(1, log.len());
     }
 
     #[test]
     fn right_fail() {
-        let mut st = ParseState::new("ACC");
+        let mut st = CharStream::new("ACC");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            char('A').and(char('B')).parse(&mut st)
+            char('A')
+                .and(char('B'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("C", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("C", st.as_stream());
+        assert_eq!(1, log.len());
     }
 
     #[test]
     fn both_fail() {
-        let mut st = ParseState::new("CCC");
+        let mut st = CharStream::new("CCC");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            char('A').and(char('B')).parse(&mut st)
+            char('A')
+                .and(char('B'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("CC", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("CC", st.as_stream());
+        assert_eq!(1, log.len());
     }
 }

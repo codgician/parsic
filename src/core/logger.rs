@@ -1,4 +1,4 @@
-use crate::core::parser::Pos;
+use crate::core::stream::Pos;
 
 #[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub struct ParseLogger {
@@ -47,6 +47,7 @@ impl IntoIterator for ParseLogger {
     }
 }
 
+// Implement IntoInterator for &'a ParseLogger
 impl<'a> IntoIterator for &'a ParseLogger {
     type Item = &'a Msg;
     type IntoIter = std::slice::Iter<'a, Msg>;
@@ -56,6 +57,7 @@ impl<'a> IntoIterator for &'a ParseLogger {
     }
 }
 
+// Implement IntoInterator for &'a mut ParseLogger
 impl<'a> IntoIterator for &'a mut ParseLogger {
     type Item = &'a mut Msg;
     type IntoIter = std::slice::IterMut<'a, Msg>;

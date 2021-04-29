@@ -1,100 +1,102 @@
-use crate::core::parser::Parser;
+use crate::core::parser::Parsable;
+use crate::core::logger::ParseLogger;
 
 #[derive(Clone, Copy, Debug)]
-pub struct Or<PA, PB> {
-    pa: PA,
-    pb: PB
-}
+pub struct OrP<P1, P2>(P1, P2);
 
-impl<PA, PB> Or<PA, PB> {
-    pub fn new(pa: PA, pb: PB) -> Or<PA, PB> {
-        Self { pa: pa, pb: pb }
-    }
-}
-
-impl<S: Clone, PA, PB> Parser<S> for Or<PA, PB>
-    where
-        PA: Parser<S>,
-        PB: Parser<S, ParsedType = PA::ParsedType>
+impl<S, T, P1, P2> Parsable<S, T> for OrP<P1, P2>
+    where S: Clone, P1: Parsable<S, T>, P2: Parsable<S, T>
 {
-    type ParsedType = PA::ParsedType;
-
-    fn parse(&self, state: &mut S) -> Option<Self::ParsedType> {
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<T> {
         let st0 = state.clone();
-        match self.pa.parse(state) {
+        let lg0 = logger.clone();
+        match self.0.parse(state, logger) {
             None => {
                 *state = st0;
-                self.pb.parse(state)
+                *logger = lg0;
+                self.1.parse(state, logger)
             },
             x => x
         }
     }
 }
 
-pub fn or<PA, PB>(pa: PA, pb: PB) -> Or<PA, PB> {
-    Or::new(pa, pb)
+pub fn or<P1, P2>(p1: P1, p2: P2) -> OrP<P1, P2> {
+    OrP(p1, p2)
 }
 
-pub trait OrExt<S> : Parser<S> {
+pub trait OrExt<S, T> : Parsable<S, T> {
     /// Or Combinator
-    fn or<PB>(self, pb: PB) -> Or<Self, PB>
-        where
-            Self: Sized,
-            PB: Parser<S, ParsedType = Self::ParsedType>
+    fn or<P>(self, parser: P) -> OrP<Self, P>
+        where Self: Sized, P: Parsable<S, T>
     {
-        Or::new(self, pb)
+        OrP(self, parser)
     }
 }
 
-impl<S, P: Parser<S>> OrExt<S> for P {}
+impl<S, T, P: Parsable<S, T>> OrExt<S, T> for P {}
 
 #[cfg(test)]
 mod test {
-    use crate::core::parser::{ Parser, ParseState };
+    use crate::core::parser::*;
+    use crate::core::stream::*;
+    use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn left_ok() {
-        let mut st = ParseState::new("Ahhh");
+        let mut st = CharStream::new("Ahhh");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some('A'),
-            char('A').or(char('B')).parse(&mut st)
+            char('A')
+                .or(char('B'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("hhh", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("hhh", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     #[test]
     fn right_ok() {
-        let mut st = ParseState::new("Ahhh");
+        let mut st = CharStream::new("Ahhh");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some('A'),
-            char('B').or(char('A')).parse(&mut st)
+            char('B')
+                .or(char('A'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("hhh", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("hhh", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     #[test]
     fn both_ok() {
-        let mut st = ParseState::new("Ahhh");
+        let mut st = CharStream::new("Ahhh");
+        let mut log = ParseLogger::default();
         assert_eq!(
             Some('A'),
-            char('A').or(char('A')).parse(&mut st)
+            char('A')
+                .or(char('A'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("hhh", st.inp.as_str());
-        assert_eq!(0, st.log.len());
+        assert_eq!("hhh", st.as_stream());
+        assert_eq!(0, log.len());
     }
 
     #[test]
     fn both_fail() {
-        let mut st = ParseState::new("Ahhh");
+        let mut st = CharStream::new("Ahhh");
+        let mut log = ParseLogger::default();
         assert_eq!(
             None,
-            char('B').or(char('C')).parse(&mut st)
+            char('B')
+                .or(char('C'))
+                .parse(&mut st, &mut log)
         );
-        assert_eq!("hhh", st.inp.as_str());
-        assert_eq!(1, st.log.len());
+        assert_eq!("hhh", st.as_stream());
+        assert_eq!(1, log.len());
     }
 }
