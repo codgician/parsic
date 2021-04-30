@@ -20,14 +20,14 @@ pub fn pure<F, T>(x: F) -> Pure<F> where F: Fn() -> T {
 #[cfg(test)]
 mod test {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
+    use crate::primitives::*;
 
     // Should construct a parser that consumes nothing
     // and returns provided parse result
     #[test]
     fn ok() {
-        let mut st = CharStream::new("Hello");
+        let mut st = StrState::new("Hello");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some(true),
@@ -39,7 +39,7 @@ mod test {
 
     #[test]
     fn empty_input() {
-        let mut st = CharStream::new("");
+        let mut st = StrState::new("");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some(true),

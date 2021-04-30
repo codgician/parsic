@@ -23,14 +23,13 @@ pub fn fix<'a, S, T, F>(fix: F) -> FixP<'a, S, T>
 #[cfg(test)]
 mod test {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn recursive_syntax() {
-        let mut st = CharStream::new("1110");
+        let mut st = StrState::new("1110");
         let mut log = ParseLogger::default();
         let parser = fix(|it| Box::new(
             char('1')

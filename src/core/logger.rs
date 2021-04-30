@@ -1,4 +1,17 @@
-use crate::core::stream::Pos;
+#[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
+pub struct Pos {
+    pub row: usize,
+    pub col: usize
+}
+
+impl Pos {
+    pub fn new(row: usize, col: usize) -> Self {
+        Self { row, col }
+    }
+    pub fn add(&self, d_row : usize, d_col: usize) -> Self {
+        Self::new(self.row + d_row, self.col + d_col)
+    }
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Msg {

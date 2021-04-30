@@ -39,14 +39,13 @@ impl<S, T, P: Parsable<S, T>> OrExt<S, T> for P {}
 #[cfg(test)]
 mod test {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn left_ok() {
-        let mut st = CharStream::new("Ahhh");
+        let mut st = StrState::new("Ahhh");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some('A'),
@@ -60,7 +59,7 @@ mod test {
 
     #[test]
     fn right_ok() {
-        let mut st = CharStream::new("Ahhh");
+        let mut st = StrState::new("Ahhh");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some('A'),
@@ -74,7 +73,7 @@ mod test {
 
     #[test]
     fn both_ok() {
-        let mut st = CharStream::new("Ahhh");
+        let mut st = StrState::new("Ahhh");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some('A'),
@@ -88,7 +87,7 @@ mod test {
 
     #[test]
     fn both_fail() {
-        let mut st = CharStream::new("Ahhh");
+        let mut st = StrState::new("Ahhh");
         let mut log = ParseLogger::default();
         assert_eq!(
             None,

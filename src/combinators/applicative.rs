@@ -85,12 +85,12 @@ impl<S, T, P: Parsable<S, T>> ApplicativeExt<S, T> for P {}
 #[cfg(test)]
 mod test_empty {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
+    use crate::primitives::*;
 
     #[test]
     fn fail() {
-        let mut st = CharStream::new("Hello");
+        let mut st = StrState::new("Hello");
         let mut log = ParseLogger::default();
         assert_eq!(
             None as Option<String>,
@@ -104,14 +104,13 @@ mod test_empty {
 #[cfg(test)]
 mod test_many {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok_nonempty() {
-        let mut st = CharStream::new("yyyyying");
+        let mut st = StrState::new("yyyyying");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some(vec!['y', 'y', 'y', 'y', 'y']),
@@ -121,7 +120,7 @@ mod test_many {
 
     #[test]
     fn ok_empty() {
-        let mut st = CharStream::new("ing");
+        let mut st = StrState::new("ing");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some(vec![]),
@@ -133,14 +132,13 @@ mod test_many {
 #[cfg(test)]
 mod test_some {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok() {
-        let mut st = CharStream::new("yyyyying");
+        let mut st = StrState::new("yyyyying");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some(vec!['y', 'y', 'y', 'y', 'y']),
@@ -150,7 +148,7 @@ mod test_some {
 
     #[test]
     fn fail() {
-        let mut st = CharStream::new("ing");
+        let mut st = StrState::new("ing");
         let mut log = ParseLogger::default();
         assert_eq!(
             None,

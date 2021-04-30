@@ -43,13 +43,12 @@ impl<S, T, P: Parsable<S, T>> SequentialPExt<S, T> for P {}
 mod test {
     use crate::core::parser::*;
     use crate::core::logger::ParseLogger;
-    use crate::core::stream::*;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok() {
-        let mut st = CharStream::new("ABC");
+        let mut st = StrState::new("ABC");
         let mut log = ParseLogger::default();
         assert_eq!(
             Some(('A', 'B')),
@@ -63,7 +62,7 @@ mod test {
 
     #[test]
     fn left_fail() {
-        let mut st = CharStream::new("BBC");
+        let mut st = StrState::new("BBC");
         let mut log = ParseLogger::default();
         assert_eq!(
             None,
@@ -77,7 +76,7 @@ mod test {
 
     #[test]
     fn right_fail() {
-        let mut st = CharStream::new("ACC");
+        let mut st = StrState::new("ACC");
         let mut log = ParseLogger::default();
         assert_eq!(
             None,
@@ -91,7 +90,7 @@ mod test {
 
     #[test]
     fn both_fail() {
-        let mut st = CharStream::new("CCC");
+        let mut st = StrState::new("CCC");
         let mut log = ParseLogger::default();
         assert_eq!(
             None,

@@ -35,14 +35,13 @@ impl<S, T, P: Parsable<S, T>> FunctorExt<S, T> for P {}
 #[cfg(test)]
 mod test {
     use crate::core::parser::*;
-    use crate::core::stream::*;
     use crate::core::logger::ParseLogger;
     use crate::combinators::*;
     use crate::primitives::*;
 
     #[test]
     fn ok() {
-        let mut st = CharStream::new("Hello");
+        let mut st = StrState::new("Hello");
         let mut log = ParseLogger::default();
         let parser = char('H')
                     .or(char('W'))
@@ -57,7 +56,7 @@ mod test {
 
     #[test]
     fn select_ok() {
-        let mut st = CharStream::new("-1");
+        let mut st = StrState::new("-1");
         let mut log = ParseLogger::default();
         let parser = char('-')
                     .and(char('1'))
