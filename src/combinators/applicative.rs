@@ -29,20 +29,20 @@ impl<S, P> Parsable<S> for ManyP<P>
 {
     type Result = Vec<P::Result>;
 
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
         -> Option<Self::Result> 
     {
         let mut res = vec![];
-        let mut st = stream.clone();
+        let mut st = state.clone();
         let mut lg = logger.clone();
 
-        while let Some(r) = self.0.parse(stream, logger) {
+        while let Some(r) = self.0.parse(state, logger) {
             res.push(r);
-            st = stream.clone();
+            st = state.clone();
             lg = logger.clone();
         }
 
-        *stream = st;
+        *state = st;
         *logger = lg;
         Some(res)
     }
@@ -62,18 +62,18 @@ pub struct SomeP<P>(P);
 impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
     type Result = Vec<P::Result>;
 
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let mut res = vec![self.0.parse(stream, logger)?];
-        let mut st = stream.clone();
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
+        let mut res = vec![self.0.parse(state, logger)?];
+        let mut st = state.clone();
         let mut lg = logger.clone();
 
-        while let Some(r) = self.0.parse(stream, logger) {
+        while let Some(r) = self.0.parse(state, logger) {
             res.push(r);
-            st = stream.clone();
+            st = state.clone();
             lg = logger.clone();
         }
 
-        *stream = st;
+        *state = st;
         *logger = lg;
         Some(res)
     }

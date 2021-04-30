@@ -11,13 +11,13 @@ impl<S, P1, P2> Parsable<S> for AndP<P1, P2>
 {
     type Result = (P1::Result, P2::Result);
 
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger)
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
         -> Option<Self::Result>
     {
-        match self.0.parse(stream, logger) {
+        match self.0.parse(state, logger) {
             None => None,
             Some(r1) => {
-                match self.1.parse(stream, logger) {
+                match self.1.parse(state, logger) {
                     None => None,
                     Some(r2) => Some((r1, r2))
                 }

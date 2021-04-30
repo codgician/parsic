@@ -8,17 +8,17 @@ pub struct CharP(char);
 impl Parsable<StrState> for CharP {
     type Result = char;
     
-    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) 
         -> Option<Self::Result> 
     {
-        match stream.inp.next() {
+        match state.next() {
             Some(ch) => {
                 if ch == self.0 {
                     Some(ch)
                 } else {
                     logger.with(Msg::Error(MsgBody::new(
                         &format!("expecting '{}', but got '{}'.", self.0, ch)[..],
-                        Some(stream.pos)
+                        Some(state.pos)
                      )));
                     None
                 }
@@ -26,7 +26,7 @@ impl Parsable<StrState> for CharP {
             None => {
                 logger.with(Msg::Error(MsgBody::new(
                     "unexpected end of input.",
-                    Some(stream.pos)
+                    Some(state.pos)
                 )));
                 None
             }
@@ -47,17 +47,17 @@ impl<'a, F> Parsable<StrState> for SatisfyP<F>
 {
     type Result = char;
 
-    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) 
         -> Option<Self::Result> 
     {
-        match stream.inp.next() {
+        match state.next() {
             Some(ch) => {
                 if self.0(&ch) {
                     Some(ch)
                 } else {
                     logger.with(Msg::Error(MsgBody::new(
                         &format!("'{}' does not satisfy required conditions.", ch)[..],
-                        Some(stream.pos)
+                        Some(state.pos)
                     )));
                     None
                 }
@@ -65,7 +65,7 @@ impl<'a, F> Parsable<StrState> for SatisfyP<F>
             None => {
                 logger.with(Msg::Error(MsgBody::new(
                     "unexpected end of input.",
-                    Some(stream.pos)
+                    Some(state.pos)
                 )));
                 None
             }
@@ -85,17 +85,17 @@ pub struct LiteralP(String);
 impl Parsable<StrState> for LiteralP {
     type Result = &'static str;
 
-    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) 
         -> Option<Self::Result> 
     {
-        if stream.as_stream().starts_with(&self.0[..]) {
-            let ret = &stream.as_stream()[0 .. self.0.len()];
-            stream.take(self.0.len()).for_each(|_| {});
+        if state.as_stream().starts_with(&self.0[..]) {
+            let ret = &state.as_stream()[0 .. self.0.len()];
+            state.take(self.0.len()).for_each(|_| {});
             Some(ret)
         } else {
             logger.with(Msg::Error(MsgBody::new(
                 &format!("expecting \"{}\".", self.0)[..],
-                Some(stream.pos)
+                Some(state.pos)
             )));
             None
         }

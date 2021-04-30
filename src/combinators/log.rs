@@ -8,10 +8,10 @@ impl<S, P> Parsable<S> for LogP<P>
 {
     type Result = P::Result;
     
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
         -> Option<Self::Result> 
     {
-        match self.0.parse(stream, logger) {
+        match self.0.parse(state, logger) {
             None => {
                 logger.add(self.1.to_owned());
                 None

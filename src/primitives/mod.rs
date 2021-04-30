@@ -1,8 +1,8 @@
 pub mod lexers;
-pub mod stream;
+pub mod state;
 
 pub use crate::primitives::{
     self,
     lexers::*,
-    stream::*
+    state::*
 };

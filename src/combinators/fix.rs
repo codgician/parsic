@@ -9,11 +9,11 @@ pub struct FixP<'a, S, T>
 impl<'a, S, T> Parsable<S> for FixP<'a, S, T> {
     type Result = T;
 
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
         -> Option<Self::Result> 
     {
         // Fixed-point Combinator: fix f = f (fix f)
-        (self.0)(self).parse(stream, logger)
+        (self.0)(self).parse(state, logger)
     }
 }
 
