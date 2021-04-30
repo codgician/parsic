@@ -6,27 +6,28 @@
 
 ## To-do
 
-- [ ] Core
-    - [x] Parsable
-    - [x] ParseState
-    - [x] Logger
-- [ ] Combinators
-    - [x] `char`: Consumes one char at a time from parse stream
-    - [x] `satisfy`: Consumes one char if given condition satisifies
-    - [x] `literal`: Consumes given literal string
-    - [x] `pure`: A parser that consumes nothing and always succeeds
-    - [x] `empty`: A parser that always fails
-    - [x] `fix`: Fixed-point combinator to support recursive syntax
-    - [x] `map`: fmap for functor
-    - [x] `bind`: bind for monad
-    - [x] `and`: Sequential combinators
-    - [x] `or`: Alternative combinators
-    - [x] `some`, `many`: Replicative combinators
-- [ ] Tests
-    - [ ] Property tests
-    - [ ] Arthimetic calculator
-    - [ ] Markdown parser
-- [ ] Enhancements
-    - [x] Implement iterator-style interface
-    - [ ] ~~Support returning multiple results~~
-    - [ ] Customizable error messages
+- :o: Core
+    - :heavy_check_mark: Parsable
+    - :heavy_check_mark: ParseLogger
+    - :heavy_check_mark: Primitives (`StrStream` and related lexers)
+- :o: Combinators
+    - :heavy_check_mark: `char`: Consumes one char at a time from parse stream
+    - :heavy_check_mark: `satisfy`: Consumes one char if given condition satisifies
+    - :heavy_check_mark: `literal`: Consumes given literal string
+    - :heavy_check_mark: `pure`: A parser that consumes nothing and always succeeds
+    - :heavy_check_mark: `empty`: A parser that always fails
+    - :heavy_check_mark: `fix`: Fixed-point combinator to support recursive syntax
+    - :heavy_check_mark: `map`: fmap for functor
+    - :heavy_check_mark: `bind`: bind for monad
+    - :heavy_check_mark: `and`: Sequential combinators
+    - :heavy_check_mark: `or`: Alternative combinators
+    - :heavy_check_mark: `some`, `many`: Replicative combinators
+- :x: Tests
+    - :x: Property tests
+    - :x: Arthimetic calculator
+    - :x: Markdown parser
+- :o: Enhancements
+    - :heavy_check_mark: Implement iterator-style interface
+    - ~~:x: Support returning multiple results~~
+    - :x: Customizable error messages
+    - :o: Wrapper for parsers

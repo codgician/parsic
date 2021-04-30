@@ -28,16 +28,18 @@ pub fn and<T1, T2>(p1: T1, p2: T2) -> AndP<T1, T2> {
     AndP(p1, p2)
 }
 
-pub trait SequentialPExt<S, T> : Parsable<S, T> {
+pub trait SequentialPExt<S, T1> : Parsable<S, T1> {
     /// And combinator
-    fn and<P>(self, parser: P) -> AndP<Self, P>
-        where Self: Sized, P: Parsable<S, T>
+    fn and<P, T2>(self, parser: P) -> AndP<Self, P>
+        where 
+            Self: Sized, 
+            P: Parsable<S, T2>
     {
         AndP(self, parser)
     }
 }
 
-impl<S, T, P: Parsable<S, T>> SequentialPExt<S, T> for P {}
+impl<S, T1, P: Parsable<S, T1>> SequentialPExt<S, T1> for P {}
 
 #[cfg(test)]
 mod test {
@@ -47,7 +49,7 @@ mod test {
     use crate::primitives::*;
 
     #[test]
-    fn ok() {
+    fn ok_same_type() {
         let mut st = StrState::new("ABC");
         let mut log = ParseLogger::default();
         assert_eq!(
@@ -57,6 +59,21 @@ mod test {
                 .parse(&mut st, &mut log)
         );
         assert_eq!("C", st.as_stream());
+        assert_eq!(0, log.len());
+    }
+
+    #[test]
+    fn ok_different_type() {
+        let mut st = StrState::new("1A+");
+        let mut log = ParseLogger::default();
+        assert_eq!(
+            Some((1, 'A')),
+            satisfy(|&ch| ch.is_digit(10))
+                .bind_option(|ch| ch.to_digit(10))
+                .and(char('A'))
+                .parse(&mut st, &mut log)
+        );
+        assert_eq!("+", st.as_stream());
         assert_eq!(0, log.len());
     }
 

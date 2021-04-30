@@ -6,6 +6,12 @@ use crate::core::logger::*;
 // T: Type for parse result
 pub trait Parsable<S, T> {
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<T>;
+
+    fn box_clone(self) -> Box<Self>
+        where Self: Sized 
+    {
+        Box::new(self)
+    }
 }
 
 // Implement Parsable trait for &Parsable<_>

@@ -25,7 +25,9 @@ pub fn pure<F, T>(x: F) -> Pure<F> where F: Fn() -> T {
 pub struct Bind<F, P, T1, T2>(F, P, PhantomData<T1>, PhantomData<T2>);
 
 impl<S, T1, T2, F, P> Parsable<S, T2> for Bind<F, P, T1, Option<T2>> 
-    where F: Fn(T1) -> Option<T2>, P: Parsable<S, T1>
+    where 
+        F: Fn(T1) -> Option<T2>, 
+        P: Parsable<S, T1>
 {
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
         -> Option<T2> 
@@ -38,7 +40,10 @@ impl<S, T1, T2, F, P> Parsable<S, T2> for Bind<F, P, T1, Option<T2>>
 }
 
 impl<S, T1, T2, F, P, E> Parsable<S, T2> for Bind<F, P, T1, Result<T2, E>> 
-    where F: Fn(T1) -> Result<T2, E>, P: Parsable<S, T1>, E: ToString
+    where 
+        F: Fn(T1) -> Result<T2, E>, 
+        P: Parsable<S, T1>, 
+        E: ToString
 {
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
         -> Option<T2> 
@@ -55,13 +60,17 @@ impl<S, T1, T2, F, P, E> Parsable<S, T2> for Bind<F, P, T1, Result<T2, E>>
 }
 
 pub fn bind_option<S, T1, T2, F, P>(func: F, parser: P) -> Bind<F, P, T1, Option<T2>>
-    where F: Fn(T1) -> Option<T2>, P: Parsable<S, T1>
+    where 
+        F: Fn(T1) -> Option<T2>, 
+        P: Parsable<S, T1>
 {
     Bind(func, parser, PhantomData, PhantomData)
 }
 
 pub fn bind_result<S, T1, T2, F, P, E>(func: F, parser: P) -> Bind<F, P, T1, Result<T2, E>>
-    where F: Fn(T1) -> Result<T2, E>, P: Parsable<S, T1>
+    where 
+        F: Fn(T1) -> Result<T2, E>, 
+        P: Parsable<S, T1>
 {
     Bind(func, parser, PhantomData, PhantomData)
 }
@@ -69,14 +78,18 @@ pub fn bind_result<S, T1, T2, F, P, E>(func: F, parser: P) -> Bind<F, P, T1, Res
 pub trait MonadicExt<S, T1> : Parsable<S, T1> {
     /// Bind Combinator (Option)
     fn bind_option<T2, F>(self, func: F) -> Bind<F, Self, T1, Option<T2>>
-       where Self: Sized, F: Fn(T1) -> Option<T2>,
+        where 
+            Self: Sized, 
+            F: Fn(T1) -> Option<T2>,
     {
         Bind(func, self, PhantomData, PhantomData)
     }
 
     /// Bind Combinator (Result)
     fn bind_result<T2, F, E>(self, func: F) -> Bind<F, Self, T1, Result<T2, E>>
-       where Self: Sized, F: Fn(T1) -> Result<T2, E>,
+        where 
+            Self: Sized, 
+            F: Fn(T1) -> Result<T2, E>
     {
         Bind(func, self, PhantomData, PhantomData)
     }

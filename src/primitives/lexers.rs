@@ -6,8 +6,8 @@ use crate::primitives::*;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct CharP(char);
 
-impl<'a> Parsable<StrState<'a>, char> for CharP {
-    fn parse(&self, stream: &mut StrState<'a>, logger: &mut ParseLogger) -> Option<char> {
+impl Parsable<StrState, char> for CharP {
+    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) -> Option<char> {
         match stream.inp.next() {
             Some(ch) => {
                 if ch == self.0 {
@@ -38,10 +38,11 @@ pub fn char(ch: char) -> CharP {
 // Satisfy parser builder
 #[derive(Clone, Copy, Debug)]
 pub struct SatisfyP<F>(F);
-impl<'a, F> Parsable<StrState<'a>, char> for SatisfyP<F>
+
+impl<'a, F> Parsable<StrState, char> for SatisfyP<F>
     where F: Fn(&char) -> bool
 {
-    fn parse(&self, stream: &mut StrState<'a>, logger: &mut ParseLogger) -> Option<char> {
+    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) -> Option<char> {
         match stream.inp.next() {
             Some(ch) => {
                 if self.0(&ch) {
@@ -72,8 +73,8 @@ pub fn satisfy< F>(f: F) -> SatisfyP<F> where F: Fn(&char) -> bool {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LiteralP(String);
 
-impl<'a> Parsable<StrState<'a>, &'a str> for LiteralP {
-    fn parse(&self, stream: &mut StrState<'a>, logger: &mut ParseLogger) -> Option<&'a str> {
+impl<'a> Parsable<StrState, &'static str> for LiteralP {
+    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) -> Option<&'static str> {
         if stream.as_stream().starts_with(&self.0[..]) {
             let ret = &stream.as_stream()[0 .. self.0.len()];
             stream.take(self.0.len()).for_each(|_| {});

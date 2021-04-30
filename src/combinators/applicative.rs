@@ -18,6 +18,7 @@ pub fn empty<T>() -> EmptyP<T> {
 }
 
 // Many
+#[derive(Copy, Clone, Debug)]
 pub struct ManyP<P>(P);
 
 impl<S, T, P> Parsable<S, Vec<T>> for ManyP<P>
@@ -26,13 +27,16 @@ impl<S, T, P> Parsable<S, Vec<T>> for ManyP<P>
     fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Vec<T>> {
         let mut res = vec![];
         let mut st = stream.clone();
+        let mut lg = logger.clone();
 
         while let Some(r) = self.0.parse(stream, logger) {
             res.push(r);
             st = stream.clone();
+            lg = logger.clone();
         }
 
         *stream = st;
+        *logger = lg;
         Some(res)
     }
 }
@@ -45,6 +49,7 @@ pub fn many<S, T, P>(parser: P) -> ManyP<P>
 }
 
 // Some Combinator
+#[derive(Copy, Clone, Debug)]
 pub struct SomeP<P>(P);
 
 impl<S: Clone, T, P: Parsable<S, T>> Parsable<S, Vec<T>> for SomeP<P> {

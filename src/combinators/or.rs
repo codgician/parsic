@@ -5,7 +5,10 @@ use crate::core::logger::ParseLogger;
 pub struct OrP<P1, P2>(P1, P2);
 
 impl<S, T, P1, P2> Parsable<S, T> for OrP<P1, P2>
-    where S: Clone, P1: Parsable<S, T>, P2: Parsable<S, T>
+    where 
+        S: Clone, 
+        P1: Parsable<S, T>, 
+        P2: Parsable<S, T>
 {
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<T> {
         let st0 = state.clone();
@@ -28,7 +31,9 @@ pub fn or<P1, P2>(p1: P1, p2: P2) -> OrP<P1, P2> {
 pub trait OrExt<S, T> : Parsable<S, T> {
     /// Or Combinator
     fn or<P>(self, parser: P) -> OrP<Self, P>
-        where Self: Sized, P: Parsable<S, T>
+        where 
+            Self: Sized, 
+            P: Parsable<S, T>
     {
         OrP(self, parser)
     }

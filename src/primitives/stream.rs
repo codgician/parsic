@@ -1,15 +1,15 @@
 use crate::core::logger::Pos;
 
 #[derive(Clone, Debug)]
-pub struct StrState<'a> {
-    pub(crate) inp: std::str::Chars<'a>,
+pub struct StrState {
+    pub(crate) inp: std::str::Chars<'static>,
     pub(crate) pos: Pos,
     pub(crate) len: usize,
     pub(crate) idx: usize
 }
 
-impl<'a> StrState<'a> {
-    pub fn new(inp: &'a str) -> Self {
+impl StrState {
+    pub fn new(inp: &'static str) -> Self {
         Self {
             inp: inp.chars(),
             pos: Pos::new(0, 0),
@@ -18,7 +18,7 @@ impl<'a> StrState<'a> {
         }
     }
 
-    pub fn as_stream(&self) -> &'a str {
+    pub fn as_stream(&self) -> &'static str {
         self.inp.as_str()
     }
     pub fn pos(&self) -> Pos {
@@ -33,7 +33,7 @@ impl<'a> StrState<'a> {
 }
 
 // Implement Iterator trait for StrState
-impl<'a> Iterator for StrState<'a> {
+impl Iterator for StrState {
     type Item = char;
     fn next(&mut self) -> Option<Self::Item> {
         let ch = self.inp.next()?;
