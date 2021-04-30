@@ -17,7 +17,8 @@
     - [x] `pure`: A parser that consumes nothing and always succeeds
     - [x] `empty`: A parser that always fails
     - [x] `fix`: Fixed-point combinator to support recursive syntax
-    - [x] `map`: Monadic fmap
+    - [x] `map`: fmap for functor
+    - [x] `bind`: bind for monad
     - [x] `and`: Sequential combinators
     - [x] `or`: Alternative combinators
     - [x] `some`, `many`: Replicative combinators
@@ -27,5 +28,5 @@
     - [ ] Markdown parser
 - [ ] Enhancements
     - [x] Implement iterator-style interface
-    - [ ] Support returning multiple results
+    - [ ] ~~Support returning multiple results~~
     - [ ] Customizable error messages

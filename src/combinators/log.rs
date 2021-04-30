@@ -24,8 +24,8 @@ pub fn warn<S, T, P>(parser: P, msg: &str) -> LogP<P> where P: Parsable<S, T> {
     LogP(parser, Msg::Warn(MsgBody::new(msg, None)))
 }
 
-pub fn err<S, T, P>(parser: P, msg: &str) -> LogP<P> where P: Parsable<S, T> {
-    LogP(parser, Msg::Err(MsgBody::new(msg, None)))
+pub fn error<S, T, P>(parser: P, msg: &str) -> LogP<P> where P: Parsable<S, T> {
+    LogP(parser, Msg::Error(MsgBody::new(msg, None)))
 }
 
 pub trait LogPExt<S, T> : Parsable<S, T> {
@@ -41,10 +41,10 @@ pub trait LogPExt<S, T> : Parsable<S, T> {
         warn(self, msg)
     }
 
-    fn err(self, msg: &str) -> LogP<Self> 
+    fn error(self, msg: &str) -> LogP<Self> 
         where Self: Sized 
     {
-        err(self, msg)
+        error(self, msg)
     }
 }
 

@@ -1,6 +1,7 @@
+use std::marker::PhantomData;
+
 use crate::core::parser::Parsable;
 use crate::core::logger::ParseLogger;
-use std::marker::PhantomData;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Map<F, P, T1>(F, P, PhantomData<T1>);
@@ -22,8 +23,8 @@ pub fn map<S, T1, T2, F, P>(func: F, parser: P) -> Map<F, P, T1>
 }
 
 pub trait FunctorExt<S, T1> : Parsable<S, T1> {
-     /// Map Combinator
-     fn map<T2, F>(self, func: F) -> Map<F, Self, T1>
+    /// Map Combinator
+    fn map<T2, F>(self, func: F) -> Map<F, Self, T1>
         where Self: Sized, F: Fn(T1) -> T2,
     {
         Map(func, self, PhantomData)

@@ -1,15 +1,20 @@
+use std::fmt::{ Display, Formatter, Result };
+
 #[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
-pub struct Pos {
-    pub row: usize,
-    pub col: usize
-}
+pub struct Pos(usize, usize);   // (row, colum)
 
 impl Pos {
     pub fn new(row: usize, col: usize) -> Self {
-        Self { row, col }
+        Self(row, col)
     }
     pub fn add(&self, d_row : usize, d_col: usize) -> Self {
-        Self::new(self.row + d_row, self.col + d_col)
+        Self(self.0 + d_row, self.1 + d_col)
+    }
+    pub fn row(&self) -> usize {
+        self.0
+    }
+    pub fn col(&self) -> usize {
+        self.1
     }
 }
 
@@ -17,7 +22,24 @@ impl Pos {
 pub enum Msg {
     Info(MsgBody),
     Warn(MsgBody),
-    Err(MsgBody)
+    Error(MsgBody)
+}
+
+impl Display for Msg {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        let (level, body) = match self {
+            Msg::Info(x) => ("INFO", x),
+            Msg::Warn(x) => ("WARN", x),
+            Msg::Error(x) => ("ERROR", x)
+        };
+        
+        let pos_text = match body.pos {
+            Some(Pos(r, c)) => format!("(at row: {}, col: {})", r, c),
+            _ => "".to_string()
+        };
+
+        write!(f, "[{}]: {} {}.", level, body.msg, pos_text)
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -34,7 +56,7 @@ impl MsgBody {
 
 #[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub struct ParseLogger {
-    stack: Vec<Msg>
+    pub stack: Vec<Msg>
 }
 
 impl ParseLogger {

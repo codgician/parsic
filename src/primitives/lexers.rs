@@ -13,7 +13,7 @@ impl<'a> Parsable<StrState<'a>, char> for CharP {
                 if ch == self.0 {
                     Some(ch)
                 } else {
-                    logger.with(Msg::Err(MsgBody::new(
+                    logger.with(Msg::Error(MsgBody::new(
                         &format!("expecting '{}', but got '{}'.", self.0, ch)[..],
                         Some(stream.pos)
                      )));
@@ -21,7 +21,7 @@ impl<'a> Parsable<StrState<'a>, char> for CharP {
                 }
             }
             None => {
-                logger.with(Msg::Err(MsgBody::new(
+                logger.with(Msg::Error(MsgBody::new(
                     "unexpected end of input.",
                     Some(stream.pos)
                 )));
@@ -47,7 +47,7 @@ impl<'a, F> Parsable<StrState<'a>, char> for SatisfyP<F>
                 if self.0(&ch) {
                     Some(ch)
                 } else {
-                    logger.with(Msg::Err(MsgBody::new(
+                    logger.with(Msg::Error(MsgBody::new(
                         &format!("'{}' does not satisfy required conditions.", ch)[..],
                         Some(stream.pos)
                     )));
@@ -55,7 +55,7 @@ impl<'a, F> Parsable<StrState<'a>, char> for SatisfyP<F>
                 }
             }
             None => {
-                logger.with(Msg::Err(MsgBody::new(
+                logger.with(Msg::Error(MsgBody::new(
                     "unexpected end of input.",
                     Some(stream.pos)
                 )));
@@ -79,7 +79,7 @@ impl<'a> Parsable<StrState<'a>, &'a str> for LiteralP {
             stream.take(self.0.len()).for_each(|_| {});
             Some(ret)
         } else {
-            logger.with(Msg::Err(MsgBody::new(
+            logger.with(Msg::Error(MsgBody::new(
                 &format!("expecting \"{}\".", self.0)[..],
                 Some(stream.pos)
             )));

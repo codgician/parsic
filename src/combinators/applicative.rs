@@ -51,13 +51,16 @@ impl<S: Clone, T, P: Parsable<S, T>> Parsable<S, Vec<T>> for SomeP<P> {
     fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Vec<T>> {
         let mut res = vec![self.0.parse(stream, logger)?];
         let mut st = stream.clone();
+        let mut lg = logger.clone();
 
         while let Some(r) = self.0.parse(stream, logger) {
             res.push(r);
             st = stream.clone();
+            lg = logger.clone();
         }
 
         *stream = st;
+        *logger = lg;
         Some(res)
     }
 }

@@ -39,7 +39,7 @@ impl<'a> Iterator for StrState<'a> {
         let ch = self.inp.next()?;
 
         self.pos = match ch {
-            '\n' => Pos::new(self.pos.row + 1, 0),
+            '\n' => Pos::new(self.pos.row() + 1, 0),
             _ => self.pos.add(1, 0)
         };
         self.idx += 1;
