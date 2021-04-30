@@ -1,15 +1,18 @@
-use crate::core::parser::Parsable;
-use crate::core::logger::ParseLogger;
+use crate::core::{ Parsable, ParseLogger };
 
 // And combinator
 #[derive(Clone, Copy, Debug)]
 pub struct AndP<PA, PB>(PA, PB);
 
-impl<S, T1, T2, P1, P2> Parsable<S, (T1, T2)> for AndP<P1, P2>
-    where P1: Parsable<S, T1>, P2: Parsable<S, T2>
+impl<S, P1, P2> Parsable<S> for AndP<P1, P2>
+    where 
+        P1: Parsable<S>, 
+        P2: Parsable<S>
 {
+    type Result = (P1::Result, P2::Result);
+
     fn parse(&self, stream: &mut S, logger: &mut ParseLogger)
-        -> Option<(T1, T2)>
+        -> Option<Self::Result>
     {
         match self.0.parse(stream, logger) {
             None => None,
@@ -28,23 +31,22 @@ pub fn and<T1, T2>(p1: T1, p2: T2) -> AndP<T1, T2> {
     AndP(p1, p2)
 }
 
-pub trait SequentialPExt<S, T1> : Parsable<S, T1> {
+pub trait SequentialPExt<S> : Parsable<S> {
     /// And combinator
-    fn and<P, T2>(self, parser: P) -> AndP<Self, P>
+    fn and<P>(self, parser: P) -> AndP<Self, P>
         where 
             Self: Sized, 
-            P: Parsable<S, T2>
+            P: Parsable<S>
     {
         AndP(self, parser)
     }
 }
 
-impl<S, T1, P: Parsable<S, T1>> SequentialPExt<S, T1> for P {}
+impl<S, P: Parsable<S>> SequentialPExt<S> for P {}
 
 #[cfg(test)]
 mod test {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
     use crate::primitives::*;
 

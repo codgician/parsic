@@ -1,16 +1,19 @@
-use crate::core::parser::Parsable;
-use crate::core::logger::ParseLogger;
+use crate::core::{ Parsable, ParseLogger };
 
 #[derive(Clone, Copy, Debug)]
 pub struct OrP<P1, P2>(P1, P2);
 
-impl<S, T, P1, P2> Parsable<S, T> for OrP<P1, P2>
+impl<S, P1, P2> Parsable<S> for OrP<P1, P2>
     where 
         S: Clone, 
-        P1: Parsable<S, T>, 
-        P2: Parsable<S, T>
+        P1: Parsable<S>, 
+        P2: Parsable<S, Result = P1::Result>
 {
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<T> {
+    type Result = P1::Result;
+
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         let st0 = state.clone();
         let lg0 = logger.clone();
         match self.0.parse(state, logger) {
@@ -28,23 +31,22 @@ pub fn or<P1, P2>(p1: P1, p2: P2) -> OrP<P1, P2> {
     OrP(p1, p2)
 }
 
-pub trait OrExt<S, T> : Parsable<S, T> {
+pub trait OrExt<S> : Parsable<S> {
     /// Or Combinator
     fn or<P>(self, parser: P) -> OrP<Self, P>
         where 
             Self: Sized, 
-            P: Parsable<S, T>
+            P: Parsable<S>
     {
         OrP(self, parser)
     }
 }
 
-impl<S, T, P: Parsable<S, T>> OrExt<S, T> for P {}
+impl<S, P: Parsable<S>> OrExt<S> for P {}
 
 #[cfg(test)]
 mod test {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
     use crate::primitives::*;
 

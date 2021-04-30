@@ -1,16 +1,18 @@
 use std::marker::PhantomData;
-
-use crate::core::parser::Parsable;
-use crate::core::logger::*;
+use crate::core::{ Parsable, ParseLogger, Msg, MsgBody };
 
 // Pure combinator
 #[derive(Clone, Copy, Debug)]
 pub struct Pure<F>(pub F);
 
-impl<F, S, T> Parsable<S, T> for Pure<F>
+impl<F, S, T> Parsable<S> for Pure<F>
     where F: Fn() -> T
 {
-    fn parse(&self, _: &mut S, _: &mut ParseLogger) -> Option<T> {
+    type Result = T;
+
+    fn parse(&self, _: &mut S, _: &mut ParseLogger) 
+        -> Option<T> 
+    {
         Some((self.0)())
     }
 }
@@ -20,17 +22,19 @@ pub fn pure<F, T>(x: F) -> Pure<F> where F: Fn() -> T {
     Pure(x)
 }
 
-// Bind combinator
+// BindP combinator
 #[derive(Clone, Copy, Debug)]
-pub struct Bind<F, P, T1, T2>(F, P, PhantomData<T1>, PhantomData<T2>);
+pub struct BindP<F, P, T>(F, P, PhantomData<T>);
 
-impl<S, T1, T2, F, P> Parsable<S, T2> for Bind<F, P, T1, Option<T2>> 
+impl<F, P, S, T> Parsable<S> for BindP<F, P, Option<T>> 
     where 
-        F: Fn(T1) -> Option<T2>, 
-        P: Parsable<S, T1>
+        F: Fn(P::Result) -> Option<T>, 
+        P: Parsable<S>
 {
+    type Result = T;
+
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<T2> 
+        -> Option<Self::Result> 
     {
         match self.1.parse(state, logger).map(&self.0) {
             Some(Some(x)) => Some(x),
@@ -39,14 +43,16 @@ impl<S, T1, T2, F, P> Parsable<S, T2> for Bind<F, P, T1, Option<T2>>
     }
 }
 
-impl<S, T1, T2, F, P, E> Parsable<S, T2> for Bind<F, P, T1, Result<T2, E>> 
+impl<F, P, S, T, E> Parsable<S> for BindP<F, P, Result<T, E>> 
     where 
-        F: Fn(T1) -> Result<T2, E>, 
-        P: Parsable<S, T1>, 
+        F: Fn(P::Result) -> Result<T, E>, 
+        P: Parsable<S>, 
         E: ToString
 {
+    type Result = T;
+
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<T2> 
+        -> Option<Self::Result>
     {
         match self.1.parse(state, logger).map(&self.0) {
             Some(Ok(x)) => Some(x),
@@ -59,48 +65,49 @@ impl<S, T1, T2, F, P, E> Parsable<S, T2> for Bind<F, P, T1, Result<T2, E>>
     }
 }
 
-pub fn bind_option<S, T1, T2, F, P>(func: F, parser: P) -> Bind<F, P, T1, Option<T2>>
+pub fn bind_option<F, P, S, T>(func: F, parser: P) 
+    -> BindP<F, P, Option<T>>
     where 
-        F: Fn(T1) -> Option<T2>, 
-        P: Parsable<S, T1>
+        F: Fn(P::Result) -> Option<T>, 
+        P: Parsable<S>
 {
-    Bind(func, parser, PhantomData, PhantomData)
+    BindP(func, parser, PhantomData)
 }
 
-pub fn bind_result<S, T1, T2, F, P, E>(func: F, parser: P) -> Bind<F, P, T1, Result<T2, E>>
+pub fn bind_result<F, P, S, T, E>(func: F, parser: P) 
+    -> BindP<F, P, Result<T, E>>
     where 
-        F: Fn(T1) -> Result<T2, E>, 
-        P: Parsable<S, T1>
+        F: Fn(P::Result) -> Result<T, E>, 
+        P: Parsable<S>
 {
-    Bind(func, parser, PhantomData, PhantomData)
+    BindP(func, parser, PhantomData)
 }
 
-pub trait MonadicExt<S, T1> : Parsable<S, T1> {
-    /// Bind Combinator (Option)
-    fn bind_option<T2, F>(self, func: F) -> Bind<F, Self, T1, Option<T2>>
+pub trait MonadicExt<S> : Parsable<S> {
+    /// BindP Combinator (Option)
+    fn bind_option<F, T>(self, func: F) -> BindP<F, Self, Option<T>>
         where 
             Self: Sized, 
-            F: Fn(T1) -> Option<T2>,
+            F: Fn(Self::Result) -> Option<T>,
     {
-        Bind(func, self, PhantomData, PhantomData)
+        BindP(func, self, PhantomData)
     }
 
-    /// Bind Combinator (Result)
-    fn bind_result<T2, F, E>(self, func: F) -> Bind<F, Self, T1, Result<T2, E>>
+    /// BindP Combinator (Result)
+    fn bind_result<F, T, E>(self, func: F) -> BindP<F, Self, Result<T, E>>
         where 
             Self: Sized, 
-            F: Fn(T1) -> Result<T2, E>
+            F: Fn(Self::Result) -> Result<T, E>
     {
-        Bind(func, self, PhantomData, PhantomData)
+        BindP(func, self, PhantomData)
     }
 }
 
-impl<S, T, P: Parsable<S, T>> MonadicExt<S, T> for P {}
+impl<S, P: Parsable<S>> MonadicExt<S> for P {}
 
 #[cfg(test)]
 mod test_pure {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::primitives::*;
     
     #[test]
@@ -130,8 +137,7 @@ mod test_pure {
 
 #[cfg(test)]
 mod test_bind {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
     use crate::primitives::*;
 

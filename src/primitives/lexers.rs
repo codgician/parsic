@@ -1,13 +1,16 @@
-use crate::core::parser::*;
-use crate::core::logger::*;
+use crate::core::*;
 use crate::primitives::*;
 
 // Char parser builder
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct CharP(char);
 
-impl Parsable<StrState, char> for CharP {
-    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) -> Option<char> {
+impl Parsable<StrState> for CharP {
+    type Result = char;
+    
+    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         match stream.inp.next() {
             Some(ch) => {
                 if ch == self.0 {
@@ -39,10 +42,14 @@ pub fn char(ch: char) -> CharP {
 #[derive(Clone, Copy, Debug)]
 pub struct SatisfyP<F>(F);
 
-impl<'a, F> Parsable<StrState, char> for SatisfyP<F>
+impl<'a, F> Parsable<StrState> for SatisfyP<F>
     where F: Fn(&char) -> bool
 {
-    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) -> Option<char> {
+    type Result = char;
+
+    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         match stream.inp.next() {
             Some(ch) => {
                 if self.0(&ch) {
@@ -66,15 +73,21 @@ impl<'a, F> Parsable<StrState, char> for SatisfyP<F>
     }
 }
 
-pub fn satisfy< F>(f: F) -> SatisfyP<F> where F: Fn(&char) -> bool {
+pub fn satisfy< F>(f: F) -> SatisfyP<F> 
+    where F: Fn(&char) -> bool 
+{
     SatisfyP(f)
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LiteralP(String);
 
-impl<'a> Parsable<StrState, &'static str> for LiteralP {
-    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) -> Option<&'static str> {
+impl Parsable<StrState> for LiteralP {
+    type Result = &'static str;
+
+    fn parse(&self, stream: &mut StrState, logger: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         if stream.as_stream().starts_with(&self.0[..]) {
             let ret = &stream.as_stream()[0 .. self.0.len()];
             stream.take(self.0.len()).for_each(|_| {});
@@ -95,12 +108,9 @@ pub fn literal(s: &str) -> LiteralP {
 
 #[cfg(test)]
 mod test_char {
-    use crate::core::parser::*;
-    use crate::core::logger::*;
-    use crate::primitives::*;
-    use super::char;
+    use crate::core::*;
+    use crate::primitives::{ StrState, char };
 
-    // Should parse when character matches
     #[test]
     fn ok() {
         let mut st = StrState::new("Hello");
@@ -113,7 +123,6 @@ mod test_char {
         assert_eq!(0, log.len());
     }
 
-    // Should return none when character does not match
     #[test]
     fn fail() {
         let mut st = StrState::new("Hello");
@@ -129,12 +138,9 @@ mod test_char {
 
 #[cfg(test)]
 mod test_satisfy {
-    use crate::core::parser::*;
-    use crate::core::logger::*;
-    use crate::primitives::*;
-    use super::satisfy;
+    use crate::core::*;
+    use crate::primitives::{ StrState, satisfy };
 
-    // Should parse when character satisifies given condition
     #[test]
     fn ok() {
         let mut st = StrState::new("Hello");
@@ -147,7 +153,6 @@ mod test_satisfy {
         assert_eq!(0, log.len());
     }
 
-    // Should return none when character does not satisfy given condition
     #[test]
     fn fail() {
         let mut st = StrState::new("hello");
@@ -163,12 +168,9 @@ mod test_satisfy {
 
 #[cfg(test)]
 mod test_literal {
-    use crate::core::parser::*;
-    use crate::core::logger::*;
-    use crate::primitives::*;
-    use super::literal;
+    use crate::core::*;
+    use crate::primitives::{ StrState, literal };
 
-    // Should parse when literal matches
     #[test]
     fn ok() {
         let mut st = StrState::new("Hello!");
@@ -181,7 +183,6 @@ mod test_literal {
         assert_eq!(0, log.len());
     }
 
-    // Should return none when literal does not match
     #[test]
     fn fail() {
         let mut st = StrState::new("Hell");

@@ -1,4 +1,4 @@
-use crate::core::logger::Pos;
+use crate::core::Pos;
 
 #[derive(Clone, Debug)]
 pub struct StrState {

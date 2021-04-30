@@ -1,32 +1,35 @@
 use std::rc::Rc;
-use crate::core::parser::Parsable;
-use crate::core::logger::ParseLogger;
+use crate::core::{ Parsable, ParseLogger };
 
 #[derive(Clone)]
 pub struct FixP<'a, S, T>
-    (Rc<dyn for<'b> Fn(&'b Self) -> Box<dyn Parsable<S, T> + 'b> + 'a>);
+    (Rc<dyn for<'b> Fn(&'b Self) 
+        -> Box<dyn Parsable<S, Result = T> + 'b> + 'a>);
 
-impl<'a, S, T> Parsable<S, T> for FixP<'a, S, T> {
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<T> {
+impl<'a, S, T> Parsable<S> for FixP<'a, S, T> {
+    type Result = T;
+
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         // Fixed-point Combinator: fix f = f (fix f)
         (self.0)(self).parse(stream, logger)
     }
 }
 
-pub fn fix<'a, S, T, F>(fix: F) -> FixP<'a, S, T>
+pub fn fix<'a, F, S, T>(fix: F) -> FixP<'a, S, T>
     where
         F: for<'b> Fn(&'b FixP<'a, S, T>)
-            -> Box<dyn Parsable<S, T> + 'b> + 'a,
+            -> Box<dyn Parsable<S, Result = T> + 'b> + 'a,
 {
     FixP(Rc::new(fix))
 }
 
 #[cfg(test)]
 mod test {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
-    use crate::primitives::*;
+    use crate::primitives::{ StrState, char, satisfy };
 
     #[test]
     fn simple_recursive_syntax() {
@@ -97,10 +100,10 @@ mod test {
             )
         }); 
 
-        let mut st = StrState::new("(1+2)*(3+4)");
+        let mut st = StrState::new("1+2*(3+4)");
         let mut log = ParseLogger::default();
         assert_eq!(
-            Some(21),
+            Some(15),
             expr_parser.parse(&mut st, &mut log)
         );
         assert_eq!(0, log.len());

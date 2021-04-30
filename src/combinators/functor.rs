@@ -1,42 +1,46 @@
-use std::marker::PhantomData;
-
-use crate::core::parser::Parsable;
-use crate::core::logger::ParseLogger;
+use crate::core::{ Parsable, ParseLogger };
 
 #[derive(Clone, Copy, Debug)]
-pub struct Map<F, P, T1>(F, P, PhantomData<T1>);
+pub struct MapP<F, P>(F, P);
 
-impl<S, T1, T2, F, P> Parsable<S, T2> for Map<F, P, T1> 
-    where F: Fn(T1) -> T2, P: Parsable<S, T1>
+impl<F, P, S, T> Parsable<S> for MapP<F, P> 
+    where 
+        F: Fn(P::Result) -> T, 
+        P: Parsable<S>
 {
+    type Result = T;
+
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<T2> 
+        -> Option<Self::Result> 
     {
         self.1.parse(state, logger).map(&self.0)
     }
 }
 
-pub fn map<S, T1, T2, F, P>(func: F, parser: P) -> Map<F, P, T1>
-    where F: Fn(T1) -> T2, P: Parsable<S, T1>
+pub fn map<F, P, S, T>(func: F, parser: P) -> MapP<F, P>
+    where 
+        F: Fn(P::Result) -> T, 
+        P: Parsable<S>
 {
-    Map(func, parser, PhantomData)
+    MapP(func, parser)
 }
 
-pub trait FunctorExt<S, T1> : Parsable<S, T1> {
-    /// Map Combinator
-    fn map<T2, F>(self, func: F) -> Map<F, Self, T1>
-        where Self: Sized, F: Fn(T1) -> T2,
+pub trait FunctorExt<S> : Parsable<S> {
+    /// MapP Combinator
+    fn map<T, F>(self, func: F) -> MapP<F, Self>
+        where 
+            Self: Sized, 
+            F: Fn(Self::Result) -> T,
     {
-        Map(func, self, PhantomData)
+        MapP(func, self)
     }
 }
 
-impl<S, T, P: Parsable<S, T>> FunctorExt<S, T> for P {}
+impl<S, P: Parsable<S>> FunctorExt<S> for P {}
 
 #[cfg(test)]
 mod test {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
     use crate::primitives::*;
 

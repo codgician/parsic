@@ -1,13 +1,16 @@
 use std::marker::PhantomData;
-use crate::core::parser::Parsable;
-use crate::core::logger::ParseLogger;
+use crate::core::*;
 
 // Empty
 #[derive(Copy, Clone, Default, Debug)]
 pub struct EmptyP<T>(PhantomData<fn() -> Option<T>>);
 
-impl<S, T> Parsable<S, T> for EmptyP<T> {
-    fn parse(&self, _: &mut S, _: &mut ParseLogger) -> Option<T> {
+impl<S, T> Parsable<S> for EmptyP<T> {
+    type Result = T;
+
+    fn parse(&self, _: &mut S, _: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         None
     }
 }
@@ -21,10 +24,14 @@ pub fn empty<T>() -> EmptyP<T> {
 #[derive(Copy, Clone, Debug)]
 pub struct ManyP<P>(P);
 
-impl<S, T, P> Parsable<S, Vec<T>> for ManyP<P>
-    where S: Clone, P: Parsable<S, T>
+impl<S, P> Parsable<S> for ManyP<P>
+    where S: Clone, P: Parsable<S>
 {
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Vec<T>> {
+    type Result = Vec<P::Result>;
+
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) 
+        -> Option<Self::Result> 
+    {
         let mut res = vec![];
         let mut st = stream.clone();
         let mut lg = logger.clone();
@@ -42,8 +49,8 @@ impl<S, T, P> Parsable<S, Vec<T>> for ManyP<P>
 }
 
 // Many Combinator
-pub fn many<S, T, P>(parser: P) -> ManyP<P>
-    where P: Parsable<S, T> 
+pub fn many<S, P>(parser: P) -> ManyP<P>
+    where P: Parsable<S> 
 {
     ManyP(parser)
 }
@@ -52,8 +59,10 @@ pub fn many<S, T, P>(parser: P) -> ManyP<P>
 #[derive(Copy, Clone, Debug)]
 pub struct SomeP<P>(P);
 
-impl<S: Clone, T, P: Parsable<S, T>> Parsable<S, Vec<T>> for SomeP<P> {
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Vec<T>> {
+impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
+    type Result = Vec<P::Result>;
+
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
         let mut res = vec![self.0.parse(stream, logger)?];
         let mut st = stream.clone();
         let mut lg = logger.clone();
@@ -71,12 +80,12 @@ impl<S: Clone, T, P: Parsable<S, T>> Parsable<S, Vec<T>> for SomeP<P> {
 }
 
 /// Some Combinator
-pub fn some<S, T, P: Parsable<S, T>>(parser: P) -> SomeP<P> {
+pub fn some<S, P: Parsable<S>>(parser: P) -> SomeP<P> {
     SomeP(parser)
 }
 
 // Implement iterator-style method for Parsable trait
-pub trait ApplicativeExt<S, T> : Parsable<S, T> {
+pub trait ApplicativeExt<S> : Parsable<S> {
     /// Many Combinator
     fn many(self) -> ManyP<Self> where Self: Sized {
         ManyP(self)
@@ -88,13 +97,12 @@ pub trait ApplicativeExt<S, T> : Parsable<S, T> {
     }
 }
 
-impl<S, T, P: Parsable<S, T>> ApplicativeExt<S, T> for P {}
+impl<S, P: Parsable<S>> ApplicativeExt<S> for P {}
 
 #[cfg(test)]
 mod test_empty {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
-    use crate::primitives::*;
+    use crate::core::*;
+    use crate::primitives::StrState;
 
     #[test]
     fn fail() {
@@ -111,10 +119,9 @@ mod test_empty {
 
 #[cfg(test)]
 mod test_many {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
-    use crate::primitives::*;
+    use crate::primitives::{ StrState, char };
 
     #[test]
     fn ok_nonempty() {
@@ -139,10 +146,9 @@ mod test_many {
 
 #[cfg(test)]
 mod test_some {
-    use crate::core::parser::*;
-    use crate::core::logger::ParseLogger;
+    use crate::core::*;
     use crate::combinators::*;
-    use crate::primitives::*;
+    use crate::primitives::{ StrState, char };
 
     #[test]
     fn ok() {
