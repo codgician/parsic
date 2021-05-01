@@ -36,8 +36,7 @@ mod test {
         // expr := '1' expr | '0'
         let expr_parser = fix(|it| Box::new(
             char('1')
-            .and(it)
-            .map(|(_, x)| x)
+            .right(it)
             .or(char('0'))
         ));
 
@@ -72,10 +71,8 @@ mod test {
 
             let parentheses_expr_parser = 
                 char('(')
-                    .and(expr_it)
-                    .map(|(_, v)| v)
-                    .and(char(')'))
-                    .map(|(v, _)| v);
+                    .right(expr_it)
+                    .left(char(')'));
 
             let factor_parser = 
                 parentheses_expr_parser
@@ -83,8 +80,7 @@ mod test {
 
             let term_parser = fix(move |term_it| Box::new(
                 factor_parser.clone()
-                    .and(char('*'))
-                    .map(|(v, _)| v)
+                    .left(char('*'))
                     .and(term_it)
                     .map(|(v1, v2)| v1 * v2)
                     .or(factor_parser.clone())
@@ -92,8 +88,7 @@ mod test {
 
             Box::new(
                 term_parser.clone()
-                    .and(char('+'))
-                    .map(|(v, _)| v)
+                    .left(char('+'))
                     .and(expr_it)
                     .map(|(v1, v2)| v1 + v2)
                     .or(term_parser)

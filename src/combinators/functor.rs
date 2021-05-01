@@ -4,9 +4,9 @@ use crate::core::{ Parsable, ParseLogger };
 pub struct MapP<F, P>(F, P);
 
 impl<F, P, S, T> Parsable<S> for MapP<F, P> 
-    where 
-        F: Fn(P::Result) -> T, 
-        P: Parsable<S>
+where 
+    F: Fn(P::Result) -> T, 
+    P: Parsable<S>
 {
     type Result = T;
 
@@ -18,9 +18,9 @@ impl<F, P, S, T> Parsable<S> for MapP<F, P>
 }
 
 pub fn map<F, P, S, T>(func: F, parser: P) -> MapP<F, P>
-    where 
-        F: Fn(P::Result) -> T, 
-        P: Parsable<S>
+where 
+    F: Fn(P::Result) -> T, 
+    P: Parsable<S>
 {
     MapP(func, parser)
 }
@@ -28,9 +28,9 @@ pub fn map<F, P, S, T>(func: F, parser: P) -> MapP<F, P>
 pub trait FunctorExt<S> : Parsable<S> {
     /// MapP Combinator
     fn map<T, F>(self, func: F) -> MapP<F, Self>
-        where 
-            Self: Sized, 
-            F: Fn(Self::Result) -> T,
+    where 
+        Self: Sized, 
+        F: Fn(Self::Result) -> T
     {
         MapP(func, self)
     }

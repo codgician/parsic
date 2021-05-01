@@ -6,11 +6,11 @@
 
 ## To-do
 
-- 💖 Core
+- 💖 **Core**
     - [x] Parsable
     - [x] ParseLogger
     - [x] Primitives (`StrState` and related lexers)
-- 🍡 Basic combinators
+- 🍡 **Basic combinators**
     - [x] `char`: Consumes one char at a time from parse stream
     - [x] `satisfy`: Consumes one char if given condition satisifies
     - [x] `literal`: Consumes given literal string
@@ -19,22 +19,23 @@
     - [x] `fix`: Fixed-point combinator to support recursive syntax
     - [x] `map`: fmap for functor
     - [x] `bind`: bind for monad
-    - [x] `and`: Sequential combinators (pair)
+    - [x] `and`: Sequential combinator (pair)
+    - [x] `left`, `right`: Sequencial combinators (select left / right)
     - [ ] `chain`: Sequential combinators (iterator)
     - [x] `or`: Alternative combinators
     - [x] `some`, `many`: Replicative combinators
     - [x] `info`, `warn`, `error`: Log combinators
     - [ ] More to be added...
-- ✨ Enhancements
+- ✨ **Enhancements**
     - [x] Implement iterator-style interface
     - [ ] ~~Support returning multiple results~~
     - [ ] Customizable error messages
     - [ ] Wrapper for parsers
-- 🩺 Tests
+- 🩺 **Tests**
     - [ ] Property tests
     - [ ] Arthimetic calculator
     - [ ] Markdown parser
-- 📄 Docs
+- 📄 **Docs**
     - [ ] Core 
     - [ ] Combinators
     - [ ] Wrappers
