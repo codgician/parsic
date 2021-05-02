@@ -3,15 +3,15 @@ use crate::core::*;
 
 // Empty
 #[derive(Copy, Clone, Default, Debug)]
-pub struct EmptyP<T>(PhantomData<fn() -> Option<T>>);
+pub struct EmptyP<S, T>(PhantomData<S>, PhantomData<fn() -> Option<T>>);
 
-impl<T> EmptyP<T> {
+impl<S, T> EmptyP<S, T> {
     pub fn new() -> Self {
-        Self(PhantomData)
+        Self(PhantomData, PhantomData)
     }
 }
 
-impl<S, T> Parsable<S> for EmptyP<T> {
+impl<S, T> Parsable<S> for EmptyP<S, T> {
     type Result = T;
 
     fn parse(&self, _: &mut S, _: &mut ParseLogger)
@@ -22,8 +22,75 @@ impl<S, T> Parsable<S> for EmptyP<T> {
 }
 
 /// ### Combinator: `empty`
-pub fn empty<T>() -> EmptyP<T> {
+/// A parser that consumes no item and always fails.
+pub fn empty<S, T>() -> EmptyP<S, T> {
     EmptyP::new()
+}
+
+// Pure
+#[derive(Clone, Copy, Debug)]
+pub struct PureP<T>(T);
+
+impl<T> PureP<T> {
+    pub fn new(item: T) -> Self {
+        Self(item)
+    }
+}
+
+impl<S, T: Clone> Parsable<S> for PureP<T> {
+    type Result = T;
+
+    fn parse(&self, _: &mut S, _: &mut ParseLogger)
+        -> Option<Self::Result>
+    {
+        Some(self.0.clone())
+    }
+}
+
+/// ### Combinator: `pure`
+/// Injects a value into an identity parser.
+pub fn pure<T: Copy>(item: T) -> PureP<T> {
+    PureP::new(item)
+}
+
+// Apply
+#[derive(Copy, Clone, Debug)]
+pub struct ApplyP<P1, P2, T>(P1, P2, PhantomData<T>);
+
+impl<P1, P2, T> ApplyP<P1, P2, T> {
+    pub fn new(p1: P1, p2: P2) -> Self {
+        Self(p1, p2, PhantomData)
+    }
+}
+
+impl<P1, P2, F, S, T> Parsable<S> for ApplyP<P1, P2, T> 
+where
+    F: Fn(P2::Result) -> T,
+    P1: Parsable<S, Result = F>,
+    P2: Parsable<S>
+{
+    type Result = T;
+    
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
+    {
+        match self.0.parse(state, logger) {
+            None => None,
+            Some(f) => match self.1.parse(state, logger) {
+                None => None,
+                Some(x) => Some(f(x))
+            }
+        }
+    }
+}
+
+pub fn apply<P1, P2, F, S, T>(p1: P1, p2: P2) -> ApplyP<P1, P2, T>
+where
+    F: Fn(P2::Result) -> T,
+    P1: Parsable<S, Result = F>,
+    P2: Parsable<S>
+{
+    ApplyP::new(p1, p2)
 }
 
 // Many
@@ -106,13 +173,29 @@ pub fn some<S, P: Parsable<S>>(parser: P) -> SomeP<P> {
 }
 
 pub trait ApplicativeExt<S> : Parsable<S> {
+    /// ### Combinator: `apply`
+    fn apply<P, T>(self, parser: P) -> ApplyP<Self, P, T> 
+    where 
+        Self: Sized,
+        Self::Result: Fn(P::Result) -> T,
+        P: Parsable<S>
+    {
+        ApplyP::new(self, parser)
+    }
+
     /// ### Combinator: `many`
-    fn many(self) -> ManyP<Self> where Self: Sized {
+    fn many(self) -> ManyP<Self>
+    where 
+        Self: Sized 
+    {
         ManyP::new(self)
     }
 
     /// ### Combinator: `some`
-    fn some(self) -> SomeP<Self> where Self: Sized {
+    fn some(self) -> SomeP<Self>
+    where 
+        Self: Sized 
+    {
         SomeP::new(self)
     }
 }
@@ -123,6 +206,7 @@ impl<S, P: Parsable<S>> ApplicativeExt<S> for P {}
 mod test_empty {
     use crate::core::*;
     use crate::primitives::StrState;
+    use crate::combinators::*;
 
     #[test]
     fn fail() {
@@ -130,7 +214,56 @@ mod test_empty {
         let mut log = ParseLogger::default();
         assert_eq!(
             None as Option<String>,
-            super::empty().parse(&mut st, &mut log)
+            empty().parse(&mut st, &mut log)
+        );
+        assert_eq!("Hello", st.as_stream());
+        assert_eq!(0, log.len());
+    }
+}
+
+#[cfg(test)]
+mod test_apply {
+    use crate::core::*;
+    use crate::primitives::*;
+    use super::*;
+
+    #[test]
+    fn ok() {
+        let mut st = StrState::new("Hello");
+        let mut log = ParseLogger::default();
+        assert_eq!(
+            Some(true),
+            pure(|x| x == 'H')
+                .apply(char('H'))
+                .parse(&mut st, &mut log)
+        );
+        assert_eq!("ello", st.as_stream());
+        assert_eq!(0, log.len());
+    }
+
+    #[test]
+    fn fail() {
+        let mut st = StrState::new("Hello");
+        let mut log = ParseLogger::default();
+        assert_eq!(
+            None,
+            pure(|x| x == 'H')
+                .apply(char('h'))
+                .parse(&mut st, &mut log)
+        );
+        assert_eq!("ello", st.as_stream());
+        assert_eq!(1, log.len());
+    }
+
+    #[test]
+    fn apply_to_empty() {
+        let mut st = StrState::new("Hello");
+        let mut log = ParseLogger::default();
+        assert_eq!(
+            None,
+            pure(|_| true)
+                .apply(empty::<StrState, bool>())
+                .parse(&mut st, &mut log)
         );
         assert_eq!("Hello", st.as_stream());
         assert_eq!(0, log.len());

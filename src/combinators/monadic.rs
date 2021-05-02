@@ -1,37 +1,6 @@
 use std::marker::PhantomData;
 use crate::core::{ Parsable, ParseLogger, Msg, MsgBody };
 
-// PureP
-#[derive(Clone, Copy, Debug)]
-pub struct PureP<F>(F);
-
-impl<F> PureP<F> {
-    pub fn new(func: F) -> Self {
-        Self(func)
-    }
-}
-
-impl<F, S, T> Parsable<S> for PureP<F>
-where
-    F: Fn() -> T
-{
-    type Result = T;
-
-    fn parse(&self, _: &mut S, _: &mut ParseLogger)
-        -> Option<T>
-    {
-        Some((self.0)())
-    }
-}
-
-/// ### Combinator: `pure`
-pub fn pure<F, T>(func: F) -> PureP<F>
-where
-    F: Fn() -> T
-{
-    PureP::new(func)
-}
-
 // Bind
 #[derive(Clone, Copy, Debug)]
 pub struct BindP<F, P, T>(F, P, PhantomData<T>);
@@ -122,36 +91,6 @@ pub trait MonadicExt<S> : Parsable<S> {
 }
 
 impl<S, P: Parsable<S>> MonadicExt<S> for P {}
-
-#[cfg(test)]
-mod test_pure {
-    use crate::core::*;
-    use crate::primitives::*;
-
-    #[test]
-    fn ok() {
-        let mut st = StrState::new("Hello");
-        let mut log = ParseLogger::default();
-        assert_eq!(
-            Some(true),
-            super::pure(|| true).parse(&mut st, &mut log)
-        );
-        assert_eq!("Hello", st.as_stream());
-        assert_eq!(0, log.len());
-    }
-
-    #[test]
-    fn empty_input() {
-        let mut st = StrState::new("");
-        let mut log = ParseLogger::default();
-        assert_eq!(
-            Some(true),
-            super::pure(|| true).parse(&mut st, &mut log)
-        );
-        assert_eq!("", st.as_stream());
-        assert_eq!(0, log.len());
-    }
-}
 
 #[cfg(test)]
 mod test_bind {

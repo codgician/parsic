@@ -64,7 +64,7 @@ where
 
 /// ### Combinator: `mid` (function variant)
 pub fn mid<S, P1, P2, P3>(p1: P1, p2: P2, p3: P3)
-    -> MapP<fn(((P1::Result, P2::Result), P3::Result)) -> P2::Result, 
+    -> MapP<fn(((P1::Result, P2::Result), P3::Result)) -> P2::Result,
         AndP<AndP<P1, P2>, P3>>
 where
     P1: Parsable<S>,
@@ -106,7 +106,7 @@ pub trait SequentialPExt<S> : Parsable<S> {
 
     /// ### Combinator: `mid`
     fn mid<P1, P2>(self, p1: P1, p2: P2)
-        -> MapP<fn(((Self::Result, P1::Result), P2::Result)) -> P1::Result, 
+        -> MapP<fn(((Self::Result, P1::Result), P2::Result)) -> P1::Result,
             AndP<AndP<Self, P1>, P2>>
     where
         Self: Sized,

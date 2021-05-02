@@ -14,11 +14,12 @@
     - [x] `char`: Consumes one char at a time from parse stream
     - [x] `satisfy`: Consumes one char if given condition satisifies
     - [x] `literal`: Consumes given literal string
-    - [x] `pure`: A parser that consumes nothing and always succeeds
+    - [x] `map`: Functor fmap `<$>`
+    - [x] `pure`: Injects value into an identity parser
+    - [x] `apply`: Applicative apply `<*>`
     - [x] `empty`: A parser that always fails
+    - [x] `bind`: bind for monad `>>=`
     - [x] `fix`: Fixed-point combinator for recursive syntax
-    - [x] `map`: fmap for functor
-    - [x] `bind`: bind for monad
     - [x] `and`: Sequential combinator (pair)
     - [x] `left`, `right`, `mid`: Sequencial combinators (select left / right / middle)
     - [ ] `chain`: Sequential combinators (iterator)
