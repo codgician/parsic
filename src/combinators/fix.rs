@@ -84,13 +84,8 @@ mod test {
                             .parse::<i64>().unwrap()
                     );
 
-            let parentheses_expr_parser =
-                char('(')
-                    .right(expr_it)
-                    .left(char(')'));
-
             let factor_parser =
-                parentheses_expr_parser
+                mid(char('('), expr_it, char(')'))
                     .or(nat_parser);
 
             let term_parser = fix(move |term_it| Box::new(

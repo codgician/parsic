@@ -20,7 +20,7 @@
     - [x] `map`: fmap for functor
     - [x] `bind`: bind for monad
     - [x] `and`: Sequential combinator (pair)
-    - [x] `left`, `right`: Sequencial combinators (select left / right)
+    - [x] `left`, `right`, `mid`: Sequencial combinators (select left / right / middle)
     - [ ] `chain`: Sequential combinators (iterator)
     - [x] `or`: Alternative combinators
     - [x] `some`, `many`: Replicative combinators
