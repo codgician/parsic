@@ -3,36 +3,43 @@ use crate::core::{ Parsable, ParseLogger };
 #[derive(Clone, Copy, Debug)]
 pub struct MapP<F, P>(F, P);
 
-impl<F, P, S, T> Parsable<S> for MapP<F, P> 
-where 
-    F: Fn(P::Result) -> T, 
+impl<F, P> MapP<F, P> {
+    pub fn new(f: F, p: P) -> Self {
+        Self(f, p)
+    }
+}
+
+impl<F, P, S, T> Parsable<S> for MapP<F, P>
+where
+    F: Fn(P::Result) -> T,
     P: Parsable<S>
 {
     type Result = T;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         self.1.parse(state, logger).map(&self.0)
     }
 }
 
+/// ### Combinator: `map` (function variant)
 pub fn map<F, P, S, T>(func: F, parser: P) -> MapP<F, P>
-where 
-    F: Fn(P::Result) -> T, 
+where
+    F: Fn(P::Result) -> T,
     P: Parsable<S>
 {
-    MapP(func, parser)
+    MapP::new(func, parser)
 }
 
 pub trait FunctorExt<S> : Parsable<S> {
-    /// MapP Combinator
+    /// ### Combinator: `map`
     fn map<T, F>(self, func: F) -> MapP<F, Self>
-    where 
-        Self: Sized, 
+    where
+        Self: Sized,
         F: Fn(Self::Result) -> T
     {
-        MapP(func, self)
+        MapP::new(func, self)
     }
 }
 

@@ -1,40 +1,56 @@
 use std::marker::PhantomData;
 use crate::core::{ Parsable, ParseLogger, Msg, MsgBody };
 
-// Pure combinator
+// PureP
 #[derive(Clone, Copy, Debug)]
-pub struct Pure<F>(pub F);
+pub struct PureP<F>(F);
 
-impl<F, S, T> Parsable<S> for Pure<F>
-    where F: Fn() -> T
+impl<F> PureP<F> {
+    pub fn new(func: F) -> Self {
+        Self(func)
+    }
+}
+
+impl<F, S, T> Parsable<S> for PureP<F>
+where
+    F: Fn() -> T
 {
     type Result = T;
 
-    fn parse(&self, _: &mut S, _: &mut ParseLogger) 
-        -> Option<T> 
+    fn parse(&self, _: &mut S, _: &mut ParseLogger)
+        -> Option<T>
     {
         Some((self.0)())
     }
 }
 
-/// Pure Combinator
-pub fn pure<F, T>(x: F) -> Pure<F> where F: Fn() -> T {
-    Pure(x)
+/// ### Combinator: `pure`
+pub fn pure<F, T>(func: F) -> PureP<F>
+where
+    F: Fn() -> T
+{
+    PureP::new(func)
 }
 
-// BindP combinator
+// Bind
 #[derive(Clone, Copy, Debug)]
 pub struct BindP<F, P, T>(F, P, PhantomData<T>);
 
-impl<F, P, S, T> Parsable<S> for BindP<F, P, Option<T>> 
-    where 
-        F: Fn(P::Result) -> Option<T>, 
-        P: Parsable<S>
+impl<F, P, T> BindP<F, P, T> {
+    pub fn new(func: F, parser: P) -> Self {
+        Self(func, parser, PhantomData)
+    }
+}
+
+impl<F, P, S, T> Parsable<S> for BindP<F, P, Option<T>>
+where
+    F: Fn(P::Result) -> Option<T>,
+    P: Parsable<S>
 {
     type Result = T;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         match self.1.parse(state, logger).map(&self.0) {
             Some(Some(x)) => Some(x),
@@ -43,15 +59,15 @@ impl<F, P, S, T> Parsable<S> for BindP<F, P, Option<T>>
     }
 }
 
-impl<F, P, S, T, E> Parsable<S> for BindP<F, P, Result<T, E>> 
-    where 
-        F: Fn(P::Result) -> Result<T, E>, 
-        P: Parsable<S>, 
-        E: ToString
+impl<F, P, S, T, E> Parsable<S> for BindP<F, P, Result<T, E>>
+where
+    F: Fn(P::Result) -> Result<T, E>,
+    P: Parsable<S>,
+    E: ToString
 {
     type Result = T;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
         -> Option<Self::Result>
     {
         match self.1.parse(state, logger).map(&self.0) {
@@ -65,41 +81,43 @@ impl<F, P, S, T, E> Parsable<S> for BindP<F, P, Result<T, E>>
     }
 }
 
-pub fn bind_option<F, P, S, T>(func: F, parser: P) 
+/// ### Combinator: `bind` (`Option<T>`, function variant)
+pub fn bind_option<F, P, S, T>(func: F, parser: P)
     -> BindP<F, P, Option<T>>
-    where 
-        F: Fn(P::Result) -> Option<T>, 
-        P: Parsable<S>
+where
+    F: Fn(P::Result) -> Option<T>,
+    P: Parsable<S>
 {
-    BindP(func, parser, PhantomData)
+    BindP::new(func, parser)
 }
 
-pub fn bind_result<F, P, S, T, E>(func: F, parser: P) 
+/// ### Combinator: `bind` (`Result<T, E>`, function variant)
+pub fn bind_result<F, P, S, T, E>(func: F, parser: P)
     -> BindP<F, P, Result<T, E>>
-    where 
-        F: Fn(P::Result) -> Result<T, E>, 
-        P: Parsable<S>
+where
+    F: Fn(P::Result) -> Result<T, E>,
+    P: Parsable<S>
 {
-    BindP(func, parser, PhantomData)
+    BindP::new(func, parser)
 }
 
 pub trait MonadicExt<S> : Parsable<S> {
-    /// BindP Combinator (Option)
+    /// ### Combinator: `bind` (`Option<T>`)
     fn bind_option<F, T>(self, func: F) -> BindP<F, Self, Option<T>>
-        where 
-            Self: Sized, 
-            F: Fn(Self::Result) -> Option<T>,
+    where
+        Self: Sized,
+        F: Fn(Self::Result) -> Option<T>,
     {
-        BindP(func, self, PhantomData)
+        BindP::new(func, self)
     }
 
-    /// BindP Combinator (Result)
+    /// ### Combinator: `bind` (`Result<T, E>`)
     fn bind_result<F, T, E>(self, func: F) -> BindP<F, Self, Result<T, E>>
-        where 
-            Self: Sized, 
-            F: Fn(Self::Result) -> Result<T, E>
+    where
+        Self: Sized,
+        F: Fn(Self::Result) -> Result<T, E>
     {
-        BindP(func, self, PhantomData)
+        BindP::new(func, self)
     }
 }
 
@@ -109,7 +127,7 @@ impl<S, P: Parsable<S>> MonadicExt<S> for P {}
 mod test_pure {
     use crate::core::*;
     use crate::primitives::*;
-    
+
     #[test]
     fn ok() {
         let mut st = StrState::new("Hello");

@@ -1,18 +1,25 @@
 use crate::core::{ Parsable, ParseLogger };
 
+// Or
 #[derive(Clone, Copy, Debug)]
 pub struct OrP<P1, P2>(P1, P2);
 
+impl<P1, P2> OrP<P1, P2> {
+    pub fn new(p1: P1, p2: P2) -> Self {
+        Self(p1, p2)
+    }
+}
+
 impl<S, P1, P2> Parsable<S> for OrP<P1, P2>
-    where 
-        S: Clone, 
-        P1: Parsable<S>, 
-        P2: Parsable<S, Result = P1::Result>
+where
+    S: Clone,
+    P1: Parsable<S>,
+    P2: Parsable<S, Result = P1::Result>
 {
     type Result = P1::Result;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         let st0 = state.clone();
         let lg0 = logger.clone();
@@ -27,18 +34,19 @@ impl<S, P1, P2> Parsable<S> for OrP<P1, P2>
     }
 }
 
+/// ### Combinator: `or` (function variant)
 pub fn or<P1, P2>(p1: P1, p2: P2) -> OrP<P1, P2> {
-    OrP(p1, p2)
+    OrP::new(p1, p2)
 }
 
 pub trait OrExt<S> : Parsable<S> {
-    /// Or Combinator
+    /// ### Combinator: `or`
     fn or<P>(self, parser: P) -> OrP<Self, P>
-        where 
-            Self: Sized, 
-            P: Parsable<S>
+    where
+        Self: Sized,
+        P: Parsable<S>
     {
-        OrP(self, parser)
+        OrP::new(self, parser)
     }
 }
 

@@ -3,26 +3,41 @@ use crate::core::{ Parsable, ParseLogger };
 
 #[derive(Clone)]
 pub struct FixP<'a, S, T>
-    (Rc<dyn for<'b> Fn(&'b Self) 
+    (Rc<dyn for<'b> Fn(&'b Self)
         -> Box<dyn Parsable<S, Result = T> + 'b> + 'a>);
+
+impl<'a, S, T> FixP<'a, S, T> {
+    pub fn new<F>(func: F) -> Self
+    where
+        F: for<'b> Fn(&'b FixP<'a, S, T>)
+            -> Box<dyn Parsable<S, Result = T> + 'b> + 'a
+    {
+        Self(Rc::new(func))
+    }
+}
 
 impl<'a, S, T> Parsable<S> for FixP<'a, S, T> {
     type Result = T;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
-        // Fixed-point Combinator: fix f = f (fix f)
+        // fix f = f (fix f)
         (self.0)(self).parse(state, logger)
     }
 }
 
-pub fn fix<'a, F, S, T>(fix: F) -> FixP<'a, S, T>
-    where
-        F: for<'b> Fn(&'b FixP<'a, S, T>)
-            -> Box<dyn Parsable<S, Result = T> + 'b> + 'a,
+/// ### Combinator: `fix`
+/// Fixed-point combinator (aka Y-Combinator), which is introduced to support recursive synatax.
+/// ```plain
+/// fix f = f (fix f)
+/// ```
+pub fn fix<'a, F, S, T>(func: F) -> FixP<'a, S, T>
+where
+    F: for<'b> Fn(&'b FixP<'a, S, T>)
+        -> Box<dyn Parsable<S, Result = T> + 'b> + 'a,
 {
-    FixP(Rc::new(fix))
+    FixP::new(func)
 }
 
 #[cfg(test)]
@@ -57,10 +72,10 @@ mod test {
         // nat      := digit { digit }
         // digit    := '0' | '1' | ... | '9'
         let expr_parser = fix(|expr_it| {
-            let digit_parser = 
+            let digit_parser =
                 satisfy(|&ch| ch.is_digit(10));
 
-            let nat_parser = 
+            let nat_parser =
                 digit_parser
                     .some()
                     .map(
@@ -69,12 +84,12 @@ mod test {
                             .parse::<i64>().unwrap()
                     );
 
-            let parentheses_expr_parser = 
+            let parentheses_expr_parser =
                 char('(')
                     .right(expr_it)
                     .left(char(')'));
 
-            let factor_parser = 
+            let factor_parser =
                 parentheses_expr_parser
                     .or(nat_parser);
 
@@ -93,7 +108,7 @@ mod test {
                     .map(|(v1, v2)| v1 + v2)
                     .or(term_parser)
             )
-        }); 
+        });
 
         let mut st = StrState::new("1+2*(3+4)");
         let mut log = ParseLogger::default();

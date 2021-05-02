@@ -5,32 +5,46 @@ use crate::core::*;
 #[derive(Copy, Clone, Default, Debug)]
 pub struct EmptyP<T>(PhantomData<fn() -> Option<T>>);
 
+impl<T> EmptyP<T> {
+    pub fn new() -> Self {
+        Self(PhantomData)
+    }
+}
+
 impl<S, T> Parsable<S> for EmptyP<T> {
     type Result = T;
 
-    fn parse(&self, _: &mut S, _: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, _: &mut S, _: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         None
     }
 }
 
-/// Empty Parsable Builder
+/// ### Combinator: `empty`
 pub fn empty<T>() -> EmptyP<T> {
-    EmptyP(PhantomData)
+    EmptyP::new()
 }
 
 // Many
 #[derive(Copy, Clone, Debug)]
 pub struct ManyP<P>(P);
 
+impl<P> ManyP<P> {
+    pub fn new(parser: P) -> Self {
+        Self(parser)
+    }
+}
+
 impl<S, P> Parsable<S> for ManyP<P>
-    where S: Clone, P: Parsable<S>
+where
+    S: Clone,
+    P: Parsable<S>
 {
     type Result = Vec<P::Result>;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         let mut res = vec![];
         let mut st = state.clone();
@@ -48,16 +62,23 @@ impl<S, P> Parsable<S> for ManyP<P>
     }
 }
 
-// Many Combinator
+/// ### Combinator: `many` (function variant)
 pub fn many<S, P>(parser: P) -> ManyP<P>
-    where P: Parsable<S> 
+where
+    P: Parsable<S>
 {
-    ManyP(parser)
+    ManyP::new(parser)
 }
 
 // Some Combinator
 #[derive(Copy, Clone, Debug)]
 pub struct SomeP<P>(P);
+
+impl<P> SomeP<P> {
+    pub fn new(parser: P) -> Self {
+        Self(parser)
+    }
+}
 
 impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
     type Result = Vec<P::Result>;
@@ -79,21 +100,20 @@ impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
     }
 }
 
-/// Some Combinator
+/// ### Combinator: `some` (function variant)
 pub fn some<S, P: Parsable<S>>(parser: P) -> SomeP<P> {
-    SomeP(parser)
+    SomeP::new(parser)
 }
 
-// Implement iterator-style method for Parsable trait
 pub trait ApplicativeExt<S> : Parsable<S> {
-    /// Many Combinator
+    /// ### Combinator: `many`
     fn many(self) -> ManyP<Self> where Self: Sized {
-        ManyP(self)
+        ManyP::new(self)
     }
 
-    /// Some combinator
+    /// ### Combinator: `some`
     fn some(self) -> SomeP<Self> where Self: Sized {
-        SomeP(self)
+        SomeP::new(self)
     }
 }
 

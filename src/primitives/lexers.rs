@@ -1,9 +1,15 @@
 use crate::core::*;
 use crate::primitives::*;
 
-// Char parser builder
+// Char
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct CharP(char);
+
+impl CharP {
+    pub(crate) fn new(ch: char) -> Self {
+        Self(ch)
+    }
+}
 
 impl Parsable<StrState> for CharP {
     type Result = char;
@@ -34,16 +40,24 @@ impl Parsable<StrState> for CharP {
     }
 }
 
+/// ### Lexer: `char`
 pub fn char(ch: char) -> CharP {
-    CharP(ch)
+    CharP::new(ch)
 }
 
-// Satisfy parser builder
+// Satisfy
 #[derive(Clone, Copy, Debug)]
 pub struct SatisfyP<F>(F);
 
+impl<F> SatisfyP<F> {
+    pub(crate) fn new(func: F) -> Self {
+        Self(func)
+    }
+}
+
 impl<'a, F> Parsable<StrState> for SatisfyP<F>
-    where F: Fn(&char) -> bool
+where
+    F: Fn(&char) -> bool
 {
     type Result = char;
 
@@ -73,14 +87,23 @@ impl<'a, F> Parsable<StrState> for SatisfyP<F>
     }
 }
 
+/// ### Lexer: `satisfy`
 pub fn satisfy< F>(f: F) -> SatisfyP<F> 
-    where F: Fn(&char) -> bool 
+where
+    F: Fn(&char) -> bool 
 {
-    SatisfyP(f)
+    SatisfyP::new(f)
 }
 
+// Literal
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LiteralP(String);
+
+impl LiteralP {
+    pub(crate) fn new<'a>(lit: &'a str) -> Self {
+        Self(lit.to_owned())
+    }
+}
 
 impl Parsable<StrState> for LiteralP {
     type Result = &'static str;
@@ -102,8 +125,9 @@ impl Parsable<StrState> for LiteralP {
     }
 }
 
+/// ### Lexer: `literal`
 pub fn literal(s: &str) -> LiteralP {
-    LiteralP(s.to_owned())
+    LiteralP::new(s)
 }
 
 #[cfg(test)]

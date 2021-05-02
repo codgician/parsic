@@ -3,13 +3,20 @@ use crate::core::{ Parsable, ParseLogger, Msg, MsgBody };
 #[derive(Clone, Debug)]
 pub struct LogP<P>(P, Msg);
 
-impl<S, P> Parsable<S> for LogP<P> 
-    where P: Parsable<S> 
+impl<P> LogP<P> {
+    pub fn new(parser: P, msg: Msg) -> Self {
+        Self(parser, msg)
+    }
+}
+
+impl<S, P> Parsable<S> for LogP<P>
+where
+    P: Parsable<S>
 {
     type Result = P::Result;
-    
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         match self.0.parse(state, logger) {
             None => {
@@ -21,41 +28,53 @@ impl<S, P> Parsable<S> for LogP<P>
     }
 }
 
-pub fn info<S, P>(parser: P, msg: &str) -> LogP<P> 
-    where P: Parsable<S> 
+/// ### Combinator: `info` (function variant)
+pub fn info<S, P>(parser: P, msg: &str) -> LogP<P>
+where
+    P: Parsable<S>
 {
-    LogP(parser, Msg::Info(MsgBody::new(msg, None)))
+    LogP::new(parser, Msg::Info(MsgBody::new(msg, None)))
 }
 
-pub fn warn<S, P>(parser: P, msg: &str) -> LogP<P> 
-    where P: Parsable<S> 
+/// ### Combinator: `warn` (function variant)
+pub fn warn<S, P>(parser: P, msg: &str) -> LogP<P>
+where
+    P: Parsable<S>
 {
-    LogP(parser, Msg::Warn(MsgBody::new(msg, None)))
+    LogP::new(parser, Msg::Warn(MsgBody::new(msg, None)))
 }
 
-pub fn error<S, P>(parser: P, msg: &str) -> LogP<P> 
-    where P: Parsable<S> 
+/// ### Combinator: `error` (function variant)
+pub fn error<S, P>(parser: P, msg: &str) -> LogP<P>
+where
+    P: Parsable<S>
 {
-    LogP(parser, Msg::Error(MsgBody::new(msg, None)))
+    LogP::new(parser, Msg::Error(MsgBody::new(msg, None)))
 }
 
 pub trait LogPExt<S> : Parsable<S> {
-    fn info(self, msg: &str) -> LogP<Self> 
-        where Self: Sized 
+    /// ### Combinator: `info`
+    fn info(self, msg: &str) -> LogP<Self>
+    where
+        Self: Sized
     {
-        info(self, msg)
+        LogP::new(self, Msg::Info(MsgBody::new(msg, None)))
     }
 
-    fn warn(self, msg: &str) -> LogP<Self> 
-        where Self: Sized 
+    /// ### Combinator: `warn`
+    fn warn(self, msg: &str) -> LogP<Self>
+    where
+        Self: Sized
     {
-        warn(self, msg)
+        LogP::new(self, Msg::Warn(MsgBody::new(msg, None)))
     }
 
-    fn error(self, msg: &str) -> LogP<Self> 
-        where Self: Sized 
+    /// ### Combinator: `error`
+    fn error(self, msg: &str) -> LogP<Self>
+    where
+        Self: Sized
     {
-        error(self, msg)
+        LogP::new(self, Msg::Warn(MsgBody::new(msg, None)))
     }
 }
 

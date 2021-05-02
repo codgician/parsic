@@ -1,12 +1,19 @@
 use crate::core::{ Parsable, ParseLogger };
+use crate::combinators::MapP;
 
 // And combinator
 #[derive(Clone, Copy, Debug)]
-pub struct AndP<PA, PB>(PA, PB);
+pub struct AndP<P1, P2>(P1, P2);
+
+impl<P1, P2> AndP<P1, P2> {
+    pub fn new(p1: P1, p2: P2) -> Self {
+        Self(p1, p2)
+    }
+}
 
 impl<S, P1, P2> Parsable<S> for AndP<P1, P2>
-where 
-    P1: Parsable<S>, 
+where
+    P1: Parsable<S>,
     P2: Parsable<S>
 {
     type Result = (P1::Result, P2::Result);
@@ -26,99 +33,63 @@ where
     }
 }
 
-/// And combinator
-pub fn and<P1, P2>(p1: P1, p2: P2) -> AndP<P1, P2> {
-    AndP(p1, p2)
-}
-
-// Combinator: left
-#[derive(Clone, Copy, Debug)]
-pub struct LeftP<PA, PB>(PA, PB);
-
-impl<S, P1, P2> Parsable<S> for LeftP<P1, P2>
-where 
-    P1: Parsable<S>, 
+/// ### Combinator: `and` (function variant)
+pub fn and<S, P1, P2>(p1: P1, p2: P2) -> AndP<P1, P2>
+where
+    P1: Parsable<S>,
     P2: Parsable<S>
 {
-    type Result = P1::Result;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
-        match self.0.parse(state, logger) {
-            None => None,
-            Some(r1) => {
-                match self.1.parse(state, logger) {
-                    None => None,
-                    _ => Some(r1)
-                }
-            }
-        }
-    }
+    AndP::new(p1, p2)
 }
 
-/// ## Combinator: `left`
-pub fn left<P1, P2>(p1: P1, p2: P2) -> LeftP<P1, P2> {
-    LeftP(p1, p2)
-}
-
-// Combinator: right
-#[derive(Clone, Copy, Debug)]
-pub struct RightP<PA, PB>(PA, PB);
-
-impl<S, P1, P2> Parsable<S> for RightP<P1, P2>
-where 
-    P1: Parsable<S>, 
+/// ### Combinator: `left` (function variant)
+pub fn left<S, P1, P2>(p1: P1, p2: P2)
+    -> MapP<fn((P1::Result, P2::Result)) -> P1::Result, AndP<P1, P2>>
+where
+    P1: Parsable<S>,
     P2: Parsable<S>
 {
-    type Result = P2::Result;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
-        match self.0.parse(state, logger) {
-            None => None,
-            _ => {
-                match self.1.parse(state, logger) {
-                    None => None,
-                    Some(r2) => Some(r2)
-                }
-            }
-        }
-    }
+    MapP::new(|(l, _)| l, AndP::new(p1, p2))
 }
 
-/// ## Combinator: `right`
-pub fn right<P1, P2>(p1: P1, p2: P2) -> RightP<P1, P2> {
-    RightP(p1, p2)
+/// ### Combinator: `right` (function variant)
+pub fn right<S, P1, P2>(p1: P1, p2: P2)
+    -> MapP<fn((P1::Result, P2::Result)) -> P2::Result, AndP<P1, P2>>
+where
+    P1: Parsable<S>,
+    P2: Parsable<S>
+{
+    MapP::new(|(_, r)| r, AndP::new(p1, p2))
 }
 
 pub trait SequentialPExt<S> : Parsable<S> {
-    /// ## Combinator: `and`
-    fn and<P>(self, parser: P) -> AndP<Self, P>
-    where 
-        Self: Sized, 
-        P: Parsable<S>
-    {
-        AndP(self, parser)
-    }
-
-    /// ## Combinator: `left`
-    fn left<P>(self, parser: P) -> LeftP<Self, P>
+    /// ### Combinator: `and`
+    fn and<P>(self, parser: P)-> AndP<Self, P>
     where
         Self: Sized,
         P: Parsable<S>
     {
-        LeftP(self, parser)
+        AndP::new(self, parser)
     }
 
-    /// ## Combinator: `right`
-    fn right<P>(self, parser: P) -> RightP<Self, P>
+    /// ### Combinator: `left`
+    fn left<P>(self, parser: P)
+        -> MapP<fn((Self::Result, P::Result)) -> Self::Result, AndP<Self, P>>
     where
         Self: Sized,
         P: Parsable<S>
     {
-        RightP(self, parser)
+        MapP::new(|(l, _)| l, AndP::new(self, parser))
+    }
+
+    /// ### Combinator: `right`
+    fn right<P>(self, parser: P)
+        -> MapP<fn((Self::Result, P::Result)) -> P::Result, AndP<Self, P>>
+    where
+        Self: Sized,
+        P: Parsable<S>
+    {
+        MapP::new(|(_, r)| r, AndP::new(self, parser))
     }
 }
 

@@ -16,7 +16,7 @@
     - [x] `literal`: Consumes given literal string
     - [x] `pure`: A parser that consumes nothing and always succeeds
     - [x] `empty`: A parser that always fails
-    - [x] `fix`: Fixed-point combinator to support recursive syntax
+    - [x] `fix`: Fixed-point combinator for recursive syntax
     - [x] `map`: fmap for functor
     - [x] `bind`: bind for monad
     - [x] `and`: Sequential combinator (pair)
@@ -39,3 +39,4 @@
     - [ ] Core 
     - [ ] Combinators
     - [ ] Wrappers
+  
