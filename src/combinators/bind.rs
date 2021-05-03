@@ -3,11 +3,11 @@ use std::marker::PhantomData;
 
 // Bind
 #[derive(Clone, Copy, Debug)]
-pub struct BindP<F, P, T>(F, P, PhantomData<T>);
+pub struct BindP<F, P, T>(P, F, PhantomData<T>);
 
 impl<F, P, T> BindP<F, P, T> {
-    pub fn new(func: F, parser: P) -> Self {
-        Self(func, parser, PhantomData)
+    pub fn new(parser: P, func: F) -> Self {
+        Self(parser, func, PhantomData)
     }
 }
 
@@ -20,8 +20,8 @@ where
     type Result = P2::Result;
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        match self.1.parse(state, logger) {
-            Some(r1) => self.0(r1).parse(state, logger),
+        match self.0.parse(state, logger) {
+            Some(r1) => self.1(r1).parse(state, logger),
             _ => None,
         }
     }
@@ -42,26 +42,29 @@ where
 /// ```
 ///
 /// ```
-///
+///  use naive_parsec::core::*;
+///  use naive_parsec::combinators::*;
+///  use naive_parsec::primitives::*;
+/// 
 ///  let parser = bind(
-///                 satisfy(|_|) true,
+///                 satisfy(|_| true),
 ///                 |ch| if ch.is_uppercase() {
 ///                     char('+')
 ///                 } else {
 ///                     char('-')
 ///                 }
 ///              );
-///   let (res1, _) = parser.exec(&mut StrState::"A+");
+///   let (res1, _) = parser.exec(&mut StrState::new("A+"));
 ///   assert_eq!(Some('+'), res1);
-///   let (res2, _) = parser.exec(&mut StrState::"a-");
+///   let (res2, _) = parser.exec(&mut StrState::new("a-"));
 ///   assert_eq!(Some('-'), res2);
 /// ```
-pub fn bind<F, P, S, T>(func: F, parser: P) -> BindP<F, P, T>
+pub fn bind<F, P, S, T>(parser: P, func: F) -> BindP<F, P, T>
 where
     F: Fn(P::Result) -> T,
     P: Parsable<S>,
 {
-    BindP::new(func, parser)
+    BindP::new(parser, func)
 }
 
 // Iterator-style methods for Parsable<S>
@@ -88,6 +91,10 @@ pub trait BindPExt<S>: Parsable<S> {
     /// ```
     ///
     /// ```
+    ///  use naive_parsec::core::*;
+    ///  use naive_parsec::combinators::*;
+    ///  use naive_parsec::primitives::*;
+    /// 
     ///  let parser = satisfy(|_| true)
     ///             .bind(|ch| if ch.is_uppercase() {
     ///                 char('+')
@@ -95,9 +102,9 @@ pub trait BindPExt<S>: Parsable<S> {
     ///                 char('-')
     ///             });
     ///
-    ///  let (res1, _) = parser.exec(&mut StrState::"A+");
+    ///  let (res1, _) = parser.exec(&mut StrState::new("A+"));
     ///  assert_eq!(Some('+'), res1);
-    ///  let (res2, _) = parser.exec(&mut StrState::"a-");
+    ///  let (res2, _) = parser.exec(&mut StrState::new("a-"));
     ///  assert_eq!(Some('-'), res2);
     /// ```
     ///
@@ -113,7 +120,7 @@ pub trait BindPExt<S>: Parsable<S> {
         Self: Sized,
         F: Fn(Self::Result) -> T,
     {
-        BindP::new(func, self)
+        BindP::new(self, func)
     }
 }
 
