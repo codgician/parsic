@@ -13,9 +13,9 @@ impl CharP {
 
 impl Parsable<StrState> for CharP {
     type Result = char;
-    
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         match state.next() {
             Some(ch) => {
@@ -61,8 +61,8 @@ where
 {
     type Result = char;
 
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         match state.next() {
             Some(ch) => {
@@ -88,9 +88,9 @@ where
 }
 
 /// ### Lexer: `satisfy`
-pub fn satisfy< F>(f: F) -> SatisfyP<F> 
+pub fn satisfy< F>(f: F) -> SatisfyP<F>
 where
-    F: Fn(&char) -> bool 
+    F: Fn(&char) -> bool
 {
     SatisfyP::new(f)
 }
@@ -108,8 +108,8 @@ impl LiteralP {
 impl Parsable<StrState> for LiteralP {
     type Result = &'static str;
 
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         if state.as_stream().starts_with(&self.0[..]) {
             let ret = &state.as_stream()[0 .. self.0.len()];

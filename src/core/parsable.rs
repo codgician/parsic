@@ -6,7 +6,7 @@ pub trait Parsable<S> {
     type Result;    // Type of parsed result
 
     /// Parse function
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
         -> Option<Self::Result>;
 }
 
@@ -15,7 +15,7 @@ impl<S, P: Parsable<S>> Parsable<S> for &P {
     type Result = P::Result;
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger)
-         -> Option<Self::Result> 
+         -> Option<Self::Result>
     {
         (**self).parse(state, logger)
     }
@@ -25,8 +25,8 @@ impl<S, P: Parsable<S>> Parsable<S> for &P {
 impl<S, P: Parsable<S>> Parsable<S>for &mut P {
     type Result = P::Result;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         (**self).parse(state, logger)
     }
@@ -36,8 +36,8 @@ impl<S, P: Parsable<S>> Parsable<S>for &mut P {
 impl<S, P: Parsable<S>> Parsable<S> for Box<P> {
     type Result = P::Result;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         (**self).parse(state, logger)
     }
@@ -47,8 +47,8 @@ impl<S, P: Parsable<S>> Parsable<S> for Box<P> {
 impl<S, P: Parsable<S>> Parsable<S> for Rc<P> {
     type Result = P::Result;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) 
-        -> Option<Self::Result> 
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
+        -> Option<Self::Result>
     {
         (**self).parse(state, logger)
     }

@@ -50,41 +50,23 @@ where
     }
 }
 
-/// ### Combinator: `bind` (`Option<T>`, function variant)
-pub fn bind_option<F, P, S, T>(func: F, parser: P)
-    -> BindP<F, P, Option<T>>
+/// ### Combinator: `bind` (function variant)
+/// Monadic bind operator.
+/// **Only supports `Option<T>` and `Result<T, E>`**.
+pub fn bind<F, P, S, T>(func: F, parser: P) -> BindP<F, P, T>
 where
-    F: Fn(P::Result) -> Option<T>,
-    P: Parsable<S>
-{
-    BindP::new(func, parser)
-}
-
-/// ### Combinator: `bind` (`Result<T, E>`, function variant)
-pub fn bind_result<F, P, S, T, E>(func: F, parser: P)
-    -> BindP<F, P, Result<T, E>>
-where
-    F: Fn(P::Result) -> Result<T, E>,
+    F: Fn(P::Result) -> T,
     P: Parsable<S>
 {
     BindP::new(func, parser)
 }
 
 pub trait MonadicExt<S> : Parsable<S> {
-    /// ### Combinator: `bind` (`Option<T>`)
-    fn bind_option<F, T>(self, func: F) -> BindP<F, Self, Option<T>>
+    /// ### Combinator: `bind`
+    fn bind<F, T>(self, func: F) -> BindP<F, Self, T>
     where
         Self: Sized,
-        F: Fn(Self::Result) -> Option<T>,
-    {
-        BindP::new(func, self)
-    }
-
-    /// ### Combinator: `bind` (`Result<T, E>`)
-    fn bind_result<F, T, E>(self, func: F) -> BindP<F, Self, Result<T, E>>
-    where
-        Self: Sized,
-        F: Fn(Self::Result) -> Result<T, E>
+        F: Fn(Self::Result) -> T,
     {
         BindP::new(func, self)
     }
@@ -102,7 +84,7 @@ mod test_bind {
     fn ok_fully_consumed() {
         let nat_parser = satisfy(|&ch| ch.is_digit(10))
                             .some()
-                            .bind_result(|v| v.into_iter()
+                            .bind(|v| v.into_iter()
                                 .collect::<String>()
                                 .parse::<i64>()
                             );
@@ -121,7 +103,7 @@ mod test_bind {
     fn ok_partially_consumed() {
         let nat_parser = satisfy(|&ch| ch.is_digit(10))
                             .some()
-                            .bind_result(|v| v.into_iter()
+                            .bind(|v| v.into_iter()
                                 .collect::<String>()
                                 .parse::<i64>()
                             );
@@ -140,7 +122,7 @@ mod test_bind {
     fn fail() {
         let nat_parser = satisfy(|&ch| ch.is_digit(10))
                             .some()
-                            .bind_result(|v| v.into_iter()
+                            .bind(|v| v.into_iter()
                                 .collect::<String>()
                                 .parse::<i64>()
                             );

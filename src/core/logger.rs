@@ -32,7 +32,7 @@ impl Display for Msg {
             Msg::Warn(x) => ("WARN", x),
             Msg::Error(x) => ("ERROR", x)
         };
-        
+
         let pos_text = match body.pos {
             Some(Pos(r, c)) => format!("(at row: {}, col: {})", r, c),
             _ => "".to_string()

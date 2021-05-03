@@ -42,8 +42,9 @@ where
     AndP::new(p1, p2)
 }
 
+
 /// ### Combinator: `left` (function variant)
-pub fn left<S, P1, P2>(p1: P1, p2: P2)
+pub fn left<S, P1, P2>(p1: P1, p2: P2) 
     -> MapP<fn((P1::Result, P2::Result)) -> P1::Result, AndP<P1, P2>>
 where
     P1: Parsable<S>,
@@ -53,7 +54,7 @@ where
 }
 
 /// ### Combinator: `right` (function variant)
-pub fn right<S, P1, P2>(p1: P1, p2: P2)
+pub fn right<S, P1, P2>(p1: P1, p2: P2) 
     -> MapP<fn((P1::Result, P2::Result)) -> P2::Result, AndP<P1, P2>>
 where
     P1: Parsable<S>,
@@ -63,8 +64,8 @@ where
 }
 
 /// ### Combinator: `mid` (function variant)
-pub fn mid<S, P1, P2, P3>(p1: P1, p2: P2, p3: P3)
-    -> MapP<fn(((P1::Result, P2::Result), P3::Result)) -> P2::Result,
+pub fn mid<S, P1, P2, P3>(p1: P1, p2: P2, p3: P3) 
+    -> MapP<fn(((P1::Result, P2::Result), P3::Result)) -> P2::Result, 
         AndP<AndP<P1, P2>, P3>>
 where
     P1: Parsable<S>,
@@ -85,7 +86,7 @@ pub trait SequentialPExt<S> : Parsable<S> {
     }
 
     /// ### Combinator: `left`
-    fn left<P>(self, parser: P)
+    fn left<P>(self, parser: P) 
         -> MapP<fn((Self::Result, P::Result)) -> Self::Result, AndP<Self, P>>
     where
         Self: Sized,
@@ -95,7 +96,7 @@ pub trait SequentialPExt<S> : Parsable<S> {
     }
 
     /// ### Combinator: `right`
-    fn right<P>(self, parser: P)
+    fn right<P>(self, parser: P) 
         -> MapP<fn((Self::Result, P::Result)) -> P::Result, AndP<Self, P>>
     where
         Self: Sized,
@@ -105,8 +106,8 @@ pub trait SequentialPExt<S> : Parsable<S> {
     }
 
     /// ### Combinator: `mid`
-    fn mid<P1, P2>(self, p1: P1, p2: P2)
-        -> MapP<fn(((Self::Result, P1::Result), P2::Result)) -> P1::Result,
+    fn mid<P1, P2>(self, p1: P1, p2: P2) 
+        -> MapP<fn(((Self::Result, P1::Result), P2::Result)) -> P1::Result, 
             AndP<AndP<Self, P1>, P2>>
     where
         Self: Sized,
@@ -146,7 +147,7 @@ mod test {
         assert_eq!(
             Some((1, 'A')),
             satisfy(|&ch| ch.is_digit(10))
-                .bind_option(|ch| ch.to_digit(10))
+                .bind(|ch| ch.to_digit(10))
                 .and(char('A'))
                 .parse(&mut st, &mut log)
         );
