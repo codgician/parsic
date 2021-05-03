@@ -42,10 +42,10 @@ where
 /// ```
 ///
 /// ```
-///  use naive_parsec::core::*;
-///  use naive_parsec::combinators::*;
-///  use naive_parsec::primitives::*;
-/// 
+///  use naive_parsec::core::Parsable;
+///  use naive_parsec::combinators::bind;
+///  use naive_parsec::primitives::{ StrState, char, satisfy };
+///
 ///  let parser = bind(
 ///                 satisfy(|_| true),
 ///                 |ch| if ch.is_uppercase() {
@@ -91,10 +91,10 @@ pub trait BindPExt<S>: Parsable<S> {
     /// ```
     ///
     /// ```
-    ///  use naive_parsec::core::*;
-    ///  use naive_parsec::combinators::*;
-    ///  use naive_parsec::primitives::*;
-    /// 
+    ///  use naive_parsec::core::Parsable;
+    ///  use naive_parsec::combinators::BindPExt;
+    ///  use naive_parsec::primitives::{ StrState, char, satisfy };
+    ///
     ///  let parser = satisfy(|_| true)
     ///             .bind(|ch| if ch.is_uppercase() {
     ///                 char('+')
@@ -129,8 +129,8 @@ impl<S, P: Parsable<S>> BindPExt<S> for P {}
 #[cfg(test)]
 mod test_bind {
     use crate::combinators::*;
-    use crate::core::*;
-    use crate::primitives::*;
+    use crate::core::Parsable;
+    use crate::primitives::{char, satisfy, StrState};
 
     #[test]
     fn ok() {

@@ -1,4 +1,4 @@
-use crate::core::*;
+use crate::core::{Parsable, ParseLogger};
 use std::marker::PhantomData;
 
 // Compose
@@ -59,8 +59,8 @@ impl<S, P: Parsable<S>> ComposePExt<S> for P {}
 #[cfg(test)]
 mod test_compose {
     use crate::combinators::*;
-    use crate::core::*;
-    use crate::primitives::*;
+    use crate::core::Parsable;
+    use crate::primitives::{char, StrState};
 
     #[test]
     fn ok() {

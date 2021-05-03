@@ -125,62 +125,70 @@ pub trait SequentialPExt<S>: Parsable<S> {
 impl<S, P: Parsable<S>> SequentialPExt<S> for P {}
 
 #[cfg(test)]
-mod test {
+mod test_and {
     use crate::combinators::*;
-    use crate::core::*;
-    use crate::primitives::*;
+    use crate::core::Parsable;
+    use crate::primitives::{char, satisfy, StrState};
 
     #[test]
-    fn ok_same_type() {
+    fn same_type_ok() {
+        let parser = char('A').and(char('B'));
+
         let mut st = StrState::new("ABC");
-        let mut log = ParseLogger::default();
-        assert_eq!(
-            Some(('A', 'B')),
-            char('A').and(char('B')).parse(&mut st, &mut log)
-        );
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some(('A', 'B')), res);
         assert_eq!("C", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
-    fn ok_different_type() {
+    fn different_type_ok() {
+        let parser = satisfy(|&ch| ch.is_digit(10))
+            .map_opt(|ch| ch.to_digit(10))
+            .and(char('A'));
+
         let mut st = StrState::new("1A+");
-        let mut log = ParseLogger::default();
-        assert_eq!(
-            Some((1, 'A')),
-            satisfy(|&ch| ch.is_digit(10))
-                .map_opt(|ch| ch.to_digit(10))
-                .and(char('A'))
-                .parse(&mut st, &mut log)
-        );
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some((1, 'A')), res);
         assert_eq!("+", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn left_fail() {
+        let parser = char('A').and(char('B'));
+
         let mut st = StrState::new("BBC");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, char('A').and(char('B')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("BC", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 
     #[test]
     fn right_fail() {
+        let parser = char('A').and(char('B'));
+
         let mut st = StrState::new("ACC");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, char('A').and(char('B')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("C", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 
     #[test]
     fn both_fail() {
+        let parser = char('A').and(char('B'));
+
         let mut st = StrState::new("CCC");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, char('A').and(char('B')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("CC", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 }

@@ -39,18 +39,19 @@ where
 #[cfg(test)]
 mod test {
     use crate::combinators::*;
-    use crate::core::*;
+    use crate::core::Parsable;
     use crate::primitives::{char, satisfy, StrState};
 
     #[test]
     fn simple_recursive_syntax() {
         // expr := '1' expr | '0'
-        let expr_parser = fix(|it| Box::new(char('1').right(it).or(char('0'))));
+        let parser = fix(|it| Box::new(char('1').right(it).or(char('0'))));
 
         let mut st = StrState::new("1110");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some('0'), expr_parser.parse(&mut st, &mut log));
-        assert_eq!(0, log.len());
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('0'), res);
+        assert_eq!(0, logs.len());
     }
 
     #[test]
@@ -91,8 +92,9 @@ mod test {
         });
 
         let mut st = StrState::new("1+2*(3+4)");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some(15), expr_parser.parse(&mut st, &mut log));
-        assert_eq!(0, log.len());
+        let (res, logs) = expr_parser.exec(&mut st);
+
+        assert_eq!(Some(15), res);
+        assert_eq!(0, logs.len());
     }
 }

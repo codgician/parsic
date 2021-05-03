@@ -102,7 +102,7 @@ impl<S, P: Parsable<S>> ReplicativeExt<S> for P {}
 #[cfg(test)]
 mod test_many {
     use crate::combinators::*;
-    use crate::core::*;
+    use crate::core::Parsable;
     use crate::primitives::{char, StrState};
 
     #[test]

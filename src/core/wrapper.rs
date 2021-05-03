@@ -1,7 +1,7 @@
 use crate::combinators::*;
-use crate::core::*;
+use crate::core::{Parsable, ParseLogger};
 use std::marker::PhantomData;
-use std::ops::*;
+use std::ops::{BitAnd, BitOr, Div, Mul, Shl, Shr};
 
 /// ## `Parser` struct: a wrapper for `Parsable`
 ///

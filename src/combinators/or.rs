@@ -54,44 +54,56 @@ pub trait OrExt<S>: Parsable<S> {
 impl<S, P: Parsable<S>> OrExt<S> for P {}
 
 #[cfg(test)]
-mod test {
+mod test_or {
     use crate::combinators::*;
-    use crate::core::*;
-    use crate::primitives::*;
+    use crate::core::Parsable;
+    use crate::primitives::{char, StrState};
 
     #[test]
     fn left_ok() {
+        let parser = char('A').or(char('B'));
+
         let mut st = StrState::new("Ahhh");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some('A'), char('A').or(char('B')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('A'), res);
         assert_eq!("hhh", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn right_ok() {
+        let parser = char('B').or(char('A'));
+
         let mut st = StrState::new("Ahhh");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some('A'), char('B').or(char('A')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('A'), res);
         assert_eq!("hhh", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn both_ok() {
+        let parser = char('A').or(char('A'));
+
         let mut st = StrState::new("Ahhh");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some('A'), char('A').or(char('A')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('A'), res);
         assert_eq!("hhh", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn both_fail() {
+        let parser = char('B').or(char('C'));
+
         let mut st = StrState::new("Ahhh");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, char('B').or(char('C')).parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("hhh", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 }

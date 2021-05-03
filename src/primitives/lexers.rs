@@ -1,5 +1,5 @@
-use crate::core::*;
-use crate::primitives::*;
+use crate::core::{Msg, MsgBody, Parsable, ParseLogger};
+use crate::primitives::StrState;
 
 // Char
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -126,78 +126,90 @@ pub fn literal(s: &str) -> LiteralP {
 
 #[cfg(test)]
 mod test_char {
-    use crate::core::*;
+    use crate::core::Parsable;
     use crate::primitives::{char, StrState};
 
     #[test]
     fn ok() {
+        let parser = char('H');
+
         let mut st = StrState::new("Hello");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some('H'), char('H').parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('H'), res);
         assert_eq!("ello", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn fail() {
+        let parser = char('h');
+
         let mut st = StrState::new("Hello");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, char('h').parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("ello", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 }
 
 #[cfg(test)]
 mod test_satisfy {
-    use crate::core::*;
+    use crate::core::Parsable;
     use crate::primitives::{satisfy, StrState};
 
     #[test]
     fn ok() {
+        let parser = satisfy(|&ch| ch.is_uppercase());
+
         let mut st = StrState::new("Hello");
-        let mut log = ParseLogger::default();
-        assert_eq!(
-            Some('H'),
-            satisfy(|&ch| ch.is_uppercase()).parse(&mut st, &mut log)
-        );
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('H'), res);
         assert_eq!("ello", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn fail() {
+        let parser = satisfy(|&ch| ch.is_uppercase());
+
         let mut st = StrState::new("hello");
-        let mut log = ParseLogger::default();
-        assert_eq!(
-            None,
-            satisfy(|&ch| ch.is_uppercase()).parse(&mut st, &mut log)
-        );
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("ello", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 }
 
 #[cfg(test)]
 mod test_literal {
-    use crate::core::*;
+    use crate::core::Parsable;
     use crate::primitives::{literal, StrState};
 
     #[test]
     fn ok() {
+        let parser = literal("Hello");
+
         let mut st = StrState::new("Hello!");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some("Hello"), literal("Hello").parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some("Hello"), res);
         assert_eq!("!", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn fail() {
+        let parser = literal("Hello");
+
         let mut st = StrState::new("Hell");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, literal("Hello").parse(&mut st, &mut log));
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("Hell", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 }

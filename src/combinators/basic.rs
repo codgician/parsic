@@ -1,4 +1,4 @@
-use crate::core::*;
+use crate::core::{Parsable, ParseLogger};
 use std::marker::PhantomData;
 
 // Empty

@@ -116,30 +116,34 @@ mod test {
 
     #[test]
     fn ok() {
-        let mut st = StrState::new("Hello");
-        let mut log = ParseLogger::default();
         let parser = char('H').or(char('W')).map(|ch: char| ch == 'H');
-        assert_eq!(Some(true), parser.parse(&mut st, &mut log));
+
+        let mut st = StrState::new("Hello");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some(true), res);
         assert_eq!("ello", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
     fn select_ok() {
-        let mut st = StrState::new("-1");
-        let mut log = ParseLogger::default();
         let parser = char('-').and(char('1')).map(|(_, x)| x);
-        assert_eq!(Some('1'), parser.parse(&mut st, &mut log));
+
+        let mut st = StrState::new("-1");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some('1'), res);
         assert_eq!("", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 }
 
 #[cfg(test)]
 mod test_map_opt {
     use crate::combinators::*;
-    use crate::core::*;
-    use crate::primitives::*;
+    use crate::core::Parsable;
+    use crate::primitives::{satisfy, StrState};
 
     #[test]
     fn ok_fully_consumed() {
@@ -148,10 +152,11 @@ mod test_map_opt {
             .map_opt(|v| v.into_iter().collect::<String>().parse::<i64>());
 
         let mut st = StrState::new("12345");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some(12345), nat_parser.parse(&mut st, &mut log));
+        let (res, logs) = nat_parser.exec(&mut st);
+
+        assert_eq!(Some(12345), res);
         assert_eq!("", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
@@ -161,10 +166,11 @@ mod test_map_opt {
             .map_opt(|v| v.into_iter().collect::<String>().parse::<i64>());
 
         let mut st = StrState::new("123de");
-        let mut log = ParseLogger::default();
-        assert_eq!(Some(123), nat_parser.parse(&mut st, &mut log));
+        let (res, logs) = nat_parser.exec(&mut st);
+
+        assert_eq!(Some(123), res);
         assert_eq!("de", st.as_stream());
-        assert_eq!(0, log.len());
+        assert_eq!(0, logs.len());
     }
 
     #[test]
@@ -174,9 +180,10 @@ mod test_map_opt {
             .map_opt(|v| v.into_iter().collect::<String>().parse::<i64>());
 
         let mut st = StrState::new("abcde");
-        let mut log = ParseLogger::default();
-        assert_eq!(None, nat_parser.parse(&mut st, &mut log));
+        let (res, logs) = nat_parser.exec(&mut st);
+
+        assert_eq!(None, res);
         assert_eq!("bcde", st.as_stream());
-        assert_eq!(1, log.len());
+        assert_eq!(1, logs.len());
     }
 }
