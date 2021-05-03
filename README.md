@@ -34,11 +34,11 @@
     - [ ] ~~Support returning multiple results~~
     - [ ] Advanced error handling
 - 🩺 **Tests**
-    - [ ] Property tests
-    - [ ] Arthimetic calculator
+    - [ ] Property tests **(WIP)**
+    - [ ] Arthimetic calculator **(WIP)**
     - [ ] Markdown parser
 - 📄 **Docs**
-    - [ ] Core 
-    - [ ] Combinators
-    - [ ] Wrappers
+    - [ ] Core **(WIP)**
+    - [ ] Combinators **(WIP)**
+    - [ ] Wrappers **(WIP)**
   

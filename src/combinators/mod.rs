@@ -1,20 +1,14 @@
-mod map;
-mod replicative;
-mod compose;
+mod basic;
 mod bind;
+mod compose;
 mod fix;
-mod sequential;
-mod or;
 mod log;
+mod map;
+mod or;
+mod replicative;
+mod sequential;
 
 pub use crate::combinators::{
-    self,
+    self, basic::*, bind::*, compose::*, fix::*, log::*, map::*, or::*, replicative::*,
     sequential::*,
-    replicative::*,
-    compose::*,
-    fix::*,
-    map::*,
-    bind::*,
-    or::*,
-    log::*,
 };

@@ -14,9 +14,7 @@ impl CharP {
 impl Parsable<StrState> for CharP {
     type Result = char;
 
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) -> Option<Self::Result> {
         match state.next() {
             Some(ch) => {
                 if ch == self.0 {
@@ -24,15 +22,15 @@ impl Parsable<StrState> for CharP {
                 } else {
                     logger.with(Msg::Error(MsgBody::new(
                         &format!("expecting '{}', but got '{}'.", self.0, ch)[..],
-                        Some(state.pos)
-                     )));
+                        Some(state.pos),
+                    )));
                     None
                 }
             }
             None => {
                 logger.with(Msg::Error(MsgBody::new(
                     "unexpected end of input.",
-                    Some(state.pos)
+                    Some(state.pos),
                 )));
                 None
             }
@@ -57,13 +55,11 @@ impl<F> SatisfyP<F> {
 
 impl<'a, F> Parsable<StrState> for SatisfyP<F>
 where
-    F: Fn(&char) -> bool
+    F: Fn(&char) -> bool,
 {
     type Result = char;
 
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) -> Option<Self::Result> {
         match state.next() {
             Some(ch) => {
                 if self.0(&ch) {
@@ -71,7 +67,7 @@ where
                 } else {
                     logger.with(Msg::Error(MsgBody::new(
                         &format!("'{}' does not satisfy required conditions.", ch)[..],
-                        Some(state.pos)
+                        Some(state.pos),
                     )));
                     None
                 }
@@ -79,7 +75,7 @@ where
             None => {
                 logger.with(Msg::Error(MsgBody::new(
                     "unexpected end of input.",
-                    Some(state.pos)
+                    Some(state.pos),
                 )));
                 None
             }
@@ -88,9 +84,9 @@ where
 }
 
 /// ### Lexer: `satisfy`
-pub fn satisfy< F>(f: F) -> SatisfyP<F>
+pub fn satisfy<F>(f: F) -> SatisfyP<F>
 where
-    F: Fn(&char) -> bool
+    F: Fn(&char) -> bool,
 {
     SatisfyP::new(f)
 }
@@ -108,17 +104,15 @@ impl LiteralP {
 impl Parsable<StrState> for LiteralP {
     type Result = &'static str;
 
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) -> Option<Self::Result> {
         if state.as_stream().starts_with(&self.0[..]) {
-            let ret = &state.as_stream()[0 .. self.0.len()];
+            let ret = &state.as_stream()[0..self.0.len()];
             state.take(self.0.len()).for_each(|_| {});
             Some(ret)
         } else {
             logger.with(Msg::Error(MsgBody::new(
                 &format!("expecting \"{}\".", self.0)[..],
-                Some(state.pos)
+                Some(state.pos),
             )));
             None
         }
@@ -133,16 +127,13 @@ pub fn literal(s: &str) -> LiteralP {
 #[cfg(test)]
 mod test_char {
     use crate::core::*;
-    use crate::primitives::{ StrState, char };
+    use crate::primitives::{char, StrState};
 
     #[test]
     fn ok() {
         let mut st = StrState::new("Hello");
         let mut log = ParseLogger::default();
-        assert_eq!(
-            Some('H'),
-            char('H').parse(&mut st, &mut log)
-        );
+        assert_eq!(Some('H'), char('H').parse(&mut st, &mut log));
         assert_eq!("ello", st.as_stream());
         assert_eq!(0, log.len());
     }
@@ -151,10 +142,7 @@ mod test_char {
     fn fail() {
         let mut st = StrState::new("Hello");
         let mut log = ParseLogger::default();
-        assert_eq!(
-            None,
-            char('h').parse(&mut st, &mut log)
-        );
+        assert_eq!(None, char('h').parse(&mut st, &mut log));
         assert_eq!("ello", st.as_stream());
         assert_eq!(1, log.len());
     }
@@ -163,7 +151,7 @@ mod test_char {
 #[cfg(test)]
 mod test_satisfy {
     use crate::core::*;
-    use crate::primitives::{ StrState, satisfy };
+    use crate::primitives::{satisfy, StrState};
 
     #[test]
     fn ok() {
@@ -193,16 +181,13 @@ mod test_satisfy {
 #[cfg(test)]
 mod test_literal {
     use crate::core::*;
-    use crate::primitives::{ StrState, literal };
+    use crate::primitives::{literal, StrState};
 
     #[test]
     fn ok() {
         let mut st = StrState::new("Hello!");
         let mut log = ParseLogger::default();
-        assert_eq!(
-            Some("Hello"),
-            literal("Hello").parse(&mut st, &mut log)
-        );
+        assert_eq!(Some("Hello"), literal("Hello").parse(&mut st, &mut log));
         assert_eq!("!", st.as_stream());
         assert_eq!(0, log.len());
     }
@@ -211,10 +196,7 @@ mod test_literal {
     fn fail() {
         let mut st = StrState::new("Hell");
         let mut log = ParseLogger::default();
-        assert_eq!(
-            None,
-            literal("Hello").parse(&mut st, &mut log)
-        );
+        assert_eq!(None, literal("Hello").parse(&mut st, &mut log));
         assert_eq!("Hell", st.as_stream());
         assert_eq!(1, log.len());
     }

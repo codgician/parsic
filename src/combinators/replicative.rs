@@ -1,4 +1,4 @@
-use crate::core::{ Parsable, ParseLogger };
+use crate::core::{Parsable, ParseLogger};
 
 // Many
 #[derive(Copy, Clone, Debug)]
@@ -13,13 +13,11 @@ impl<P> ManyP<P> {
 impl<S, P> Parsable<S> for ManyP<P>
 where
     S: Clone,
-    P: Parsable<S>
+    P: Parsable<S>,
 {
     type Result = Vec<P::Result>;
 
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
         let mut res = vec![];
         let mut st = state.clone();
         let mut lg = logger.clone();
@@ -36,10 +34,10 @@ where
     }
 }
 
-/// ### Combinator: `many` (function variant)
+/// ## Combinator: `many` (function ver.)
 pub fn many<S, P>(parser: P) -> ManyP<P>
 where
-    P: Parsable<S>
+    P: Parsable<S>,
 {
     ManyP::new(parser)
 }
@@ -74,26 +72,26 @@ impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
     }
 }
 
-/// ### Combinator: `some` (function variant)
+/// ## Combinator: `some` (function ver.)
 pub fn some<S: Clone, P: Parsable<S>>(parser: P) -> SomeP<P> {
     SomeP::new(parser)
 }
 
-pub trait ReplicativeExt<S> : Parsable<S> {
-    /// ### Combinator: `many`
+pub trait ReplicativeExt<S>: Parsable<S> {
+    /// ## Combinator: `many`
     fn many(self) -> ManyP<Self>
     where
         Self: Sized,
-        S: Clone
+        S: Clone,
     {
         ManyP::new(self)
     }
 
-    /// ### Combinator: `some`
+    /// ## Combinator: `some`
     fn some(self) -> SomeP<Self>
     where
         Self: Sized,
-        S: Clone
+        S: Clone,
     {
         SomeP::new(self)
     }
@@ -101,19 +99,18 @@ pub trait ReplicativeExt<S> : Parsable<S> {
 
 impl<S, P: Parsable<S>> ReplicativeExt<S> for P {}
 
-
 #[cfg(test)]
 mod test_many {
-    use crate::core::*;
     use crate::combinators::*;
-    use crate::primitives::{ StrState, char };
+    use crate::core::*;
+    use crate::primitives::{char, StrState};
 
     #[test]
     fn ok_nonempty() {
         let parser = char('y').many();
 
         let mut st = StrState::new("yyyyying");
-        let (res, logs) = parse(parser, &mut st);
+        let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec!['y', 'y', 'y', 'y', 'y']), res);
         assert_eq!(0, logs.len());
@@ -124,7 +121,7 @@ mod test_many {
         let parser = many(char('y'));
 
         let mut st = StrState::new("ing");
-        let (res, logs) = parse(parser, &mut st);
+        let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec![]), res);
         assert_eq!(0, logs.len());
@@ -133,9 +130,9 @@ mod test_many {
 
 #[cfg(test)]
 mod test_some {
-    use crate::core::*;
     use crate::combinators::*;
-    use crate::primitives::{ StrState, char };
+    use crate::core::*;
+    use crate::primitives::{char, StrState};
 
     #[test]
     fn ok() {
@@ -153,7 +150,7 @@ mod test_some {
         let parser = char('y').some();
 
         let mut st = StrState::new("cpnb");
-        let (res, logs) = parse(parser, &mut st);
+        let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
         assert_eq!(1, logs.len());

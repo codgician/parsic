@@ -4,5 +4,3 @@ edition = "2018"
 name = "naive-parsec"
 version = "0.1.0"
 [dependencies]
-quickcheck = "*"
-quickcheck_macros = "*"

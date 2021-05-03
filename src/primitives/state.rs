@@ -5,7 +5,7 @@ pub struct StrState {
     pub(crate) inp: std::str::Chars<'static>,
     pub(crate) pos: Pos,
     pub(crate) len: usize,
-    pub(crate) idx: usize
+    pub(crate) idx: usize,
 }
 
 impl StrState {
@@ -40,7 +40,7 @@ impl Iterator for StrState {
 
         self.pos = match ch {
             '\n' => Pos::new(self.pos.row() + 1, 0),
-            _ => self.pos.add(1, 0)
+            _ => self.pos.add(1, 0),
         };
         self.idx += 1;
         Some(ch)
