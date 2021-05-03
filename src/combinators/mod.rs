@@ -1,6 +1,7 @@
-mod functor;
-mod applicative;
-mod monadic;
+mod map;
+mod replicative;
+mod compose;
+mod bind;
 mod fix;
 mod sequential;
 mod or;
@@ -9,10 +10,11 @@ mod log;
 pub use crate::combinators::{
     self,
     sequential::*,
-    applicative::*,
+    replicative::*,
+    compose::*,
     fix::*,
-    functor::*,
-    monadic::*,
+    map::*,
+    bind::*,
     or::*,
     log::*,
 };

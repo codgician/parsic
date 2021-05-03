@@ -44,7 +44,8 @@ pub trait OrExt<S> : Parsable<S> {
     fn or<P>(self, parser: P) -> OrP<Self, P>
     where
         Self: Sized,
-        P: Parsable<S>
+        P: Parsable<S>,
+        S: Clone
     {
         OrP::new(self, parser)
     }

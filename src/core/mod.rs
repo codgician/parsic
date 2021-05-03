@@ -1,12 +1,12 @@
 // mod convert;
 mod parsable;
 mod logger;
-mod ops;
+mod wrapper;
 
 pub use crate::core::{
     self,
     // convert::*,
     parsable::*,
     logger::*,
-    ops::*
+    wrapper::*
 };

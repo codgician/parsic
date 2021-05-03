@@ -9,8 +9,7 @@
 - 💖 **Core**
     - [x] `Parsable`: anything that could be parsed
     - [x] `ParseLogger`: logger for parser
-    - [ ] `IntoParser`: anything that could be converted to a parser
-    - [ ] `Parser`: wrapper for parsable
+    - [x] `Parser`: wrapper for parsable
 - 🐣 **Primitives**
     - [x] `StrState`: parse state for `&str`
     - [x] `char`: consumes one char at a time from parse stream
@@ -18,22 +17,22 @@
     - [x] `literal`: consumes given literal string
     - [ ] `reg_exp`: consumes literal according to regular expression 
 - 🍡 **Basic combinators**
-    - [x] `map`: functor fmap `<$>`
+    - [x] `map`: Maps the result of current parser to another value
+    - [x] `map_opt`: `map`, but automatically unwraps `Option<T>` and `Result<T, E>`
     - [x] `pure`: injects value into an identity parser
-    - [x] `compose`: applicative composition `<*>`
+    - [x] `compose`: compose one parser with another if applicable
     - [x] `empty`: a parser that always fails
-    - [x] `bind`: bind for monad `>>=`
     - [x] `fix`: fixed-point combinator for recursive syntax
     - [x] `and`: sequential combinator (pair)
+    - [x] `bind`: monadic bind operator for context sensitive parsing
     - [x] `left`, `right`, `mid`: sequencial combinators (select left / right / middle)
     - [x] `or`: alternative combinators
     - [x] `some`, `many`: replicative combinators
     - [x] `info`, `warn`, `error`: log combinators
-    - [ ] More to be added...
 - ✨ **Enhancements**
     - [x] Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`
     - [ ] ~~Support returning multiple results~~
-    - [ ] Customizable error messages
+    - [ ] Advanced error handling
 - 🩺 **Tests**
     - [ ] Property tests
     - [ ] Arthimetic calculator

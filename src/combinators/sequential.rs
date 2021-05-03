@@ -147,7 +147,7 @@ mod test {
         assert_eq!(
             Some((1, 'A')),
             satisfy(|&ch| ch.is_digit(10))
-                .bind(|ch| ch.to_digit(10))
+                .map_opt(|ch| ch.to_digit(10))
                 .and(char('A'))
                 .parse(&mut st, &mut log)
         );

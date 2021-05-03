@@ -5,15 +5,24 @@ use crate::combinators::*;
 
 // Wrapper for parsers
 #[derive(Copy, Clone, Debug)]
-pub struct Parser<S, P>(P, PhantomData<fn(&mut S)>);
+pub struct Parser<S, P: Parsable<S>>(P, PhantomData<fn(&mut S)>);
 
-impl<S, P> Parser<S, P> {
+impl<S, P: Parsable<S>> Parser<S, P> {
     pub fn new(parser: P) -> Self {
         Self(parser, PhantomData)
     }
 
     pub fn unwrap(self) -> P {
         self.0
+    }
+
+    pub fn inspect(&self) -> &P {
+        &self.0
+    }
+
+    pub fn exec(&self, state: &mut S) -> (Option<P::Result>, ParseLogger) {
+        let mut logger = ParseLogger::default();
+        (self.0.parse(state, &mut logger), logger)
     }
 }
 
@@ -22,6 +31,30 @@ impl<S, P: Parsable<S>> Parsable<S> for Parser<S, P> {
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
         self.0.parse(state, logger)
+    }
+}
+
+// Wrapper function for parsing
+pub fn parse<S, P: Parsable<S>>(parser: P, state: &mut S) 
+    -> (Option<P::Result>, ParseLogger) 
+{
+    let mut logger = ParseLogger::default();
+    (parser.parse(state, &mut logger), logger)
+}
+
+
+/// Parse function wrapper
+#[derive(Copy, Clone, Debug)]
+pub struct ParseFn<F>(pub F);
+
+impl<S, T, F> Parsable<S> for ParseFn<F>
+where
+    F: for<'a> Fn(&'a mut S, &mut ParseLogger) -> Option<T>,
+{
+    type Result = T;
+
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
+        (self.0)(stream, logger)
     }
 }
 
@@ -57,7 +90,7 @@ where
 
 // Overload operator `/` to `or` combinator
 // `p1 / p2` ~ `p1.or(p2)`
-impl<S, P1, P2> Div<P2> for Parser<S, P1>
+impl<S: Clone, P1, P2> Div<P2> for Parser<S, P1>
 where
     P1: Parsable<S>,
     P2: Parsable<S, Result = P1::Result>
