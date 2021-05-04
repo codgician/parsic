@@ -15,8 +15,8 @@
     - [x] `char`: consumes one char at a time from parse stream
     - [x] `satisfy`: consumes one char if given condition satisifies
     - [x] `literal`: consumes given literal string
-    - [ ] `reg_exp`: consumes literal according to regular expression 
-- 🍡 **Basic combinators**
+    - [x] `regex`: consumes literal string that matches given regular expression
+- 🍡 **Combinators**
     - [x] `map`: Maps the result of current parser to another value
     - [x] `map_opt`: `map`, but automatically unwraps `Option<T>` and `Result<T, E>`
     - [x] `pure`: injects value into an identity parser
@@ -29,6 +29,7 @@
     - [x] `or`: alternative combinators
     - [x] `some`, `many`: replicative combinators
     - [x] `info`, `warn`, `error`: log combinators
+    - [ ] `pos`: returns current parsing position as result
 - ✨ **Enhancements**
     - [x] Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`
     - [ ] ~~Support returning multiple results~~

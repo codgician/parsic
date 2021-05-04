@@ -39,6 +39,7 @@ impl Parsable<StrState> for CharP {
 }
 
 /// ### Lexer: `char`
+/// Consumes one char at a time from parse stream.
 pub fn char(ch: char) -> CharP {
     CharP::new(ch)
 }
@@ -84,6 +85,7 @@ where
 }
 
 /// ### Lexer: `satisfy`
+/// Consumes a single character if given condition satisifies.
 pub fn satisfy<F>(f: F) -> SatisfyP<F>
 where
     F: Fn(&char) -> bool,
@@ -96,7 +98,7 @@ where
 pub struct LiteralP(String);
 
 impl LiteralP {
-    pub(crate) fn new<'a>(lit: &'a str) -> Self {
+    pub(crate) fn new(lit: &str) -> Self {
         Self(lit.to_owned())
     }
 }
@@ -120,8 +122,62 @@ impl Parsable<StrState> for LiteralP {
 }
 
 /// ### Lexer: `literal`
+/// Consumes given literal string.
 pub fn literal(s: &str) -> LiteralP {
     LiteralP::new(s)
+}
+
+// Regex
+#[derive(Clone, Debug)]
+pub struct RegexP(regex::Regex);
+
+impl RegexP {
+    pub fn new(re: &str) -> Result<Self, regex::Error> {
+        regex::Regex::new(re).map(|r| Self(r))
+    }
+
+    pub fn unwrap(self) -> regex::Regex {
+        self.0
+    }
+
+    pub fn inspect(&self) -> &regex::Regex {
+        &self.0
+    }
+}
+
+impl From<regex::Regex> for RegexP {
+    fn from(re: regex::Regex) -> Self {
+        Self(re)
+    }
+}
+
+impl Parsable<StrState> for RegexP {
+    type Result = &'static str;
+
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
+        -> Option<Self::Result>
+    {
+        let stream = state.as_stream();
+        match self.0.find(stream) {
+            Some(m) if m.start() == 0 => {
+                state.take(m.end()).for_each(|_| {});
+                Some(&stream[0 .. m.end()])
+            }
+            _ => {
+                logger.with(Msg::Error(MsgBody::new(
+                    &format!("expecting \"{}\".", self.0.as_str())[..],
+                    Some(state.pos),
+                )));
+                None
+            }
+        }
+    }
+}
+
+/// ### Combinator: `regex`
+/// Consumes a literal string that matches given regular expression.
+pub fn regex(re: &str) -> RegexP {
+    RegexP::new(re).unwrap()
 }
 
 #[cfg(test)]
@@ -210,6 +266,36 @@ mod test_literal {
 
         assert_eq!(None, res);
         assert_eq!("Hell", st.as_stream());
+        assert_eq!(1, logs.len());
+    }
+}
+
+#[cfg(test)]
+mod test_regex {
+    use crate::core::Parsable;
+    use crate::primitives::{regex, StrState};
+
+    #[test]
+    fn ok() {
+        let parser = regex(r"^\d{2}/\d{2}/\d{4}");
+
+        let mut st = StrState::new("10/30/2020!");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some("10/30/2020"), res);
+        assert_eq!("!", st.as_stream());
+        assert_eq!(0, logs.len());
+    }
+
+    #[test]
+    fn fail() {
+        let parser = regex(r"^\d{2}/\d{2}/\d{4}");
+
+        let mut st = StrState::new("Hello");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
+        assert_eq!("Hello", st.as_stream());
         assert_eq!(1, logs.len());
     }
 }
