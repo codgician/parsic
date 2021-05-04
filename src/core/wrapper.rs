@@ -48,6 +48,28 @@ pub fn parse<S, P: Parsable<S>>(parser: &P, state: &mut S) -> (Option<P::Result>
     (parser.parse(state, &mut logger), logger)
 }
 
+// Wrapper for lazy parsing
+#[derive(Copy, Clone, Debug)]
+pub struct Lazy<F>(F);
+
+impl<F> Lazy<F> {
+    pub fn new(f: F) -> Self {
+        Self(f)
+    }
+}
+
+impl<S, P, F> Parsable<S> for Lazy<F>
+where
+    P: Parsable<S>,
+    F: Fn() -> P,
+{
+    type Result = P::Result;
+
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
+        (self.0)().parse(stream, logger)
+    }
+}
+
 /// Parse function wrapper
 #[derive(Copy, Clone, Debug)]
 pub struct ParseFn<F>(pub F);

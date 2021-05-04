@@ -77,6 +77,39 @@ pub fn some<S: Clone, P: Parsable<S>>(parser: P) -> SomeP<P> {
     SomeP::new(parser)
 }
 
+// Optional
+#[derive(Copy, Clone, Debug)]
+pub struct OptionalP<P>(P);
+
+impl<P> OptionalP<P> {
+    pub fn new(parser: P) -> Self {
+        Self(parser)
+    }
+}
+
+impl<S: Clone, P: Parsable<S>> Parsable<S> for OptionalP<P> {
+    type Result = Option<P::Result>;
+
+    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
+        let st = state.clone();
+        let lg = logger.clone();
+
+        match self.0.parse(state, logger) {
+            None => {
+                *state = st;
+                *logger = lg;
+                Some(None)
+            },
+            x => Some(x)
+        }
+    }
+}
+
+/// ## Combinator: `optional` (function ver.)
+pub fn optional<P>(parser: P) -> OptionalP<P> {
+    OptionalP::new(parser)
+}
+
 pub trait ReplicativeExt<S>: Parsable<S> {
     /// ## Combinator: `many`
     fn many(self) -> ManyP<Self>
@@ -94,6 +127,15 @@ pub trait ReplicativeExt<S>: Parsable<S> {
         S: Clone,
     {
         SomeP::new(self)
+    }
+
+    /// ## Combinator: `optional`
+    fn optional(self) -> OptionalP<Self>
+    where
+        Self: Sized,
+        S: Clone
+    {
+        OptionalP::new(self)
     }
 }
 
@@ -154,5 +196,34 @@ mod test_some {
 
         assert_eq!(None, res);
         assert_eq!(1, logs.len());
+    }
+}
+
+#[cfg(test)]
+mod test_optional {
+    use crate::combinators::*;
+    use crate::core::*;
+    use crate::primitives::{char, StrState};
+
+    #[test]
+    fn ok_one() {
+        let parser = char('y').optional();
+
+        let mut st = StrState::new("yyyyycpnb");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some(Some('y')), res);
+        assert_eq!(0, logs.len());
+    }
+
+    #[test]
+    fn ok_zero() {
+        let parser = char('y').optional();
+
+        let mut st = StrState::new("cpnb");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(Some(None), res);
+        assert_eq!(0, logs.len());
     }
 }

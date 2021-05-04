@@ -25,7 +25,12 @@ impl<'a, S, T> Parsable<S> for FixP<'a, S, T> {
 }
 
 /// ## Combinator: `fix`
-/// Fixed-point combinator (aka Y-Combinator), which is introduced to support recursive synatax.
+///
+/// Fixed-point combinator (aka Y-Combinator), which is
+/// introduced to support recursive synatax using closures.
+///
+/// ### Property
+///
 /// ```plain
 /// fix f = f (fix f)
 /// ```

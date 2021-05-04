@@ -154,14 +154,12 @@ impl From<regex::Regex> for RegexP {
 impl Parsable<StrState> for RegexP {
     type Result = &'static str;
 
-    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger)
-        -> Option<Self::Result>
-    {
+    fn parse(&self, state: &mut StrState, logger: &mut ParseLogger) -> Option<Self::Result> {
         let stream = state.as_stream();
         match self.0.find(stream) {
             Some(m) if m.start() == 0 => {
                 state.take(m.end()).for_each(|_| {});
-                Some(&stream[0 .. m.end()])
+                Some(&stream[0..m.end()])
             }
             _ => {
                 logger.with(Msg::Error(MsgBody::new(

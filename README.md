@@ -16,6 +16,7 @@
     - [x] `satisfy`: consumes one char if given condition satisifies
     - [x] `literal`: consumes given literal string
     - [x] `regex`: consumes literal string that matches given regular expression
+    - [x] `trim`: constructs a parser that consumes whitespaces at both ends
 - 🍡 **Combinators**
     - [x] `map`: Maps the result of current parser to another value
     - [x] `map_opt`: `map`, but automatically unwraps `Option<T>` and `Result<T, E>`
@@ -27,7 +28,7 @@
     - [x] `bind`: monadic bind operator for context sensitive parsing
     - [x] `left`, `right`, `mid`: sequencial combinators (select left / right / middle)
     - [x] `or`: alternative combinators
-    - [x] `some`, `many`: replicative combinators
+    - [x] `many`, `some`, `optional`: replicative combinators
     - [x] `info`, `warn`, `error`: log combinators
     - [ ] `pos`: returns current parsing position as result
 - ✨ **Enhancements**
@@ -36,10 +37,9 @@
     - [ ] Advanced error handling
 - 🩺 **Tests**
     - [ ] Property tests **(WIP)**
-    - [ ] Arthimetic calculator **(WIP)**
+    - [x] Arthimetic calculator
     - [ ] Markdown parser
 - 📄 **Docs**
     - [ ] Core **(WIP)**
     - [ ] Combinators **(WIP)**
     - [ ] Wrappers **(WIP)**
-  
