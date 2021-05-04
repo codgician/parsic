@@ -1,5 +1,9 @@
 use crate::core::{Msg, MsgBody, Parsable, ParseLogger};
 
+/// Data structure for logging combinators, including:
+/// - `info`
+/// - `warn`
+/// - `error`
 #[derive(Clone, Debug)]
 pub struct LogP<P>(P, Msg);
 
@@ -50,6 +54,10 @@ where
     LogP::new(parser, Msg::Error(MsgBody::new(msg, None)))
 }
 
+/// Implements following method for `Parsable<S>`:
+/// - `info`
+/// - `warn`
+/// - `error`
 pub trait LogPExt<S>: Parsable<S> {
     /// ## Combinator: `info`
     fn info(self, msg: &str) -> LogP<Self>

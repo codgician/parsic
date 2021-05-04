@@ -1,6 +1,7 @@
 use crate::core::{Msg, MsgBody, Parsable, ParseLogger};
 use std::marker::PhantomData;
 
+/// Data structure for `map` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct MapP<F, P>(F, P);
 
@@ -31,7 +32,7 @@ where
     MapP::new(func, parser)
 }
 
-// MapOpt
+/// Data structure for `map_opt` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct MapOptP<F, P, T>(F, P, PhantomData<T>);
 
@@ -86,6 +87,9 @@ where
     MapOptP::new(func, parser)
 }
 
+/// Implements following method for `Parsable<S>`:
+/// - `map`
+/// - `map_opt`
 pub trait MapExt<S>: Parsable<S> {
     /// ## Combinator: `map`
     fn map<T, F>(self, func: F) -> MapP<F, Self>

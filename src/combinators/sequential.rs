@@ -1,7 +1,7 @@
 use crate::combinators::MapP;
 use crate::core::{Parsable, ParseLogger};
 
-// And combinator
+/// Data structure for `and` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct AndP<P1, P2>(P1, P2);
 
@@ -38,11 +38,15 @@ where
     AndP::new(p1, p2)
 }
 
+/// Type declaration for `left` combinator.
+pub type LeftP<P1, P2, T1, T2> =
+    MapP<fn((T1, T2)) -> T1, AndP<P1, P2>>;
+
 /// ## Combinator: `left` (function ver.)
 pub fn left<S, P1, P2>(
     p1: P1,
     p2: P2,
-) -> MapP<fn((P1::Result, P2::Result)) -> P1::Result, AndP<P1, P2>>
+) -> LeftP<P1, P2, P1::Result, P2::Result>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -50,11 +54,15 @@ where
     MapP::new(|(l, _)| l, AndP::new(p1, p2))
 }
 
+/// Type declaration for `right` combinator.
+pub type RightP<P1, P2, T1, T2> =
+    MapP<fn((T1, T2)) -> T2, AndP<P1, P2>>;
+
 /// ## Combinator: `right` (function ver.)
 pub fn right<S, P1, P2>(
     p1: P1,
     p2: P2,
-) -> MapP<fn((P1::Result, P2::Result)) -> P2::Result, AndP<P1, P2>>
+) -> RightP<P1, P2, P1::Result, P2::Result>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -62,12 +70,16 @@ where
     MapP::new(|(_, r)| r, AndP::new(p1, p2))
 }
 
+/// Type declaration for `mid` combinator.
+pub type MidP<P1, P2, P3, T1, T2, T3> =
+    MapP<fn(((T1, T2), T3)) -> T2, AndP<AndP<P1, P2>, P3>>;
+
 /// ## Combinator: `mid` (function ver.)
 pub fn mid<S, P1, P2, P3>(
     p1: P1,
     p2: P2,
     p3: P3,
-) -> MapP<fn(((P1::Result, P2::Result), P3::Result)) -> P2::Result, AndP<AndP<P1, P2>, P3>>
+) -> MidP<P1, P2, P3, P1::Result, P2::Result, P3::Result>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -76,6 +88,11 @@ where
     MapP::new(|((_, m), _)| m, AndP::new(AndP::new(p1, p2), p3))
 }
 
+/// Implements following methods for `Parsable<S>`:
+/// - `and`
+/// - `left`
+/// - `right`
+/// - `mid`
 pub trait SequentialPExt<S>: Parsable<S> {
     /// ## Combinator: `and`
     fn and<P>(self, parser: P) -> AndP<Self, P>
@@ -87,10 +104,7 @@ pub trait SequentialPExt<S>: Parsable<S> {
     }
 
     /// ## Combinator: `left`
-    fn left<P>(
-        self,
-        parser: P,
-    ) -> MapP<fn((Self::Result, P::Result)) -> Self::Result, AndP<Self, P>>
+    fn left<P>(self, parser: P) -> LeftP<Self, P, Self::Result, P::Result>
     where
         Self: Sized,
         P: Parsable<S>,
@@ -99,7 +113,7 @@ pub trait SequentialPExt<S>: Parsable<S> {
     }
 
     /// ## Combinator: `right`
-    fn right<P>(self, parser: P) -> MapP<fn((Self::Result, P::Result)) -> P::Result, AndP<Self, P>>
+    fn right<P>(self, parser: P) -> RightP<Self, P, Self::Result, P::Result>
     where
         Self: Sized,
         P: Parsable<S>,
@@ -112,7 +126,7 @@ pub trait SequentialPExt<S>: Parsable<S> {
         self,
         p1: P1,
         p2: P2,
-    ) -> MapP<fn(((Self::Result, P1::Result), P2::Result)) -> P1::Result, AndP<AndP<Self, P1>, P2>>
+    ) -> MidP<Self, P1, P2, Self::Result, P1::Result, P2::Result>
     where
         Self: Sized,
         P1: Parsable<S>,

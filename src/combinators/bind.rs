@@ -1,7 +1,7 @@
 use crate::core::{Parsable, ParseLogger};
 use std::marker::PhantomData;
 
-// Bind
+/// Data structure for `bind` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct BindP<F, P, T>(P, F, PhantomData<T>);
 
@@ -67,7 +67,7 @@ where
     BindP::new(parser, func)
 }
 
-// Iterator-style methods for Parsable<S>
+/// Implements `bind` method for `Parsable<S>`.
 pub trait BindPExt<S>: Parsable<S> {
     /// ## Combinator: `bind`
     ///
@@ -155,7 +155,7 @@ mod test_bind {
 
     #[test]
     fn left_identity() {
-        // pure(x).bind(f) ~ f(x)
+        //! Left identity: `pure(x).bind(f) ~ f(x)`
         let f = |b| if b { char('1') } else { char('0') };
         let parser1 = pure::<StrState, bool>(true).bind(f);
         let parser2 = f(true);
@@ -172,7 +172,7 @@ mod test_bind {
 
     #[test]
     fn right_identity() {
-        // p.bind(|x| pure(x)) ~ p
+        //! Right identity: `p.bind(|x| pure(x)) ~ p`
         let parser1 = char('0').bind(|x| pure(x));
         let parser2 = char('0');
 
@@ -188,7 +188,7 @@ mod test_bind {
 
     #[test]
     fn associativity() {
-        // p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))
+        //! Right identity: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
         let f = |ch: char| if ch == '0' { char('a') } else { char('b') };
         let g = |ch: char| if ch == 'a' { char('A') } else { char('B') };
         let parser1 = char('0').bind(g.clone()).bind(f.clone());

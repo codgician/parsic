@@ -1,6 +1,6 @@
 use crate::core::{Parsable, ParseLogger};
 
-// Or
+/// Data structure for `or` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct OrP<P1, P2>(P1, P2);
 
@@ -38,6 +38,7 @@ pub fn or<P1, P2>(p1: P1, p2: P2) -> OrP<P1, P2> {
     OrP::new(p1, p2)
 }
 
+/// Implements `or` method for `Parsable<S>`.
 pub trait OrExt<S>: Parsable<S> {
     /// ## Combinator: `or`
     /// Alternative combinator.

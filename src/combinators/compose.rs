@@ -1,7 +1,7 @@
 use crate::core::{Parsable, ParseLogger};
 use std::marker::PhantomData;
 
-// Compose
+/// Data structure for `compose` combinator.
 #[derive(Copy, Clone, Debug)]
 pub struct ComposeP<P1, P2, T>(P1, P2, PhantomData<T>);
 
@@ -41,6 +41,7 @@ where
     ComposeP::new(p1, p2)
 }
 
+/// Implements `compose` method for `Parsable<S>`.
 pub trait ComposePExt<S>: Parsable<S> {
     /// ## Combinator: `compose`
     /// Functional composition between parsers.

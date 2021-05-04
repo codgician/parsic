@@ -35,18 +35,22 @@ fn float() -> impl Parsable<StrState, Result = f64> {
                 _ => {}
             };
             res.parse::<f64>()
-        })
+        }).trim()
 }
 
 fn factor() -> impl Parsable<StrState, Result = f64> {
-    mid(char('('), expr(), char(')')).or(float())
+    mid(
+        char('(').trim(),
+        expr(), 
+        char(')').trim()
+    ).or(float())
 }
 
 fn term() -> impl Parsable<StrState, Result = f64> {
     fix(|term_it| {
         Box::new(
             factor()
-                .and(char('*').or(char('/')))
+                .and(char('*').or(char('/').trim()))
                 .and(term_it)
                 .map(|((v1, op), v2)| if op == '*' { v1 * v2 } else { v1 / v2 })
                 .or(factor()),
@@ -58,7 +62,7 @@ fn expr() -> impl Parsable<StrState, Result = f64> {
     fix(|expr_it| {
         Box::new(
             term()
-                .and(char('+').or(char('-')))
+                .and(char('+').or(char('-')).trim())
                 .and(expr_it)
                 .map(|((v1, op), v2)| if op == '+' { v1 + v2 } else { v1 - v2 })
                 .or(term()),
@@ -67,11 +71,41 @@ fn expr() -> impl Parsable<StrState, Result = f64> {
 }
 
 #[test]
-fn simple_expr() {
-    let mut st = StrState::new("1+2*(5+7)/3");
+fn int_expr() {
+    let mut st = StrState::new("2+4*(6+0)/1");
     let (res, logs) = expr().exec(&mut st);
 
-    assert_eq!(Some(9.0), res);
+    assert_eq!(Some((2+4*(6+0)/1) as f64), res);
+    assert_eq!("", st.as_stream());
+    assert_eq!(0, logs.len());
+}
+
+#[test]
+fn int_expr_with_whitespace() {
+    let mut st = StrState::new(" 2 + 4 * ( 6 + 0 ) / 1 ");
+    let (res, logs) = expr().exec(&mut st);
+
+    assert_eq!(Some((2+4*(6+0)/1) as f64), res);
+    assert_eq!("", st.as_stream());
+    assert_eq!(0, logs.len());
+}
+
+#[test]
+fn float_expr() {
+    let mut st = StrState::new("1.9/(2.6+0.8)+1.7");
+    let (res, logs) = expr().exec(&mut st);
+
+    assert_eq!(Some(1.9/(2.6+0.8)+1.7), res);
+    assert_eq!("", st.as_stream());
+    assert_eq!(0, logs.len());
+}
+
+#[test]
+fn float_expr_with_whitespace() {
+    let mut st = StrState::new("1.9 / ( 2.6 + 0.8 ) + 1.7 ");
+    let (res, logs) = expr().exec(&mut st);
+
+    assert_eq!(Some(1.9/(2.6+0.8)+1.7), res);
     assert_eq!("", st.as_stream());
     assert_eq!(0, logs.len());
 }

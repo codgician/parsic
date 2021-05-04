@@ -1,7 +1,7 @@
 use crate::core::{Parsable, ParseLogger};
 use std::marker::PhantomData;
 
-// Empty
+/// Data structure for `empty` combinator.
 #[derive(Copy, Clone, Default, Debug)]
 pub struct EmptyP<S, T>(PhantomData<(S, T)>);
 
@@ -19,13 +19,13 @@ impl<S, T> Parsable<S> for EmptyP<S, T> {
     }
 }
 
-/// ## Combinator: `empty`
+/// ### Combinator: `empty`
 /// A parser that consumes no item and always fails.
 pub fn empty<S, T>() -> EmptyP<S, T> {
     EmptyP::new()
 }
 
-// Pure
+/// Data structure for `pure` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct PureP<S, T>(T, PhantomData<S>);
 
@@ -43,7 +43,7 @@ impl<S, T: Clone> Parsable<S> for PureP<S, T> {
     }
 }
 
-/// ## Combinator: `pure`
+/// ### Combinator: `pure`
 /// Injects a value into an identity parser.
 pub fn pure<S, T: Copy>(item: T) -> PureP<S, T> {
     PureP::new(item)

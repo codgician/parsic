@@ -4,7 +4,7 @@ use std::rc::Rc;
 /// ## `Parsable` trait
 /// Anything that is parsable should implement `Parsable` trait,
 /// where `Result` indicates the result type of the parser.
-/// The return types of all the lexers and combinators in this library
+/// The return types of all the combinators and combinators in this library
 /// implements `Parsable` trait, meaning you can treat them as parsers
 /// and call `parse()` or `exec()` from them to parse given input.
 pub trait Parsable<S> {

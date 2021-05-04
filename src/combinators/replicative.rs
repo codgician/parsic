@@ -1,6 +1,6 @@
 use crate::core::{Parsable, ParseLogger};
 
-// Many
+/// Data structure for `many` combinator.
 #[derive(Copy, Clone, Debug)]
 pub struct ManyP<P>(P);
 
@@ -42,7 +42,7 @@ where
     ManyP::new(parser)
 }
 
-// Some
+/// Data structure for `some` combinator.
 #[derive(Copy, Clone, Debug)]
 pub struct SomeP<P>(P);
 
@@ -77,7 +77,7 @@ pub fn some<S: Clone, P: Parsable<S>>(parser: P) -> SomeP<P> {
     SomeP::new(parser)
 }
 
-// Optional
+/// Data structure for `optional` combinator.
 #[derive(Copy, Clone, Debug)]
 pub struct OptionalP<P>(P);
 
@@ -110,6 +110,10 @@ pub fn optional<P>(parser: P) -> OptionalP<P> {
     OptionalP::new(parser)
 }
 
+/// Implements following method for `Parsable<S>`:
+/// - `many`
+/// - `some`
+/// - `optional`
 pub trait ReplicativeExt<S>: Parsable<S> {
     /// ## Combinator: `many`
     fn many(self) -> ManyP<Self>

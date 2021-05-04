@@ -1,7 +1,8 @@
+use crate::combinators::*;
 use crate::core::{Msg, MsgBody, Parsable, ParseLogger};
 use crate::primitives::StrState;
 
-// Char
+/// Data structure for `char` combinator.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct CharP(char);
 
@@ -38,13 +39,13 @@ impl Parsable<StrState> for CharP {
     }
 }
 
-/// ### Lexer: `char`
+/// ## Combinator: `char`
 /// Consumes one char at a time from parse stream.
 pub fn char(ch: char) -> CharP {
     CharP::new(ch)
 }
 
-// Satisfy
+/// Data structure for `satisfy` combinator.
 #[derive(Clone, Copy, Debug)]
 pub struct SatisfyP<F>(F);
 
@@ -84,7 +85,7 @@ where
     }
 }
 
-/// ### Lexer: `satisfy`
+/// ## Combinator: `satisfy`
 /// Consumes a single character if given condition satisifies.
 pub fn satisfy<F>(f: F) -> SatisfyP<F>
 where
@@ -93,7 +94,7 @@ where
     SatisfyP::new(f)
 }
 
-// Literal
+/// Data structure for `literal` combinator.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LiteralP(String);
 
@@ -121,13 +122,13 @@ impl Parsable<StrState> for LiteralP {
     }
 }
 
-/// ### Lexer: `literal`
+/// ## Combinator: `literal`
 /// Consumes given literal string.
 pub fn literal(s: &str) -> LiteralP {
     LiteralP::new(s)
 }
 
-// Regex
+/// Data structure for `regex` combinator.
 #[derive(Clone, Debug)]
 pub struct RegexP(regex::Regex);
 
@@ -172,11 +173,45 @@ impl Parsable<StrState> for RegexP {
     }
 }
 
-/// ### Combinator: `regex`
+/// ## Combinator: `regex`
 /// Consumes a literal string that matches given regular expression.
 pub fn regex(re: &str) -> RegexP {
     RegexP::new(re).unwrap()
 }
+
+/// Type declaration for `space` combinator.
+pub type SpaceP = OrP<OrP<OrP<CharP, CharP>, CharP>, CharP>;
+
+/// ## Combinator: `space`
+/// Consumes a single whitespace character (` `, `\n`, `\r` or `\t`).
+pub fn space() -> SpaceP {
+    char(' ').or(char('\n')).or(char('\r')).or(char('\t'))
+}
+
+/// Type declaration for `trim` combinator.
+pub type TrimP<P, T> =
+    MidP<ManyP<SpaceP>, P, ManyP<SpaceP>, Vec<char>, T, Vec<char>>;
+
+/// ## Combinator: `trim` (function ver.)
+/// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`) 
+/// as possible surrounding given parser.
+pub fn trim<P: Parsable<StrState>>(parser: P) -> TrimP<P, P::Result> {
+    mid(space().many(), parser, space().many())
+}
+
+pub trait PrimitivePExt: Parsable<StrState> {
+    /// ## Combinator: `trim`
+    /// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`) 
+    /// as possible surrounding given parser.
+    fn trim(self) -> TrimP<Self, Self::Result>
+    where
+        Self: Sized
+    {
+        mid(space().many(), self, space().many())
+    }
+}
+
+impl<P: Parsable<StrState>> PrimitivePExt for P {}
 
 #[cfg(test)]
 mod test_char {

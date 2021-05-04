@@ -1,6 +1,7 @@
 use crate::core::{Parsable, ParseLogger};
 use std::rc::Rc;
 
+/// Data structure for `fix` combinator.
 #[derive(Clone)]
 pub struct FixP<'a, S, T>(
     Rc<dyn for<'b> Fn(&'b Self) -> Box<dyn Parsable<S, Result = T> + 'b> + 'a>,
@@ -19,7 +20,7 @@ impl<'a, S, T> Parsable<S> for FixP<'a, S, T> {
     type Result = T;
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        // fix f = f (fix f)
+        //! fix f = f (fix f)
         (self.0)(self).parse(state, logger)
     }
 }
