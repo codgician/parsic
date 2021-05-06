@@ -19,8 +19,7 @@ where
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
         let mut res = vec![];
-        let mut st = state.clone();
-        let mut lg = logger.clone();
+        let (mut st, mut lg) = (state.clone(), logger.clone());
 
         while let Some(r) = self.0.parse(state, logger) {
             res.push(r);
@@ -56,9 +55,8 @@ impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
     type Result = Vec<P::Result>;
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let mut res = vec![self.0.parse(state, logger)?];
-        let mut st = state.clone();
-        let mut lg = logger.clone();
+        let (mut st, mut lg) = (state.clone(), logger.clone());
+        let mut res = vec![];
 
         while let Some(r) = self.0.parse(state, logger) {
             res.push(r);
@@ -67,8 +65,13 @@ impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
         }
 
         *state = st;
-        *logger = lg;
-        Some(res)
+        match res {
+            v if v.is_empty() => None,
+            _ => {
+                *logger = lg; 
+                Some(res)
+            }
+        }
     }
 }
 
@@ -159,6 +162,7 @@ mod test_many {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec!['y', 'y', 'y', 'y', 'y']), res);
+        assert_eq!("ing", st.as_stream());
         assert_eq!(0, logs.len());
     }
 
@@ -170,6 +174,7 @@ mod test_many {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec![]), res);
+        assert_eq!("ing", st.as_stream());
         assert_eq!(0, logs.len());
     }
 }
@@ -188,6 +193,7 @@ mod test_some {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec!['y', 'y', 'y', 'y', 'y']), res);
+        assert_eq!("cpnb", st.as_stream());
         assert_eq!(0, logs.len());
     }
 
@@ -199,6 +205,7 @@ mod test_some {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
+        assert_eq!("cpnb", st.as_stream());
         assert_eq!(1, logs.len());
     }
 }

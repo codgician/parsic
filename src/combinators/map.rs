@@ -187,7 +187,7 @@ mod test_map_opt {
         let (res, logs) = nat_parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("bcde", st.as_stream());
+        assert_eq!("abcde", st.as_stream());
         assert_eq!(1, logs.len());
     }
 }

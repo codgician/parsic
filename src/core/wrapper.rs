@@ -157,7 +157,7 @@ where
 
 // Overload operator `*` to `compose` combinator
 // `p1 * p2` ~ `p1.compose(p2)`
-impl<F, S, T, P1, P2> Mul<P2> for Parser<S, P1>
+impl<F, S: Clone, T, P1, P2> Mul<P2> for Parser<S, P1>
 where
     F: Fn(P2::Result) -> T,
     P1: Parsable<S, Result = F>,

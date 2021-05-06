@@ -19,13 +19,18 @@ where
     type Result = P1::Result;
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let st0 = state.clone();
-        let lg0 = logger.clone();
+        let (st, lg) = (state.clone(), logger.clone());
         match self.0.parse(state, logger) {
             None => {
-                *state = st0;
-                *logger = lg0;
-                self.1.parse(state, logger)
+                *state = st.clone();
+                *logger = lg;
+                match self.1.parse(state, logger) {
+                    None => {
+                        *state = st;
+                        None
+                    }
+                    x => x
+                }
             }
             x => x,
         }
@@ -104,7 +109,7 @@ mod test_or {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("hhh", st.as_stream());
+        assert_eq!("Ahhh", st.as_stream());
         assert_eq!(1, logs.len());
     }
 }

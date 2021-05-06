@@ -11,7 +11,7 @@ impl<P1, P2, T> ComposeP<P1, P2, T> {
     }
 }
 
-impl<P1, P2, F, S, T> Parsable<S> for ComposeP<P1, P2, T>
+impl<P1, P2, F, S: Clone, T> Parsable<S> for ComposeP<P1, P2, T>
 where
     F: Fn(P2::Result) -> T,
     P1: Parsable<S, Result = F>,
@@ -20,10 +20,17 @@ where
     type Result = T;
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
+        let st = state.clone();
         match self.0.parse(state, logger) {
-            None => None,
+            None => {
+                *state = st;
+                None
+            }
             Some(f) => match self.1.parse(state, logger) {
-                None => None,
+                None => { 
+                    *state = st;
+                    None
+                },
                 Some(x) => Some(f(x)),
             },
         }
@@ -83,7 +90,7 @@ mod test_compose {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("ello", st.as_stream());
+        assert_eq!("Hello", st.as_stream());
         assert_eq!(1, logs.len());
     }
 
