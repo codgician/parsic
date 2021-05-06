@@ -99,8 +99,8 @@ impl<S: Clone, P: Parsable<S>> Parsable<S> for OptionalP<P> {
                 *state = st;
                 *logger = lg;
                 Some(None)
-            },
-            x => Some(x)
+            }
+            x => Some(x),
         }
     }
 }
@@ -137,7 +137,7 @@ pub trait ReplicativeExt<S>: Parsable<S> {
     fn optional(self) -> OptionalP<Self>
     where
         Self: Sized,
-        S: Clone
+        S: Clone,
     {
         OptionalP::new(self)
     }

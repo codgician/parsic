@@ -39,14 +39,10 @@ where
 }
 
 /// Type declaration for `left` combinator.
-pub type LeftP<P1, P2, T1, T2> =
-    MapP<fn((T1, T2)) -> T1, AndP<P1, P2>>;
+pub type LeftP<P1, P2, T1, T2> = MapP<fn((T1, T2)) -> T1, AndP<P1, P2>>;
 
 /// ## Combinator: `left` (function ver.)
-pub fn left<S, P1, P2>(
-    p1: P1,
-    p2: P2,
-) -> LeftP<P1, P2, P1::Result, P2::Result>
+pub fn left<S, P1, P2>(p1: P1, p2: P2) -> LeftP<P1, P2, P1::Result, P2::Result>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -55,14 +51,10 @@ where
 }
 
 /// Type declaration for `right` combinator.
-pub type RightP<P1, P2, T1, T2> =
-    MapP<fn((T1, T2)) -> T2, AndP<P1, P2>>;
+pub type RightP<P1, P2, T1, T2> = MapP<fn((T1, T2)) -> T2, AndP<P1, P2>>;
 
 /// ## Combinator: `right` (function ver.)
-pub fn right<S, P1, P2>(
-    p1: P1,
-    p2: P2,
-) -> RightP<P1, P2, P1::Result, P2::Result>
+pub fn right<S, P1, P2>(p1: P1, p2: P2) -> RightP<P1, P2, P1::Result, P2::Result>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -71,8 +63,7 @@ where
 }
 
 /// Type declaration for `mid` combinator.
-pub type MidP<P1, P2, P3, T1, T2, T3> =
-    MapP<fn(((T1, T2), T3)) -> T2, AndP<AndP<P1, P2>, P3>>;
+pub type MidP<P1, P2, P3, T1, T2, T3> = MapP<fn(((T1, T2), T3)) -> T2, AndP<AndP<P1, P2>, P3>>;
 
 /// ## Combinator: `mid` (function ver.)
 pub fn mid<S, P1, P2, P3>(
@@ -122,11 +113,7 @@ pub trait SequentialPExt<S>: Parsable<S> {
     }
 
     /// ## Combinator: `mid`
-    fn mid<P1, P2>(
-        self,
-        p1: P1,
-        p2: P2,
-    ) -> MidP<Self, P1, P2, Self::Result, P1::Result, P2::Result>
+    fn mid<P1, P2>(self, p1: P1, p2: P2) -> MidP<Self, P1, P2, Self::Result, P1::Result, P2::Result>
     where
         Self: Sized,
         P1: Parsable<S>,

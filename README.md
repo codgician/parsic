@@ -30,7 +30,8 @@
     - [x] `or`: alternative combinators
     - [x] `many`, `some`, `optional`: replicative combinators
     - [x] `info`, `warn`, `error`: log combinators
-    - [ ] `pos`: returns current parsing position as result
+    - [x] `inspect`: returns parser result alongwith current parsing state
+    - [x] `recover`: returns a fallback value is given parser fails 
 - ✨ **Enhancements**
     - [x] Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`
     - [ ] ~~Support returning multiple results~~

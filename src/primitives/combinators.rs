@@ -189,11 +189,10 @@ pub fn space() -> SpaceP {
 }
 
 /// Type declaration for `trim` combinator.
-pub type TrimP<P, T> =
-    MidP<ManyP<SpaceP>, P, ManyP<SpaceP>, Vec<char>, T, Vec<char>>;
+pub type TrimP<P, T> = MidP<ManyP<SpaceP>, P, ManyP<SpaceP>, Vec<char>, T, Vec<char>>;
 
 /// ## Combinator: `trim` (function ver.)
-/// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`) 
+/// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`)
 /// as possible surrounding given parser.
 pub fn trim<P: Parsable<StrState>>(parser: P) -> TrimP<P, P::Result> {
     mid(space().many(), parser, space().many())
@@ -201,11 +200,11 @@ pub fn trim<P: Parsable<StrState>>(parser: P) -> TrimP<P, P::Result> {
 
 pub trait PrimitivePExt: Parsable<StrState> {
     /// ## Combinator: `trim`
-    /// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`) 
+    /// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`)
     /// as possible surrounding given parser.
     fn trim(self) -> TrimP<Self, Self::Result>
     where
-        Self: Sized
+        Self: Sized,
     {
         mid(space().many(), self, space().many())
     }
