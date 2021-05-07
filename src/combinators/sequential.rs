@@ -11,7 +11,7 @@ impl<P1, P2> AndP<P1, P2> {
     }
 }
 
-impl<S, P1, P2> Parsable<S> for AndP<P1, P2>
+impl<S: Clone, P1, P2> Parsable<S> for AndP<P1, P2>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -19,10 +19,18 @@ where
     type Result = (P1::Result, P2::Result);
 
     fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
+        let st = state.clone();
+
         match self.0.parse(state, logger) {
-            None => None,
+            None => {
+                *state = st; 
+                None
+            },
             Some(r1) => match self.1.parse(state, logger) {
-                None => None,
+                None => {
+                    *state = st;
+                    None
+                },
                 Some(r2) => Some((r1, r2)),
             },
         }
@@ -177,7 +185,7 @@ mod test_and {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("C", st.as_stream());
+        assert_eq!("ACC", st.as_stream());
         assert_eq!(1, logs.len());
     }
 
@@ -189,7 +197,7 @@ mod test_and {
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("CC", st.as_stream());
+        assert_eq!("CCC", st.as_stream());
         assert_eq!(1, logs.len());
     }
 }

@@ -87,7 +87,7 @@ where
 
 // Overload Shl `<<` to `left` combinator
 // `p1 << p2` ~ `p1.left(p2)`
-impl<S, P1, P2> Shl<P2> for Parser<S, P1>
+impl<S: Clone, P1, P2> Shl<P2> for Parser<S, P1>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -101,7 +101,7 @@ where
 
 // Overload Shr `>>` to `right` combinator
 // `p1 >> p2` ~ `p1.right(p2)`
-impl<S, P1, P2> Shr<P2> for Parser<S, P1>
+impl<S: Clone, P1, P2> Shr<P2> for Parser<S, P1>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,
@@ -143,7 +143,7 @@ where
 
 // Overload operator `&` to `and` combinator
 // `p1 & p2` ~ `p1.and(p2)`
-impl<S, P1, P2> BitAnd<P2> for Parser<S, P1>
+impl<S: Clone, P1, P2> BitAnd<P2> for Parser<S, P1>
 where
     P1: Parsable<S>,
     P2: Parsable<S>,

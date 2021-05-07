@@ -30,6 +30,9 @@ impl StrState {
     pub fn len(&self) -> usize {
         self.len
     }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
 }
 
 // Implement Iterator trait for StrState

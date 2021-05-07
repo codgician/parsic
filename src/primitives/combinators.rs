@@ -134,7 +134,7 @@ pub struct RegexP(regex::Regex);
 
 impl RegexP {
     pub fn new(re: &str) -> Result<Self, regex::Error> {
-        regex::Regex::new(re).map(|r| Self(r))
+        regex::Regex::new(re).map(Self)
     }
 
     pub fn unwrap(self) -> regex::Regex {
