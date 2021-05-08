@@ -95,7 +95,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">logger</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
-<span class="doccomment">/// ## `Parser` struct</span>
+<span class="doccomment">/// # `Parser` struct</span>
 <span class="doccomment">/// Wraps the parser function.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParseLogger</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;f</span><span class="op">&gt;</span>);
@@ -109,7 +109,7 @@
     }
 }
 
-<span class="doccomment">/// ## `Parsable` trait</span>
+<span class="doccomment">/// # `Parsable` trait</span>
 <span class="doccomment">/// Anything that is parsable should implement `Parsable` trait,</span>
 <span class="doccomment">/// The return types of all the combinators and combinators in this library</span>
 <span class="doccomment">/// Implement `Parsable` trait, meaning you can treat them as parsers</span>

@@ -319,13 +319,13 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">combinators</span>::<span class="ident">MapExt</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
-<span class="doccomment">/// ## Combinator: `and` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `and` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
 <span class="doccomment">/// If both parsers succeed, returns a tuple containing their results,</span>
 <span class="doccomment">/// otherwise fail.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -357,13 +357,13 @@
     })
 }
 
-<span class="doccomment">/// ## Combinator: `left` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `left` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
 <span class="doccomment">/// If both parsers succeed, returns the result of the first parser,</span>
 <span class="doccomment">/// otherwise fail.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -386,13 +386,13 @@
     <span class="ident">p1</span>.<span class="ident">and</span>(<span class="ident">p2</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">l</span>)
 }
 
-<span class="doccomment">/// ## Combinator: `right` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `right` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
 <span class="doccomment">/// If both parsers succeed, returns the result of the second parser,</span>
 <span class="doccomment">/// otherwise fail.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -415,13 +415,13 @@
     <span class="ident">p1</span>.<span class="ident">and</span>(<span class="ident">p2</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">r</span>)<span class="op">|</span> <span class="ident">r</span>)
 }
 
-<span class="doccomment">/// ## Combinator: `mid` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `mid` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A sequential combinator that applys three parsers one after another.</span>
 <span class="doccomment">/// If all parsers succeed, returns the result of the second parser,</span>
 <span class="doccomment">/// otherwise fail.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -447,13 +447,13 @@
 
 <span class="doccomment">/// Implement sequential combinators for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SequentialExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// ## Combinator: `and` (function ver.)</span>
+    <span class="doccomment">/// # Combinator: `and` (function ver.)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
     <span class="doccomment">/// If both parsers succeed, returns a tuple containing their results,</span>
     <span class="doccomment">/// otherwise fail.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -477,13 +477,13 @@
         <span class="ident">and</span>(<span class="self">self</span>, <span class="ident">p</span>)
     }
 
-    <span class="doccomment">/// ## Combinator: `left`</span>
+    <span class="doccomment">/// # Combinator: `left`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
     <span class="doccomment">/// If both parsers succeed, returns the result of the first parser,</span>
     <span class="doccomment">/// otherwise fail.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -507,13 +507,13 @@
         <span class="ident">left</span>(<span class="self">self</span>, <span class="ident">p</span>)
     }
 
-    <span class="doccomment">/// ## Combinator: `right`</span>
+    <span class="doccomment">/// # Combinator: `right`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
     <span class="doccomment">/// If both parsers succeed, returns the result of the second parser,</span>
     <span class="doccomment">/// otherwise fail.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -537,13 +537,13 @@
         <span class="ident">right</span>(<span class="self">self</span>, <span class="ident">p</span>)
     }
 
-    <span class="doccomment">/// ## Combinator: `mid`</span>
+    <span class="doccomment">/// # Combinator: `mid`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A sequential combinator that applys three parsers one after another.</span>
     <span class="doccomment">/// If all parsers succeed, returns the result of the second parser,</span>
     <span class="doccomment">/// otherwise fail.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>

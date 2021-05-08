@@ -240,13 +240,13 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
-<span class="doccomment">/// ## Combinator: `many` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `many` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Apply given parser as many times as possible (**zero** or more times),</span>
 <span class="doccomment">/// and returns a vector `Vec&lt;T&gt;` containg all the parse results. The</span>
 <span class="doccomment">/// combinator always succeeds.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -283,13 +283,13 @@
     })
 }
 
-<span class="doccomment">/// ## Combinator: `some` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `some` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Apply given parser as many times as possible (**one** or more times),</span>
 <span class="doccomment">/// and returns a vector `Vec&lt;T&gt;` containg all the parse results. The</span>
 <span class="doccomment">/// combinator fails if the parser fails at the first attempt.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -331,13 +331,13 @@
     })
 }
 
-<span class="doccomment">/// ## Combinator: `optional` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `optional` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Apply given parser **at most one time**. Denote the result</span>
 <span class="doccomment">/// of the given parser `p` as `x`, then the result of `optional(p)`</span>
 <span class="doccomment">/// would be `Some(x)`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -373,13 +373,13 @@
 
 <span class="doccomment">/// Implement replicative combinators for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReplicativeExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// ## Combinator: `many`</span>
+    <span class="doccomment">/// # Combinator: `many`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Apply given parser as many times as possible (zero or more times),</span>
     <span class="doccomment">/// and returns a vector `Vec&lt;T&gt;` containg all the parse results. The</span>
     <span class="doccomment">/// combinator always succeeds.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -406,13 +406,13 @@
         <span class="ident">many</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// ## Combinator: `some` (function ver.)</span>
+    <span class="doccomment">/// # Combinator: `some` (function ver.)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Apply given parser as many times as possible (**one** or more times),</span>
     <span class="doccomment">/// and returns a vector `Vec&lt;T&gt;` containg all the parse results. The</span>
     <span class="doccomment">/// combinator fails if the parser fails at the first attempt.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -439,13 +439,13 @@
         <span class="ident">some</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// ## Combinator: `optional`</span>
+    <span class="doccomment">/// # Combinator: `optional`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Apply given parser **at most one time**. Denote the result</span>
     <span class="doccomment">/// of the given parser `p` as `x`, then the result of `p.optional()`</span>
     <span class="doccomment">/// would be `Some(x)`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>

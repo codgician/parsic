@@ -185,11 +185,11 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
-<span class="doccomment">/// ## Combinator: `bind` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `bind` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Monadic bind operator `(&gt;&gt;=)` for context sensitive parsing.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Properties</span>
+<span class="doccomment">/// # Properties</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Should satisfy [Monad laws](https://wiki.haskell.org/Typeclassopedia#Laws_3):</span>
 <span class="doccomment">///</span>
@@ -199,7 +199,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Check out `test_bind` module in the source code for naive examples of above laws.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::combinators::bind;</span>
@@ -239,11 +239,11 @@
 
 <span class="doccomment">/// Implement `bind` combinator for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BindExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// ## Combinator: `bind`</span>
+    <span class="doccomment">/// # Combinator: `bind`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Monadic bind operator `(&gt;&gt;=)` for context sensitive parsing.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Properties</span>
+    <span class="doccomment">/// # Properties</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Should satisfy [Monad laws](https://wiki.haskell.org/Typeclassopedia#Laws_3):</span>
     <span class="doccomment">///</span>
@@ -253,7 +253,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Check out `test_bind` module in the source code for naive examples of above laws.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The code example below parses `expr` with the following grammar:</span>
     <span class="doccomment">///</span>

@@ -66,11 +66,11 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">Parser</span>;
 
-<span class="doccomment">/// ## Combinator: `empty`</span>
+<span class="doccomment">/// # Combinator: `empty`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A parser that consumes no item and always fails.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::*;</span>
@@ -89,12 +89,12 @@
     <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="prelude-val">None</span>)
 }
 
-<span class="doccomment">/// ## Combinator: `pure`</span>
+<span class="doccomment">/// # Combinator: `pure`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Injects a value into an identity parser.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Examples</span>
-<span class="doccomment">/// #### Injects a value</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">/// # Injects a value</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::*;</span>
@@ -109,7 +109,7 @@
 <span class="doccomment">/// assert_eq!(0, logs.len());</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// #### Injects a function</span>
+<span class="doccomment">/// # Injects a function</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::*;</span>

@@ -307,12 +307,12 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">Msg</span>, <span class="ident">MsgBody</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">primitives</span>::<span class="ident">CharStream</span>;
 
-<span class="doccomment">/// ## Combinator: `satisfy`</span>
+<span class="doccomment">/// # Combinator: `satisfy`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Consume a single character if given function applied</span>
 <span class="doccomment">/// to the next character from the parse stream yields `true`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{CharStream, satisfy};</span>
@@ -351,12 +351,12 @@
     })
 }
 
-<span class="doccomment">/// ## Combinator: `char`</span>
+<span class="doccomment">/// # Combinator: `char`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Consume the given char from the parse stream.</span>
 <span class="doccomment">/// `char(x)` is equivalent to `satisfy(|x: &amp;char| *x == ch)`</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{char, CharStream};</span>
@@ -375,11 +375,11 @@
     <span class="ident">satisfy</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ch</span>)
 }
 
-<span class="doccomment">/// ## Combinator: `literal`</span>
+<span class="doccomment">/// # Combinator: `literal`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Consume given literal string from the parse stream.test</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{CharStream, literal};</span>
@@ -410,11 +410,11 @@
     })
 }
 
-<span class="doccomment">/// ## Combinator: `regex`</span>
+<span class="doccomment">/// # Combinator: `regex`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Consume a literal string that matches given regular expression.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{CharStream, regex};</span>
@@ -449,12 +449,12 @@
     })
 }
 
-<span class="doccomment">/// ## Combinator: `space`</span>
+<span class="doccomment">/// # Combinator: `space`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Consume a single whitespace character (` `, `\n`, `\r` or `\t`).</span>
 <span class="doccomment">/// Equivalant to `char(&#39; &#39;).or(char(&#39;\n&#39;)).or(char(&#39;\r&#39;)).or(char(&#39;\t&#39;))`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{CharStream, space};</span>
@@ -473,13 +473,13 @@
     <span class="ident">char</span>(<span class="string">&#39; &#39;</span>).<span class="ident">or</span>(<span class="ident">char</span>(<span class="string">&#39;\n&#39;</span>)).<span class="ident">or</span>(<span class="ident">char</span>(<span class="string">&#39;\r&#39;</span>)).<span class="ident">or</span>(<span class="ident">char</span>(<span class="string">&#39;\t&#39;</span>))
 }
 
-<span class="doccomment">/// ## Combinator: `trim` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `trim` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Consume as many whitespace characters (` `, `\n`, `\r` or `\t`)</span>
 <span class="doccomment">/// as possible surrounding given parser. `trim(p)` is equivalant to</span>
 <span class="doccomment">/// `mid(space().many(), p, space().many())`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{CharStream, literal, trim};</span>
@@ -502,13 +502,13 @@
 
 <span class="doccomment">/// Implement `trim` method for `Parsable&lt;CharStream&gt;`:</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PrimitiveExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">CharStream</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span><span class="op">&gt;</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// ## Combinator: `trim`</span>
+    <span class="doccomment">/// # Combinator: `trim`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Consume as many whitespace characters (` `, `\n`, `\r` or `\t`)</span>
     <span class="doccomment">/// as possible surrounding given parser. `trim(p)` is equivalant to</span>
     <span class="doccomment">/// `mid(space().many(), p, space().many())`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Example</span>
+    <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
     <span class="doccomment">/// use naive_parsec::primitives::{CharStream, literal, PrimitiveExt, trim};</span>

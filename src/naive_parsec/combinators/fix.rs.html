@@ -112,7 +112,7 @@
     }
 }
 
-<span class="doccomment">/// ## Combinator: `fix`</span>
+<span class="doccomment">/// # Combinator: `fix`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// In Rust, closures are anonymous functions, so there is no name for us to call</span>
 <span class="doccomment">/// when we want to make it recursive. Therefore, a Y-Combinator, or</span>
@@ -120,11 +120,11 @@
 <span class="doccomment">/// is introduced to address this issue, making it possible to write parsers that</span>
 <span class="doccomment">/// support recursive syntax using closures.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Property</span>
+<span class="doccomment">/// # Property</span>
 <span class="doccomment">/// ```plain</span>
 <span class="doccomment">/// fix f = f (fix f)</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// ### Example</span>
+<span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>

@@ -137,13 +137,13 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
-<span class="doccomment">/// ## Combinator: `or` (function ver.)</span>
+<span class="doccomment">/// # Combinator: `or` (function ver.)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Alternative combinator. Accepts two parsers as arguments,</span>
 <span class="doccomment">/// if the first parser succeeds then its result is returned,</span>
 <span class="doccomment">/// otherwise the result of the second parser is returned.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ### Examples</span>
+<span class="doccomment">/// # Examples</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
@@ -181,13 +181,13 @@
 
 <span class="doccomment">/// Implement `or` combinator for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">OrExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// ## Combinator: `or` (function ver.)</span>
+    <span class="doccomment">/// # Combinator: `or` (function ver.)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Alternative combinator. Accepts two parsers as arguments,</span>
     <span class="doccomment">/// if the first parser succeeds then its result is returned,</span>
     <span class="doccomment">/// otherwise the result of the second parser is returned.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ### Examples</span>
+    <span class="doccomment">/// # Examples</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use naive_parsec::combinators::*;</span>
     <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
