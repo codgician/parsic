@@ -107,11 +107,6 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">Msg</span>, <span class="ident">MsgBody</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
@@ -172,12 +167,7 @@
     <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">stream</span>, <span class="ident">logger</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">parse</span>(<span class="ident">stream</span>, <span class="ident">logger</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>.<span class="ident">clone</span>())))
 }
 
-<span class="doccomment">/// Implement following method for `Parsable&lt;S&gt;`:</span>
-<span class="doccomment">/// - `info`</span>
-<span class="doccomment">/// - `warn`</span>
-<span class="doccomment">/// - `error`</span>
-<span class="doccomment">/// - `inspect`</span>
-<span class="doccomment">/// - `recover`</span>
+<span class="doccomment">/// Implement error related combinators for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LogExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="doccomment">/// ## Combinator: `info`</span>
     <span class="kw">fn</span> <span class="ident">info</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;f</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>

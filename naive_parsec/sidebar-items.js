@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["combinators",""],["core",""],["primitives",""]]});
+initSidebarItems({"mod":[["combinators","Generic parser combinators."],["core","Definitions of a parser and its friends."],["primitives","`CharStream` and its primitive parser combinators."]]});

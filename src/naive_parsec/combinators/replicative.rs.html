@@ -237,9 +237,6 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
@@ -374,10 +371,7 @@
     })
 }
 
-<span class="doccomment">/// Implement following method for `Parsable&lt;S&gt;`:</span>
-<span class="doccomment">/// - `many`</span>
-<span class="doccomment">/// - `some`</span>
-<span class="doccomment">/// - `optional`</span>
+<span class="doccomment">/// Implement replicative combinators for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReplicativeExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
     <span class="doccomment">/// ## Combinator: `many`</span>
     <span class="doccomment">///</span>
