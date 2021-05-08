@@ -1,7 +1,0 @@
-[package]
-authors = ["codgician <15964984+codgician@users.noreply.github.com>"]
-edition = "2018"
-name = "naive-parsec"
-version = "0.1.0"
-[dependencies]
-regex = "*"
