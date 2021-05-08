@@ -1,100 +1,62 @@
-use crate::core::{Msg, MsgBody, Parsable, ParseLogger};
-
-/// Data structure for logging combinators, including:
-/// - `info`
-/// - `warn`
-/// - `error`
-#[derive(Clone, Debug)]
-pub struct LogP<P>(P, Msg);
-
-impl<P> LogP<P> {
-    pub fn new(parser: P, msg: Msg) -> Self {
-        Self(parser, msg)
-    }
-}
-
-impl<S, P: Parsable<S>> Parsable<S> for LogP<P> {
-    type Result = P::Result;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        match self.0.parse(state, logger) {
-            None => {
-                logger.add(self.1.to_owned());
-                None
-            }
-            x => x,
-        }
-    }
-}
+use crate::core::{Msg, MsgBody, Parsable, Parser};
 
 /// ## Combinator: `info` (function ver.)
-pub fn info<S, P: Parsable<S>>(parser: P, msg: &str) -> LogP<P> {
-    LogP::new(parser, Msg::Info(MsgBody::new(msg, None)))
+fn info<'f, A: 'f, S>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+    msg: &'f str,
+) -> Parser<'f, A, S> {
+    Parser::new(move |stream, logger| {
+        p.parse(stream, logger).or_else(|| {
+            logger.with(Msg::Info(MsgBody::new(msg, None)));
+            None
+        })
+    })
 }
 
 /// ## Combinator: `warn` (function ver.)
-pub fn warn<S, P: Parsable<S>>(parser: P, msg: &str) -> LogP<P> {
-    LogP::new(parser, Msg::Warn(MsgBody::new(msg, None)))
+fn warn<'f, A: 'f, S>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+    msg: &'f str,
+) -> Parser<'f, A, S> {
+    Parser::new(move |stream, logger| {
+        p.parse(stream, logger).or_else(|| {
+            logger.with(Msg::Warn(MsgBody::new(msg, None)));
+            None
+        })
+    })
 }
 
 /// ## Combinator: `error` (function ver.)
-pub fn error<S, P: Parsable<S>>(parser: P, msg: &str) -> LogP<P> {
-    LogP::new(parser, Msg::Error(MsgBody::new(msg, None)))
-}
-
-/// Data structure for `pos` combinator.
-#[derive(Copy, Clone, Debug)]
-pub struct InspectP<P>(P);
-
-impl<P> InspectP<P> {
-    pub fn new(parser: P) -> Self {
-        Self(parser)
-    }
-}
-
-impl<S: Clone, P: Parsable<S>> Parsable<S> for InspectP<P> {
-    type Result = (Option<P::Result>, S);
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        Some((self.0.parse(state, logger), (*state).clone()))
-    }
+fn error<'f, A: 'f, S>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+    msg: &'f str,
+) -> Parser<'f, A, S> {
+    Parser::new(move |stream, logger| {
+        p.parse(stream, logger).or_else(|| {
+            logger.with(Msg::Error(MsgBody::new(msg, None)));
+            None
+        })
+    })
 }
 
 /// ## Combinator: `inspect` (function ver.)
-pub fn inspect<S: Clone, P: Parsable<S>>(parser: P) -> InspectP<P> {
-    InspectP::new(parser)
-}
-
-/// Data structure for `recover` combinator
-#[derive(Copy, Clone, Debug)]
-pub struct RecoverP<P, T>(P, T);
-
-impl<P, T: Clone> RecoverP<P, T> {
-    pub fn new(parser: P, fallback: T) -> Self {
-        Self(parser, fallback)
-    }
-}
-
-impl<S, P: Parsable<S>> Parsable<S> for RecoverP<P, P::Result>
-where
-    P::Result: Clone,
-{
-    type Result = P::Result;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        match self.0.parse(state, logger) {
-            None => Some(self.1.clone()),
-            x => x,
-        }
-    }
+fn inspect<'f, A: 'f, S: Clone + 'f>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+) -> Parser<'f, (Option<A>, S), S> {
+    Parser::new(move |stream, logger| {
+        let res = p.parse(stream, logger);
+        Some((res, stream.clone()))
+    })
 }
 
 /// ## Combinator: `recover` (function ver.)
-pub fn recover<S, P: Parsable<S>>(parser: P, fallback: P::Result) -> RecoverP<P, P::Result>
-where
-    P::Result: Clone,
-{
-    RecoverP::new(parser, fallback)
+fn recover<'f, A: Clone + 'f, S: Clone>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+    x: A,
+) -> Parser<'f, A, S> {
+    Parser::new(move |stream, logger| {
+        p.parse(stream, logger).or_else(|| Some(x.clone()))
+    })
 }
 
 /// Implements following method for `Parsable<S>`:
@@ -103,48 +65,49 @@ where
 /// - `error`
 /// - `inspect`
 /// - `recover`
-pub trait LogPExt<S>: Parsable<S> {
+pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `info`
-    fn info(self, msg: &str) -> LogP<Self>
+    fn info(self, msg: &'f str) -> Parser<'f, A, S>
     where
-        Self: Sized,
+        Self: Sized + 'f,
     {
-        LogP::new(self, Msg::Info(MsgBody::new(msg, None)))
+        info(self, msg)
     }
 
     /// ## Combinator: `warn`
-    fn warn(self, msg: &str) -> LogP<Self>
+    fn warn(self, msg: &'f str) -> Parser<'f, A, S>
     where
-        Self: Sized,
+        Self: Sized + 'f,
     {
-        LogP::new(self, Msg::Warn(MsgBody::new(msg, None)))
+        warn(self, msg)
     }
 
     /// ## Combinator: `error`
-    fn error(self, msg: &str) -> LogP<Self>
+    fn error(self, msg: &'f str) -> Parser<'f, A, S>
     where
-        Self: Sized,
+        Self: Sized + 'f,
     {
-        LogP::new(self, Msg::Warn(MsgBody::new(msg, None)))
+        error(self, msg)
     }
 
     /// ## Combinator: `inspect`
-    fn inspect(self) -> InspectP<Self>
+    fn inspect(self) -> Parser<'f, (Option<A>, S), S>
     where
-        Self: Sized,
-        S: Clone,
+        Self: Sized + 'f,
+        S: Clone + 'f,
     {
-        InspectP::new(self)
+        inspect(self)
     }
 
     /// ## Combinator: `recover`
-    fn recover(self, fallback: Self::Result) -> RecoverP<Self, Self::Result>
+    fn recover(self, x: A) -> Parser<'f, A, S>
     where
-        Self: Sized,
-        Self::Result: Clone,
+        Self: Sized + 'f,
+        A: Clone,
+        S: Clone,
     {
-        RecoverP::new(self, fallback)
+        recover(self, x)
     }
 }
 
-impl<S, P: Parsable<S>> LogPExt<S> for P {}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> LogExt<'f, A, S> for P {}

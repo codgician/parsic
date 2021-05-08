@@ -1,180 +1,132 @@
-use crate::core::{Parsable, ParseLogger};
-
-/// Data structure for `many` combinator.
-#[derive(Copy, Clone, Debug)]
-pub struct ManyP<P>(P);
-
-impl<P> ManyP<P> {
-    pub fn new(parser: P) -> Self {
-        Self(parser)
-    }
-}
-
-impl<S, P> Parsable<S> for ManyP<P>
-where
-    S: Clone,
-    P: Parsable<S>,
-{
-    type Result = Vec<P::Result>;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let mut res = vec![];
-        let (mut st, mut lg) = (state.clone(), logger.clone());
-
-        while let Some(r) = self.0.parse(state, logger) {
-            res.push(r);
-            st = state.clone();
-            lg = logger.clone();
-        }
-
-        *state = st;
-        *logger = lg;
-        Some(res)
-    }
-}
+use crate::core::{Parsable, Parser};
 
 /// ## Combinator: `many` (function ver.)
-pub fn many<S, P>(parser: P) -> ManyP<P>
-where
-    P: Parsable<S>,
-{
-    ManyP::new(parser)
-}
-
-/// Data structure for `some` combinator.
-#[derive(Copy, Clone, Debug)]
-pub struct SomeP<P>(P);
-
-impl<P> SomeP<P> {
-    pub fn new(parser: P) -> Self {
-        Self(parser)
-    }
-}
-
-impl<S: Clone, P: Parsable<S>> Parsable<S> for SomeP<P> {
-    type Result = Vec<P::Result>;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let (mut st, mut lg) = (state.clone(), logger.clone());
+pub fn many<'f, A: 'f, S: Clone>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+) -> Parser<'f, Vec<A>, S> {
+    Parser::new(move |stream: &mut S, logger| {
+        let (mut st, mut lg) = (stream.clone(), logger.clone());
         let mut res = vec![];
-
-        while let Some(r) = self.0.parse(state, logger) {
-            res.push(r);
-            st = state.clone();
+        while let Some(x) = p.parse(stream, logger) {
+            res.push(x);
+            st = stream.clone();
             lg = logger.clone();
         }
 
-        *state = st;
-        match res {
-            v if v.is_empty() => None,
-            _ => {
-                *logger = lg; 
-                Some(res)
-            }
-        }
-    }
+        *stream = st;
+        *logger = lg;
+        Some(res)
+    })
 }
 
 /// ## Combinator: `some` (function ver.)
-pub fn some<S: Clone, P: Parsable<S>>(parser: P) -> SomeP<P> {
-    SomeP::new(parser)
+pub fn some<'f, A: 'f, S: Clone>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+) -> Parser<'f, Vec<A>, S> {
+    Parser::new(move |stream: &mut S, logger| {
+        let (mut st, mut lg) = (stream.clone(), logger.clone());
+        let mut res = vec![];
+        while let Some(x) = p.parse(stream, logger) {
+            res.push(x);
+            st = stream.clone();
+            lg = logger.clone();
+        }
+
+        *stream = st;
+        match res {
+            v if v.is_empty() => None,
+            _ => {
+                *logger = lg;
+                Some(res)
+            }
+        }
+    })
 }
 
-/// Data structure for `optional` combinator.
-#[derive(Copy, Clone, Debug)]
-pub struct OptionalP<P>(P);
-
-impl<P> OptionalP<P> {
-    pub fn new(parser: P) -> Self {
-        Self(parser)
-    }
-}
-
-impl<S: Clone, P: Parsable<S>> Parsable<S> for OptionalP<P> {
-    type Result = Option<P::Result>;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let st = state.clone();
-        let lg = logger.clone();
-
-        match self.0.parse(state, logger) {
+/// ## Combinator: `optional` (function ver.)
+pub fn optional<'f, A: 'f, S: Clone>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+) -> Parser<'f, Option<A>, S> {
+    Parser::new(move |stream: &mut S, logger| {
+        let (st, lg) = (stream.clone(), logger.clone());
+        match p.parse(stream, logger) {
             None => {
-                *state = st;
+                *stream = st;
                 *logger = lg;
                 Some(None)
             }
             x => Some(x),
         }
-    }
-}
-
-/// ## Combinator: `optional` (function ver.)
-pub fn optional<P>(parser: P) -> OptionalP<P> {
-    OptionalP::new(parser)
+    })
 }
 
 /// Implements following method for `Parsable<S>`:
 /// - `many`
 /// - `some`
 /// - `optional`
-pub trait ReplicativeExt<S>: Parsable<S> {
+pub trait ReplicativeExt<'f, A: 'f, S>:
+    Parsable<Stream = S, Result = A>
+{
     /// ## Combinator: `many`
-    fn many(self) -> ManyP<Self>
+    fn many(self) -> Parser<'f, Vec<A>, S>
     where
-        Self: Sized,
+        Self: Sized + 'f,
         S: Clone,
     {
-        ManyP::new(self)
+        many(self)
     }
 
     /// ## Combinator: `some`
-    fn some(self) -> SomeP<Self>
+    fn some(self) -> Parser<'f, Vec<A>, S>
     where
-        Self: Sized,
+        Self: Sized + 'f,
         S: Clone,
     {
-        SomeP::new(self)
+        some(self)
     }
 
     /// ## Combinator: `optional`
-    fn optional(self) -> OptionalP<Self>
+    fn optional(self) -> Parser<'f, Option<A>, S>
     where
-        Self: Sized,
+        Self: Sized + 'f,
         S: Clone,
     {
-        OptionalP::new(self)
+        optional(self)
     }
 }
 
-impl<S, P: Parsable<S>> ReplicativeExt<S> for P {}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ReplicativeExt<'f, A, S>
+    for P
+{
+}
 
 #[cfg(test)]
 mod test_many {
     use crate::combinators::*;
     use crate::core::Parsable;
-    use crate::primitives::{char, StrState};
+    use crate::primitives::{char, CharStream};
 
     #[test]
     fn ok_nonempty() {
         let parser = char('y').many();
 
-        let mut st = StrState::new("yyyyying");
+        let mut st = CharStream::new("yyyyying");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec!['y', 'y', 'y', 'y', 'y']), res);
-        assert_eq!("ing", st.as_stream());
+        assert_eq!("ing", st.as_str());
         assert_eq!(0, logs.len());
     }
 
     #[test]
     fn ok_empty() {
-        let parser = many(char('y'));
+        let parser = char('y').many();
 
-        let mut st = StrState::new("ing");
+        let mut st = CharStream::new("ing");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec![]), res);
-        assert_eq!("ing", st.as_stream());
+        assert_eq!("ing", st.as_str());
         assert_eq!(0, logs.len());
     }
 }
@@ -183,17 +135,17 @@ mod test_many {
 mod test_some {
     use crate::combinators::*;
     use crate::core::*;
-    use crate::primitives::{char, StrState};
+    use crate::primitives::{char, CharStream};
 
     #[test]
     fn ok() {
-        let parser = Parser::new(char('y').some());
+        let parser = char('y').some();
 
-        let mut st = StrState::new("yyyyycpnb");
+        let mut st = CharStream::new("yyyyycpnb");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(vec!['y', 'y', 'y', 'y', 'y']), res);
-        assert_eq!("cpnb", st.as_stream());
+        assert_eq!("cpnb", st.as_str());
         assert_eq!(0, logs.len());
     }
 
@@ -201,11 +153,11 @@ mod test_some {
     fn fail() {
         let parser = char('y').some();
 
-        let mut st = StrState::new("cpnb");
+        let mut st = CharStream::new("cpnb");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("cpnb", st.as_stream());
+        assert_eq!("cpnb", st.as_str());
         assert_eq!(1, logs.len());
     }
 }
@@ -214,13 +166,13 @@ mod test_some {
 mod test_optional {
     use crate::combinators::*;
     use crate::core::*;
-    use crate::primitives::{char, StrState};
+    use crate::primitives::{char, CharStream};
 
     #[test]
     fn ok_one() {
         let parser = char('y').optional();
 
-        let mut st = StrState::new("yyyyycpnb");
+        let mut st = CharStream::new("yyyyycpnb");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(Some('y')), res);
@@ -231,7 +183,7 @@ mod test_optional {
     fn ok_zero() {
         let parser = char('y').optional();
 
-        let mut st = StrState::new("cpnb");
+        let mut st = CharStream::new("cpnb");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(None), res);

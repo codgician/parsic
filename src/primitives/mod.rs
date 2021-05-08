@@ -1,4 +1,4 @@
 pub mod combinators;
-pub mod state;
+pub mod stream;
 
-pub use crate::primitives::{self, combinators::*, state::*};
+pub use crate::primitives::{self, combinators::*, stream::*};

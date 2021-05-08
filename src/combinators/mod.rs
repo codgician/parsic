@@ -9,6 +9,6 @@ mod replicative;
 mod sequential;
 
 pub use crate::combinators::{
-    self, basic::*, bind::*, compose::*, error::*, fix::*, map::*, or::*, replicative::*,
-    sequential::*,
+    self, basic::*, bind::*, compose::*, error::*, fix::*, map::*, or::*,
+    replicative::*, sequential::*,
 };

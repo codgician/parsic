@@ -1,84 +1,70 @@
-use crate::core::{Parsable, ParseLogger};
-use std::marker::PhantomData;
-
-/// Data structure for `compose` combinator.
-#[derive(Copy, Clone, Debug)]
-pub struct ComposeP<P1, P2, T>(P1, P2, PhantomData<T>);
-
-impl<P1, P2, T> ComposeP<P1, P2, T> {
-    pub fn new(p1: P1, p2: P2) -> Self {
-        Self(p1, p2, PhantomData)
-    }
-}
-
-impl<P1, P2, F, S: Clone, T> Parsable<S> for ComposeP<P1, P2, T>
-where
-    F: Fn(P2::Result) -> T,
-    P1: Parsable<S, Result = F>,
-    P2: Parsable<S>,
-{
-    type Result = T;
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let st = state.clone();
-        match self.0.parse(state, logger) {
-            None => {
-                *state = st;
-                None
-            }
-            Some(f) => match self.1.parse(state, logger) {
-                None => { 
-                    *state = st;
-                    None
-                },
-                Some(x) => Some(f(x)),
-            },
-        }
-    }
-}
+use crate::core::{Parsable, Parser};
 
 /// ## Combinator: `compose` (function ver.)
 /// Functional composition between parsers.
-pub fn compose<P1, P2, F, S, T>(p1: P1, p2: P2) -> ComposeP<P1, P2, T>
+pub fn compose<'f, A: 'f, B: 'f, F, S>(
+    pf: impl Parsable<Stream = S, Result = F> + 'f,
+    px: impl Parsable<Stream = S, Result = A> + 'f,
+) -> Parser<'f, B, S>
 where
-    F: Fn(P2::Result) -> T,
-    P1: Parsable<S, Result = F>,
-    P2: Parsable<S>,
+    F: Fn(A) -> B + 'f,
+    S: Clone,
 {
-    ComposeP::new(p1, p2)
+    Parser::new(move |stream: &mut S, logger| {
+        let st = stream.clone();
+        match pf.parse(stream, logger) {
+            Some(f) => match px.parse(stream, logger) {
+                Some(x) => Some(f(x)),
+                _ => {
+                    *stream = st;
+                    None
+                }
+            },
+            _ => {
+                *stream = st;
+                None
+            }
+        }
+    })
 }
 
 /// Implements `compose` method for `Parsable<S>`.
-pub trait ComposePExt<S>: Parsable<S> {
+pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     /// ## Combinator: `compose`
     /// Functional composition between parsers.
-    fn compose<P, T>(self, parser: P) -> ComposeP<Self, P, T>
+    fn compose<A: 'f, B: 'f>(
+        self,
+        px: impl Parsable<Stream = S, Result = A> + 'f,
+    ) -> Parser<'f, B, S>
     where
-        Self: Sized,
-        Self::Result: Fn(P::Result) -> T,
-        P: Parsable<S>,
+        Self: Sized + 'f,
+        F: Fn(A) -> B,
+        S: Clone,
     {
-        ComposeP::new(self, parser)
+        compose(self, px)
     }
 }
 
-impl<S, P: Parsable<S>> ComposePExt<S> for P {}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ComposeExt<'f, A, S>
+    for P
+{
+}
 
 #[cfg(test)]
 mod test_compose {
     use crate::combinators::*;
     use crate::core::Parsable;
-    use crate::primitives::{char, StrState};
+    use crate::primitives::{char, CharStream};
 
     #[test]
     fn ok() {
         let parser = pure(|x| x == 'H').compose(char('H'));
 
-        let mut st = StrState::new("Hello");
+        let mut st = CharStream::new("Hello");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(true), res);
-        assert_eq!("ello", st.as_stream());
+        assert_eq!("ello", st.as_str());
         assert_eq!(0, logs.len());
     }
 
@@ -86,23 +72,23 @@ mod test_compose {
     fn fail() {
         let parser = pure(|x| x == 'H').compose(char('h'));
 
-        let mut st = StrState::new("Hello");
+        let mut st = CharStream::new("Hello");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("Hello", st.as_stream());
+        assert_eq!("Hello", st.as_str());
         assert_eq!(1, logs.len());
     }
 
     #[test]
     fn compose_with_empty() {
-        let parser = pure(|_| true).compose(empty::<StrState, bool>());
+        let parser = pure(|_| true).compose(empty::<bool, CharStream>());
 
-        let mut st = StrState::new("Hello");
+        let mut st = CharStream::new("Hello");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("Hello", st.as_stream());
+        assert_eq!("Hello", st.as_str());
         assert_eq!(0, logs.len());
     }
 }

@@ -1,90 +1,52 @@
-use crate::combinators::MapP;
-use crate::core::{Parsable, ParseLogger};
-
-/// Data structure for `and` combinator.
-#[derive(Clone, Copy, Debug)]
-pub struct AndP<P1, P2>(P1, P2);
-
-impl<P1, P2> AndP<P1, P2> {
-    pub fn new(p1: P1, p2: P2) -> Self {
-        Self(p1, p2)
-    }
-}
-
-impl<S: Clone, P1, P2> Parsable<S> for AndP<P1, P2>
-where
-    P1: Parsable<S>,
-    P2: Parsable<S>,
-{
-    type Result = (P1::Result, P2::Result);
-
-    fn parse(&self, state: &mut S, logger: &mut ParseLogger) -> Option<Self::Result> {
-        let st = state.clone();
-
-        match self.0.parse(state, logger) {
-            None => {
-                *state = st; 
-                None
-            },
-            Some(r1) => match self.1.parse(state, logger) {
-                None => {
-                    *state = st;
-                    None
-                },
-                Some(r2) => Some((r1, r2)),
-            },
-        }
-    }
-}
+use crate::combinators::MapExt;
+use crate::core::{Parsable, Parser};
 
 /// ## Combinator: `and` (function ver.)
-pub fn and<S, P1, P2>(p1: P1, p2: P2) -> AndP<P1, P2>
-where
-    P1: Parsable<S>,
-    P2: Parsable<S>,
-{
-    AndP::new(p1, p2)
+pub fn and<'f, A: 'f, B: 'f, S: Clone>(
+    p1: impl Parsable<Stream = S, Result = A> + 'f,
+    p2: impl Parsable<Stream = S, Result = B> + 'f,
+) -> Parser<'f, (A, B), S> {
+    Parser::new(move |stream: &mut S, logger| {
+        let st = stream.clone();
+        match p1.parse(stream, logger) {
+            Some(x) => match p2.parse(stream, logger) {
+                None => {
+                    *stream = st;
+                    None
+                }
+                Some(y) => Some((x, y)),
+            },
+            None => {
+                *stream = st;
+                None
+            }
+        }
+    })
 }
-
-/// Type declaration for `left` combinator.
-pub type LeftP<P1, P2, T1, T2> = MapP<fn((T1, T2)) -> T1, AndP<P1, P2>>;
 
 /// ## Combinator: `left` (function ver.)
-pub fn left<S, P1, P2>(p1: P1, p2: P2) -> LeftP<P1, P2, P1::Result, P2::Result>
-where
-    P1: Parsable<S>,
-    P2: Parsable<S>,
-{
-    MapP::new(|(l, _)| l, AndP::new(p1, p2))
+pub fn left<'f, A: 'f, B: 'f, S: Clone + 'f>(
+    p1: impl Parsable<Stream = S, Result = A> + 'f,
+    p2: impl Parsable<Stream = S, Result = B> + 'f,
+) -> Parser<'f, A, S> {
+    p1.and(p2).map(|(l, _)| l)
 }
-
-/// Type declaration for `right` combinator.
-pub type RightP<P1, P2, T1, T2> = MapP<fn((T1, T2)) -> T2, AndP<P1, P2>>;
 
 /// ## Combinator: `right` (function ver.)
-pub fn right<S, P1, P2>(p1: P1, p2: P2) -> RightP<P1, P2, P1::Result, P2::Result>
-where
-    P1: Parsable<S>,
-    P2: Parsable<S>,
-{
-    MapP::new(|(_, r)| r, AndP::new(p1, p2))
+pub fn right<'f, A: 'f, B: 'f, S: Clone + 'f>(
+    p1: impl Parsable<Stream = S, Result = A> + 'f,
+    p2: impl Parsable<Stream = S, Result = B> + 'f,
+) -> Parser<'f, B, S> {
+    p1.and(p2).map(|(_, r)| r)
 }
 
-/// Type declaration for `mid` combinator.
-pub type MidP<P1, P2, P3, T1, T2, T3> = MapP<fn(((T1, T2), T3)) -> T2, AndP<AndP<P1, P2>, P3>>;
-
 /// ## Combinator: `mid` (function ver.)
-pub fn mid<S, P1, P2, P3>(
-    p1: P1,
-    p2: P2,
-    p3: P3,
-) -> MidP<P1, P2, P3, P1::Result, P2::Result, P3::Result>
-where
-    P1: Parsable<S>,
-    P2: Parsable<S>,
-    P3: Parsable<S>,
-{
-    MapP::new(|((_, m), _)| m, AndP::new(AndP::new(p1, p2), p3))
+pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
+    p1: impl Parsable<Stream = S, Result = A> + 'f,
+    p2: impl Parsable<Stream = S, Result = B> + 'f,
+    p3: impl Parsable<Stream = S, Result = C> + 'f,
+) -> Parser<'f, B, S> {
+    p1.and(p2).and(p3).map(|((_, m), _)| m)
 }
 
 /// Implements following methods for `Parsable<S>`:
@@ -92,76 +54,93 @@ where
 /// - `left`
 /// - `right`
 /// - `mid`
-pub trait SequentialPExt<S>: Parsable<S> {
+pub trait SequentialExt<'f, A: 'f, S>:
+    Parsable<Stream = S, Result = A>
+{
     /// ## Combinator: `and`
-    fn and<P>(self, parser: P) -> AndP<Self, P>
+    fn and<B: 'f>(
+        self,
+        p: impl Parsable<Stream = S, Result = B> + 'f,
+    ) -> Parser<'f, (A, B), S>
     where
-        Self: Sized,
-        P: Parsable<S>,
+        Self: Sized + 'f,
+        S: Clone,
     {
-        AndP::new(self, parser)
+        and(self, p)
     }
 
     /// ## Combinator: `left`
-    fn left<P>(self, parser: P) -> LeftP<Self, P, Self::Result, P::Result>
+    fn left<B: 'f>(
+        self,
+        p: impl Parsable<Stream = S, Result = B> + 'f,
+    ) -> Parser<'f, A, S>
     where
-        Self: Sized,
-        P: Parsable<S>,
+        Self: Sized + 'f,
+        S: Clone + 'f,
     {
-        MapP::new(|(l, _)| l, AndP::new(self, parser))
+        left(self, p)
     }
 
     /// ## Combinator: `right`
-    fn right<P>(self, parser: P) -> RightP<Self, P, Self::Result, P::Result>
+    fn right<B: 'f>(
+        self,
+        p: impl Parsable<Stream = S, Result = B> + 'f,
+    ) -> Parser<'f, B, S>
     where
-        Self: Sized,
-        P: Parsable<S>,
+        Self: Sized + 'f,
+        S: Clone + 'f,
     {
-        MapP::new(|(_, r)| r, AndP::new(self, parser))
+        right(self, p)
     }
 
     /// ## Combinator: `mid`
-    fn mid<P1, P2>(self, p1: P1, p2: P2) -> MidP<Self, P1, P2, Self::Result, P1::Result, P2::Result>
+    fn mid<B: 'f, C: 'f>(
+        self,
+        p1: impl Parsable<Stream = S, Result = B> + 'f,
+        p2: impl Parsable<Stream = S, Result = C> + 'f,
+    ) -> Parser<'f, B, S>
     where
-        Self: Sized,
-        P1: Parsable<S>,
-        P2: Parsable<S>,
+        Self: Sized + 'f,
+        S: Clone + 'f,
     {
-        MapP::new(|((_, m), _)| m, AndP::new(AndP::new(self, p1), p2))
+        mid(self, p1, p2)
     }
 }
 
-impl<S, P: Parsable<S>> SequentialPExt<S> for P {}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> SequentialExt<'f, A, S>
+    for P
+{
+}
 
 #[cfg(test)]
 mod test_and {
     use crate::combinators::*;
     use crate::core::Parsable;
-    use crate::primitives::{char, satisfy, StrState};
+    use crate::primitives::{char, satisfy, CharStream};
 
     #[test]
     fn same_type_ok() {
         let parser = char('A').and(char('B'));
 
-        let mut st = StrState::new("ABC");
+        let mut st = CharStream::new("ABC");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some(('A', 'B')), res);
-        assert_eq!("C", st.as_stream());
+        assert_eq!("C", st.as_str());
         assert_eq!(0, logs.len());
     }
 
     #[test]
     fn different_type_ok() {
         let parser = satisfy(|&ch| ch.is_digit(10))
-            .map_opt(|ch| ch.to_digit(10))
+            .map_option(|ch| ch.to_digit(10))
             .and(char('A'));
 
-        let mut st = StrState::new("1A+");
+        let mut st = CharStream::new("1A+");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(Some((1, 'A')), res);
-        assert_eq!("+", st.as_stream());
+        assert_eq!("+", st.as_str());
         assert_eq!(0, logs.len());
     }
 
@@ -169,11 +148,11 @@ mod test_and {
     fn left_fail() {
         let parser = char('A').and(char('B'));
 
-        let mut st = StrState::new("BBC");
+        let mut st = CharStream::new("BBC");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("BC", st.as_stream());
+        assert_eq!("BBC", st.as_str());
         assert_eq!(1, logs.len());
     }
 
@@ -181,11 +160,11 @@ mod test_and {
     fn right_fail() {
         let parser = char('A').and(char('B'));
 
-        let mut st = StrState::new("ACC");
+        let mut st = CharStream::new("ACC");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("ACC", st.as_stream());
+        assert_eq!("ACC", st.as_str());
         assert_eq!(1, logs.len());
     }
 
@@ -193,11 +172,11 @@ mod test_and {
     fn both_fail() {
         let parser = char('A').and(char('B'));
 
-        let mut st = StrState::new("CCC");
+        let mut st = CharStream::new("CCC");
         let (res, logs) = parser.exec(&mut st);
 
         assert_eq!(None, res);
-        assert_eq!("CCC", st.as_stream());
+        assert_eq!("CCC", st.as_str());
         assert_eq!(1, logs.len());
     }
 }

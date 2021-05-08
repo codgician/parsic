@@ -7,11 +7,11 @@
 ## To-do
 
 - 💖 **Core**
+    - [x] `Parser`: wrapper for parser function
     - [x] `Parsable`: anything that could be parsed
     - [x] `ParseLogger`: logger for parser
-    - [x] `Parser`: wrapper for parsable
 - 🐣 **Primitives**
-    - [x] `StrState`: parse state for `&str`
+    - [x] `CharStream`: parse state for `&str`
     - [x] `char`: consumes one char at a time from parse stream
     - [x] `satisfy`: consumes one char if given condition satisifies
     - [x] `literal`: consumes given literal string
@@ -19,7 +19,8 @@
     - [x] `trim`: constructs a parser that consumes whitespaces at both ends
 - 🍡 **Combinators**
     - [x] `map`: Maps the result of current parser to another value
-    - [x] `map_opt`: `map`, but automatically unwraps `Option<T>` and `Result<T, E>`
+    - [x] `map_option`: `map`, but automatically unwraps `Option<T>`
+    - [x] `map_result`: `map`, but automatically unwraps `Result<T, E>`
     - [x] `pure`: injects value into an identity parser
     - [x] `compose`: compose one parser with another if applicable
     - [x] `empty`: a parser that always fails
@@ -33,7 +34,7 @@
     - [x] `inspect`: returns parser result alongwith current parsing state
     - [x] `recover`: returns a fallback value is given parser fails 
 - ✨ **Enhancements**
-    - [x] Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`
+    - [ ] ~~Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`~~
     - [ ] ~~Support returning multiple results~~
     - [ ] Advanced error handling
 - 🩺 **Tests**

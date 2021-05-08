@@ -1,15 +1,15 @@
 use crate::core::Pos;
 
 #[derive(Clone, Debug)]
-pub struct StrState {
-    pub(crate) inp: std::str::Chars<'static>,
+pub struct CharStream<'s> {
+    pub(crate) inp: std::str::Chars<'s>,
     pub(crate) pos: Pos,
     pub(crate) len: usize,
     pub(crate) idx: usize,
 }
 
-impl StrState {
-    pub fn new(inp: &'static str) -> Self {
+impl<'s> CharStream<'s> {
+    pub fn new(inp: &'s str) -> Self {
         Self {
             inp: inp.chars(),
             pos: Pos::new(0, 0),
@@ -18,7 +18,7 @@ impl StrState {
         }
     }
 
-    pub fn as_stream(&self) -> &'static str {
+    pub fn as_str(&self) -> &'s str {
         self.inp.as_str()
     }
     pub fn pos(&self) -> Pos {
@@ -35,8 +35,8 @@ impl StrState {
     }
 }
 
-// Implement Iterator trait for StrState
-impl Iterator for StrState {
+// Implement Iterator trait for CharStream
+impl<'s> Iterator for CharStream<'s> {
     type Item = char;
     fn next(&mut self) -> Option<Self::Item> {
         let ch = self.inp.next()?;
