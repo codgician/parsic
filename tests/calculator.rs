@@ -3,7 +3,7 @@
 /// A simple arithmetic expression evaluator that supports
 /// `+`, `-`, `*`, `/` and `()`. It accepts input with
 /// whitespaces.
-/// 
+///
 /// This test contains two implementations: one is implemented
 /// with functions that returns a `Parser`, the other is implemented
 /// with closures.

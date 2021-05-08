@@ -1,0 +1,21 @@
+name: Generate doc
+on:
+  push:
+    branches: [ main ]
+  pull-request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  generate-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build doc
+        run: cargo doc --no-deps
+      - name: Deploy doc
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/doc
