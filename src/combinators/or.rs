@@ -1,12 +1,12 @@
 use crate::core::{return_none, Parsable, Parser};
 
-/// ## Combinator: `or` (function ver.)
+/// # Combinator: `or` (function ver.)
 ///
 /// Alternative combinator. Accepts two parsers as arguments,
 /// if the first parser succeeds then its result is returned,
 /// otherwise the result of the second parser is returned.
 ///
-/// ### Examples
+/// # Examples
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -44,13 +44,13 @@ pub fn or<'f, A: 'f, S: Clone>(
 
 /// Implement `or` combinator for `Parsable<S>`.
 pub trait OrExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `or` (function ver.)
+    /// # Combinator: `or` (function ver.)
     ///
     /// Alternative combinator. Accepts two parsers as arguments,
     /// if the first parser succeeds then its result is returned,
     /// otherwise the result of the second parser is returned.
     ///
-    /// ### Examples
+    /// # Examples
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;

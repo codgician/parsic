@@ -1,7 +1,7 @@
 use crate::core::logger::*;
 use std::rc::Rc;
 
-/// ## `Parser` struct
+/// # `Parser` struct
 /// Wraps the parser function.
 #[derive(Clone)]
 pub struct Parser<'f, A, S>(Rc<dyn Fn(&mut S, &mut ParseLogger) -> Option<A> + 'f>);
@@ -15,7 +15,7 @@ impl<'f, A: 'f, S> Parser<'f, A, S> {
     }
 }
 
-/// ## `Parsable` trait
+/// # `Parsable` trait
 /// Anything that is parsable should implement `Parsable` trait,
 /// The return types of all the combinators and combinators in this library
 /// Implement `Parsable` trait, meaning you can treat them as parsers

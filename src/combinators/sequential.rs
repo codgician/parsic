@@ -1,13 +1,13 @@
 use crate::combinators::MapExt;
 use crate::core::{return_none, Parsable, Parser};
 
-/// ## Combinator: `and` (function ver.)
+/// # Combinator: `and` (function ver.)
 ///
 /// A sequential combinator that applys the first parser then the second.
 /// If both parsers succeed, returns a tuple containing their results,
 /// otherwise fail.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -39,13 +39,13 @@ pub fn and<'f, A: 'f, B: 'f, S: Clone>(
     })
 }
 
-/// ## Combinator: `left` (function ver.)
+/// # Combinator: `left` (function ver.)
 ///
 /// A sequential combinator that applys the first parser then the second.
 /// If both parsers succeed, returns the result of the first parser,
 /// otherwise fail.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -68,13 +68,13 @@ pub fn left<'f, A: 'f, B: 'f, S: Clone + 'f>(
     p1.and(p2).map(|(l, _)| l)
 }
 
-/// ## Combinator: `right` (function ver.)
+/// # Combinator: `right` (function ver.)
 ///
 /// A sequential combinator that applys the first parser then the second.
 /// If both parsers succeed, returns the result of the second parser,
 /// otherwise fail.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -97,13 +97,13 @@ pub fn right<'f, A: 'f, B: 'f, S: Clone + 'f>(
     p1.and(p2).map(|(_, r)| r)
 }
 
-/// ## Combinator: `mid` (function ver.)
+/// # Combinator: `mid` (function ver.)
 ///
 /// A sequential combinator that applys three parsers one after another.
 /// If all parsers succeed, returns the result of the second parser,
 /// otherwise fail.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -129,13 +129,13 @@ pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
 
 /// Implement sequential combinators for `Parsable<S>`.
 pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `and` (function ver.)
+    /// # Combinator: `and` (function ver.)
     ///
     /// A sequential combinator that applys the first parser then the second.
     /// If both parsers succeed, returns a tuple containing their results,
     /// otherwise fail.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -159,13 +159,13 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         and(self, p)
     }
 
-    /// ## Combinator: `left`
+    /// # Combinator: `left`
     ///
     /// A sequential combinator that applys the first parser then the second.
     /// If both parsers succeed, returns the result of the first parser,
     /// otherwise fail.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -189,13 +189,13 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         left(self, p)
     }
 
-    /// ## Combinator: `right`
+    /// # Combinator: `right`
     ///
     /// A sequential combinator that applys the first parser then the second.
     /// If both parsers succeed, returns the result of the second parser,
     /// otherwise fail.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -219,13 +219,13 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         right(self, p)
     }
 
-    /// ## Combinator: `mid`
+    /// # Combinator: `mid`
     ///
     /// A sequential combinator that applys three parsers one after another.
     /// If all parsers succeed, returns the result of the second parser,
     /// otherwise fail.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;

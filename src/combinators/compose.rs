@@ -1,10 +1,10 @@
 use crate::core::{return_none, Parsable, Parser};
 
-/// ## Combinator: `compose` (function ver.)
+/// # Combinator: `compose` (function ver.)
 ///
 /// Functional composition between parsers.
 ///
-/// ### Properties
+/// # Properties
 ///
 /// Should satisfy [Applicative functor laws](https://wiki.haskell.org/Typeclassopedia#Laws_2).
 ///
@@ -15,7 +15,7 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// Check out `test_bind` module in the source code for naive examples of above laws.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -51,11 +51,11 @@ where
 
 /// Implement `compose` combinator for `Parsable<S>`.
 pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
-    /// ## Combinator: `compose`
+    /// # Combinator: `compose`
     ///
     /// Functional composition between parsers.
     ///
-    /// ### Properties
+    /// # Properties
     ///
     /// Should satisfy [Applicative functor laws](https://wiki.haskell.org/Typeclassopedia#Laws_2):
     ///
@@ -66,7 +66,7 @@ pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     ///
     /// Check out `test_bind` module in the source code for naive examples of above laws.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;

@@ -1,6 +1,6 @@
 use crate::core::{Msg, MsgBody, Parsable, Parser};
 
-/// ## Combinator: `info` (function ver.)
+/// # Combinator: `info` (function ver.)
 fn info<'f, A: 'f, S>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
     msg: &'f str,
@@ -13,7 +13,7 @@ fn info<'f, A: 'f, S>(
     })
 }
 
-/// ## Combinator: `warn` (function ver.)
+/// # Combinator: `warn` (function ver.)
 fn warn<'f, A: 'f, S>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
     msg: &'f str,
@@ -26,7 +26,7 @@ fn warn<'f, A: 'f, S>(
     })
 }
 
-/// ## Combinator: `error` (function ver.)
+/// # Combinator: `error` (function ver.)
 fn error<'f, A: 'f, S>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
     msg: &'f str,
@@ -39,7 +39,7 @@ fn error<'f, A: 'f, S>(
     })
 }
 
-/// ## Combinator: `inspect` (function ver.)
+/// # Combinator: `inspect` (function ver.)
 fn inspect<'f, A: 'f, S: Clone + 'f>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
 ) -> Parser<'f, (Option<A>, S), S> {
@@ -49,7 +49,7 @@ fn inspect<'f, A: 'f, S: Clone + 'f>(
     })
 }
 
-/// ## Combinator: `recover` (function ver.)
+/// # Combinator: `recover` (function ver.)
 fn recover<'f, A: Clone + 'f, S: Clone>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
     x: A,
@@ -59,7 +59,7 @@ fn recover<'f, A: Clone + 'f, S: Clone>(
 
 /// Implement error related combinators for `Parsable<S>`.
 pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `info`
+    /// # Combinator: `info`
     fn info(self, msg: &'f str) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,
@@ -67,7 +67,7 @@ pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         info(self, msg)
     }
 
-    /// ## Combinator: `warn`
+    /// # Combinator: `warn`
     fn warn(self, msg: &'f str) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,
@@ -75,7 +75,7 @@ pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         warn(self, msg)
     }
 
-    /// ## Combinator: `error`
+    /// # Combinator: `error`
     fn error(self, msg: &'f str) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,
@@ -83,7 +83,7 @@ pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         error(self, msg)
     }
 
-    /// ## Combinator: `inspect`
+    /// # Combinator: `inspect`
     fn inspect(self) -> Parser<'f, (Option<A>, S), S>
     where
         Self: Sized + 'f,
@@ -92,7 +92,7 @@ pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         inspect(self)
     }
 
-    /// ## Combinator: `recover`
+    /// # Combinator: `recover`
     fn recover(self, x: A) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,

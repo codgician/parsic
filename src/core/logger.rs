@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 
-/// ## Struct `Pos`
+/// # Struct `Pos`
 /// Data structure for parsing position.
 #[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
 pub struct Pos(usize, usize);
@@ -46,7 +46,7 @@ impl Display for Msg {
     }
 }
 
-/// ## Struct `MsgBody`
+/// # Struct `MsgBody`
 /// Data structure for error message body.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MsgBody {
@@ -63,7 +63,7 @@ impl MsgBody {
     }
 }
 
-/// ## Struct `ParseLogger`
+/// # Struct `ParseLogger`
 /// An implementation of parse logger that stores logs.
 #[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub struct ParseLogger {

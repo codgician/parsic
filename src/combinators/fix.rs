@@ -14,7 +14,7 @@ impl<'f, A: 'f, S> Parsable for Fix<'f, A, S> {
     }
 }
 
-/// ## Combinator: `fix`
+/// # Combinator: `fix`
 ///
 /// In Rust, closures are anonymous functions, so there is no name for us to call
 /// when we want to make it recursive. Therefore, a Y-Combinator, or
@@ -22,11 +22,11 @@ impl<'f, A: 'f, S> Parsable for Fix<'f, A, S> {
 /// is introduced to address this issue, making it possible to write parsers that
 /// support recursive syntax using closures.
 ///
-/// ### Property
+/// # Property
 /// ```plain
 /// fix f = f (fix f)
 /// ```
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;

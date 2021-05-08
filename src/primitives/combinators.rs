@@ -2,12 +2,12 @@ use crate::combinators::*;
 use crate::core::{Msg, MsgBody, Parsable, Parser};
 use crate::primitives::CharStream;
 
-/// ## Combinator: `satisfy`
+/// # Combinator: `satisfy`
 ///
 /// Consume a single character if given function applied
 /// to the next character from the parse stream yields `true`.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::primitives::{CharStream, satisfy};
@@ -46,12 +46,12 @@ pub fn satisfy<'f>(f: impl Fn(&char) -> bool + 'f) -> Parser<'f, char, CharStrea
     })
 }
 
-/// ## Combinator: `char`
+/// # Combinator: `char`
 ///
 /// Consume the given char from the parse stream.
 /// `char(x)` is equivalent to `satisfy(|x: &char| *x == ch)`
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::primitives::{char, CharStream};
@@ -70,11 +70,11 @@ pub fn char<'f>(ch: char) -> Parser<'f, char, CharStream<'f>> {
     satisfy(move |x| *x == ch)
 }
 
-/// ## Combinator: `literal`
+/// # Combinator: `literal`
 ///
 /// Consume given literal string from the parse stream.test
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::primitives::{CharStream, literal};
@@ -105,11 +105,11 @@ pub fn literal<'f>(s: &'f str) -> Parser<'f, &'f str, CharStream> {
     })
 }
 
-/// ## Combinator: `regex`
+/// # Combinator: `regex`
 ///
 /// Consume a literal string that matches given regular expression.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::primitives::{CharStream, regex};
@@ -144,12 +144,12 @@ pub fn regex<'f>(re: &'f str) -> Parser<'f, &'f str, CharStream> {
     })
 }
 
-/// ## Combinator: `space`
+/// # Combinator: `space`
 ///
 /// Consume a single whitespace character (` `, `\n`, `\r` or `\t`).
 /// Equivalant to `char(' ').or(char('\n')).or(char('\r')).or(char('\t'))`.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::primitives::{CharStream, space};
@@ -168,13 +168,13 @@ pub fn space<'f>() -> Parser<'f, char, CharStream<'f>> {
     char(' ').or(char('\n')).or(char('\r')).or(char('\t'))
 }
 
-/// ## Combinator: `trim` (function ver.)
+/// # Combinator: `trim` (function ver.)
 ///
 /// Consume as many whitespace characters (` `, `\n`, `\r` or `\t`)
 /// as possible surrounding given parser. `trim(p)` is equivalant to
 /// `mid(space().many(), p, space().many())`.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::primitives::{CharStream, literal, trim};
@@ -197,13 +197,13 @@ pub fn trim<'f, A: 'f>(
 
 /// Implement `trim` method for `Parsable<CharStream>`:
 pub trait PrimitiveExt<'f, A: 'f>: Parsable<Stream = CharStream<'f>, Result = A> {
-    /// ## Combinator: `trim`
+    /// # Combinator: `trim`
     ///
     /// Consume as many whitespace characters (` `, `\n`, `\r` or `\t`)
     /// as possible surrounding given parser. `trim(p)` is equivalant to
     /// `mid(space().many(), p, space().many())`.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::core::Parsable;
     /// use naive_parsec::primitives::{CharStream, literal, PrimitiveExt, trim};

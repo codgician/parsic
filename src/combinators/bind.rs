@@ -1,10 +1,10 @@
 use crate::core::{return_none, Parsable, Parser};
 
-/// ## Combinator: `bind` (function ver.)
+/// # Combinator: `bind` (function ver.)
 ///
 /// Monadic bind operator `(>>=)` for context sensitive parsing.
 ///
-/// ### Properties
+/// # Properties
 ///
 /// Should satisfy [Monad laws](https://wiki.haskell.org/Typeclassopedia#Laws_3):
 ///
@@ -14,7 +14,7 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// Check out `test_bind` module in the source code for naive examples of above laws.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::combinators::bind;
@@ -54,11 +54,11 @@ where
 
 /// Implement `bind` combinator for `Parsable<S>`.
 pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `bind`
+    /// # Combinator: `bind`
     ///
     /// Monadic bind operator `(>>=)` for context sensitive parsing.
     ///
-    /// ### Properties
+    /// # Properties
     ///
     /// Should satisfy [Monad laws](https://wiki.haskell.org/Typeclassopedia#Laws_3):
     ///
@@ -68,7 +68,7 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// Check out `test_bind` module in the source code for naive examples of above laws.
     ///
-    /// ### Example
+    /// # Example
     ///
     /// The code example below parses `expr` with the following grammar:
     ///

@@ -1,10 +1,10 @@
 use crate::core::{return_none, Msg, MsgBody, Parsable, Parser};
 
-/// ## Combinator: `map` (function ver.)
+/// # Combinator: `map` (function ver.)
 ///
 /// Maps the result of a parser to another value using the given function.
 ///
-/// ### Properties
+/// # Properties
 ///
 /// Should satisfy [Functor laws](https://wiki.haskell.org/Typeclassopedia#Laws):
 ///
@@ -13,7 +13,7 @@ use crate::core::{return_none, Msg, MsgBody, Parsable, Parser};
 ///
 /// Check out `test_map` module in the source code for naive examples of above laws.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -40,14 +40,14 @@ pub fn map<'f, A: 'f, B: 'f, S: Clone>(
     })
 }
 
-/// ## Combinator: `map_option` (function ver.)
+/// # Combinator: `map_option` (function ver.)
 ///
 /// Maps the result of a parser to another value using the given function that
 /// produces an `Option<T>`. The only difference with `map` is that `map_option`
 /// will automatically try to unwrap the `Option<T>` and will fail if the result
 /// is `None`.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -81,7 +81,7 @@ pub fn map_option<'f, A: 'f, B: 'f, S: Clone>(
     })
 }
 
-/// ## Combinator: `map_result` (function ver.)
+/// # Combinator: `map_result` (function ver.)
 ///
 /// Maps the result of a parser to another value using the given function that
 /// produces an `Result<T, E>`. The only difference with `map` is that `map_result`
@@ -89,7 +89,7 @@ pub fn map_option<'f, A: 'f, B: 'f, S: Clone>(
 /// `map_result` will log down the error message. Therefore, it requires `E` from
 /// `Result<T, E>` to implement `ToString` trait.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -126,11 +126,11 @@ pub fn map_result<'f, A: 'f, B: 'f, E: ToString, S: Clone>(
 
 /// Implement `map` and related combinators for `Parsable`.
 pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `map`
+    /// # Combinator: `map`
     ///
     /// Maps the result of current parser to another value.
     ///
-    /// ### Properties
+    /// # Properties
     ///
     /// Should satisfy [Functor laws](https://wiki.haskell.org/Typeclassopedia#Laws):
     ///
@@ -139,7 +139,7 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// Check out `test_map` module in the source code for naive examples of above laws.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -163,14 +163,14 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         map(self, f)
     }
 
-    /// ## Combinator: `map_option`
+    /// # Combinator: `map_option`
     ///
     /// Maps the result of a parser to another value using the given function that
     /// produces an `Option<T>`. The only difference with `map` is that `map_option`
     /// will automatically try to unwrap the `Option<T>` and will fail if the result
     /// is `None`.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -193,7 +193,7 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         map_option(self, f)
     }
 
-    /// ## Combinator: `map_result`
+    /// # Combinator: `map_result`
     ///
     /// Maps the result of a parser to another value using the given function that
     /// produces an `Result<T, E>`. The only difference with `map` is that `map_result`
@@ -201,7 +201,7 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// `map_result` will log down the error message. Therefore, it requires `E` from
     /// `Result<T, E>` to implement `ToString` trait.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;

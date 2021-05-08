@@ -1,12 +1,12 @@
 use crate::core::{return_none, Parsable, Parser};
 
-/// ## Combinator: `many` (function ver.)
+/// # Combinator: `many` (function ver.)
 ///
 /// Apply given parser as many times as possible (**zero** or more times),
 /// and returns a vector `Vec<T>` containg all the parse results. The
 /// combinator always succeeds.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -43,13 +43,13 @@ pub fn many<'f, A: 'f, S: Clone>(
     })
 }
 
-/// ## Combinator: `some` (function ver.)
+/// # Combinator: `some` (function ver.)
 ///
 /// Apply given parser as many times as possible (**one** or more times),
 /// and returns a vector `Vec<T>` containg all the parse results. The
 /// combinator fails if the parser fails at the first attempt.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -91,13 +91,13 @@ pub fn some<'f, A: 'f, S: Clone>(
     })
 }
 
-/// ## Combinator: `optional` (function ver.)
+/// # Combinator: `optional` (function ver.)
 ///
 /// Apply given parser **at most one time**. Denote the result
 /// of the given parser `p` as `x`, then the result of `optional(p)`
 /// would be `Some(x)`.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::Parsable;
@@ -133,13 +133,13 @@ pub fn optional<'f, A: 'f, S: Clone>(
 
 /// Implement replicative combinators for `Parsable<S>`.
 pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `many`
+    /// # Combinator: `many`
     ///
     /// Apply given parser as many times as possible (zero or more times),
     /// and returns a vector `Vec<T>` containg all the parse results. The
     /// combinator always succeeds.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -166,13 +166,13 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         many(self)
     }
 
-    /// ## Combinator: `some` (function ver.)
+    /// # Combinator: `some` (function ver.)
     ///
     /// Apply given parser as many times as possible (**one** or more times),
     /// and returns a vector `Vec<T>` containg all the parse results. The
     /// combinator fails if the parser fails at the first attempt.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;
@@ -199,13 +199,13 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         some(self)
     }
 
-    /// ## Combinator: `optional`
+    /// # Combinator: `optional`
     ///
     /// Apply given parser **at most one time**. Denote the result
     /// of the given parser `p` as `x`, then the result of `p.optional()`
     /// would be `Some(x)`.
     ///
-    /// ### Example
+    /// # Example
     /// ```
     /// use naive_parsec::combinators::*;
     /// use naive_parsec::core::Parsable;

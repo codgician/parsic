@@ -1,6 +1,6 @@
 use crate::core::Pos;
 
-/// ## Struct: `CharStream`
+/// # Struct: `CharStream`
 /// An implementation for parse stream consisting of characters.
 #[derive(Clone, Debug)]
 pub struct CharStream<'s> {

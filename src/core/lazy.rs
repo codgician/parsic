@@ -1,6 +1,6 @@
 use crate::core::{Parsable, ParseLogger};
 
-/// ## Trait: `Lazy`
+/// # Trait: `Lazy`
 /// Wraps anything that implements `Parsable` to
 /// support lazy evaluation.
 #[derive(Clone)]

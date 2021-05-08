@@ -1,10 +1,10 @@
 use crate::core::Parser;
 
-/// ## Combinator: `empty`
+/// # Combinator: `empty`
 ///
 /// A parser that consumes no item and always fails.
 ///
-/// ### Example
+/// # Example
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::*;
@@ -23,12 +23,12 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
     Parser::new(|_, _| None)
 }
 
-/// ## Combinator: `pure`
+/// # Combinator: `pure`
 ///
 /// Injects a value into an identity parser.
 ///
-/// ### Examples
-/// #### Injects a value
+/// # Examples
+/// # Injects a value
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::*;
@@ -43,7 +43,7 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
 /// assert_eq!(0, logs.len());
 ///
 /// ```
-/// #### Injects a function
+/// # Injects a function
 /// ```
 /// use naive_parsec::combinators::*;
 /// use naive_parsec::core::*;
