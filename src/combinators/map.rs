@@ -124,10 +124,7 @@ pub fn map_result<'f, A: 'f, B: 'f, E: ToString, S: Clone>(
     })
 }
 
-/// Implement the following combinators for `Parsable`:
-/// - `map`
-/// - `map_option`
-/// - `map_result`
+/// Implement `map` and related combinators for `Parsable`.
 pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `map`
     ///

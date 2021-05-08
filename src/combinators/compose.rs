@@ -49,7 +49,7 @@ where
     })
 }
 
-/// Implement `compose` method for `Parsable<S>`.
+/// Implement `compose` combinator for `Parsable<S>`.
 pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     /// ## Combinator: `compose`
     ///

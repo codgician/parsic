@@ -64,11 +64,7 @@ pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
     p1.and(p2).and(p3).map(|((_, m), _)| m)
 }
 
-/// Implement following methods for `Parsable<S>`:
-/// - `and`
-/// - `left`
-/// - `right`
-/// - `mid`
+/// Implement sequential combinators for `Parsable<S>`.
 pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `and` (function ver.)
     ///

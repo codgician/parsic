@@ -52,7 +52,7 @@ where
     })
 }
 
-/// Implement `bind` method for `Parsable<S>`.
+/// Implement `bind` combinator for `Parsable<S>`.
 pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `bind`
     ///

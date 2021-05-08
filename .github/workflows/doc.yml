@@ -1,4 +1,4 @@
-name: Generate doc
+name: Doc
 on:
   push:
     branches: [ main ]

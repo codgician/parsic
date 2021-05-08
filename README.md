@@ -1,6 +1,7 @@
 # naive-parsec
 
 ![Build Status](https://github.com/codgician/naive-parsec/actions/workflows/build.yml/badge.svg)
+![Doc status](https://github.com/codgician/naive-parsec/actions/workflows/doc.yml/badge.svg)
 
 :frog: A naive parser combinator written while learning Rust.
 

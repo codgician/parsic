@@ -42,7 +42,7 @@ pub fn or<'f, A: 'f, S: Clone>(
     })
 }
 
-/// Implement `or` method for `Parsable<S>`.
+/// Implement `or` combinator for `Parsable<S>`.
 pub trait OrExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `or` (function ver.)
     ///

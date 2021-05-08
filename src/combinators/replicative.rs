@@ -131,10 +131,7 @@ pub fn optional<'f, A: 'f, S: Clone>(
     })
 }
 
-/// Implement following method for `Parsable<S>`:
-/// - `many`
-/// - `some`
-/// - `optional`
+/// Implement replicative combinators for `Parsable<S>`.
 pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `many`
     ///

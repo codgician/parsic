@@ -57,12 +57,7 @@ fn recover<'f, A: Clone + 'f, S: Clone>(
     Parser::new(move |stream, logger| p.parse(stream, logger).or_else(|| Some(x.clone())))
 }
 
-/// Implement following method for `Parsable<S>`:
-/// - `info`
-/// - `warn`
-/// - `error`
-/// - `inspect`
-/// - `recover`
+/// Implement error related combinators for `Parsable<S>`.
 pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `info`
     fn info(self, msg: &'f str) -> Parser<'f, A, S>
