@@ -1,25 +1,32 @@
-use crate::core::{Parsable, Parser};
+use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `bind` (function ver.)
+///
 /// Monadic bind operator for context sensitive parsing.
 /// See the iterator-style variant `bind` in `BindPExt` trait
 /// for detailed introductions.
+///
+/// ### Properties
+///
+/// - **Left-identity**: `bind(pure(x), f) ~ f(x)`
+/// - **Right-identity**: `bind(p, |x| pure(x)) ~ p`
+/// - **Associativity**: `bind(bind(p, f), g) ~ bind(p, |x| bind(f(x), g))`
 ///
 /// ### Example
 ///
 /// The code example below parses `expr` with the following grammar:
 ///
 /// ```plain
-///  <expr> := <uppercase_letter> '+'
-///  <expr> := <lowercase_letter> '-'
+/// <expr> := <uppercase_letter> '+'
+/// <expr> := <lowercase_letter> '-'
 /// ```
 ///
 /// ```
-///  use naive_parsec::core::Parsable;
-///  use naive_parsec::combinators::bind;
-///  use naive_parsec::primitives::{ CharStream, char, satisfy };
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::combinators::bind;
+/// use naive_parsec::primitives::{ CharStream, char, satisfy };
 ///
-///  let parser = bind(
+/// let parser = bind(
 ///                 satisfy(|_| true),
 ///                 |ch| if ch.is_uppercase() {
 ///                     char('+')
@@ -27,10 +34,10 @@ use crate::core::{Parsable, Parser};
 ///                     char('-')
 ///                 }
 ///              );
-///   let (res1, _) = parser.exec(&mut CharStream::new("A+"));
-///   assert_eq!(Some('+'), res1);
-///   let (res2, _) = parser.exec(&mut CharStream::new("a-"));
-///   assert_eq!(Some('-'), res2);
+/// let (res1, _) = parser.exec(&mut CharStream::new("A+"));
+/// assert_eq!(Some('+'), res1);
+/// let (res2, _) = parser.exec(&mut CharStream::new("a-"));
+/// assert_eq!(Some('-'), res2);
 /// ```
 pub fn bind<'f, A: 'f, B: 'f, S, P>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
@@ -42,13 +49,9 @@ where
 {
     Parser::new(move |stream: &mut S, logger| {
         let st = stream.clone();
-        match p.parse(stream, logger) {
-            Some(x) => f(x).parse(stream, logger),
-            _ => {
-                *stream = st;
-                None
-            }
-        }
+        p.parse(stream, logger)
+            .and_then(|x| f(x).parse(stream, logger))
+            .or_else(|| return_none(stream, &st))
     })
 }
 
@@ -66,40 +69,38 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// to give another parser `f(r1)` and then applied to the remaining
     /// part of the input to give the final result.
     ///
+    /// ### Properties
+    ///
+    /// - **Left-identity**: `pure(x).bind(f) ~ f(x)`
+    /// - **Right-identity**: `p.bind(|x| pure(x)) ~ p`
+    /// - **Associativity**: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
+    ///
     /// ### Example
     ///
     /// The code example below parses `expr` with the following grammar:
     ///
     /// ```plain
-    ///  <expr> := <uppercase_letter> '+'
-    ///  <expr> := <lowercase_letter> '-'
+    /// <expr> := <uppercase_letter> '+'
+    /// <expr> := <lowercase_letter> '-'
     /// ```
     ///
     /// ```
-    ///  use naive_parsec::core::Parsable;
-    ///  use naive_parsec::combinators::BindExt;
-    ///  use naive_parsec::primitives::{ CharStream, char, satisfy };
+    /// use naive_parsec::core::Parsable;
+    /// use naive_parsec::combinators::BindExt;
+    /// use naive_parsec::primitives::{ CharStream, char, satisfy };
     ///
-    ///  let parser = satisfy(|_| true)
-    ///             .bind(|ch| if ch.is_uppercase() {
-    ///                 char('+')
-    ///             } else {
-    ///                 char('-')
-    ///             });
+    /// let parser = satisfy(|_| true)
+    ///            .bind(|ch| if ch.is_uppercase() {
+    ///                char('+')
+    ///            } else {
+    ///                char('-')
+    ///            });
     ///
-    ///  let (res1, _) = parser.exec(&mut CharStream::new("A+"));
-    ///  assert_eq!(Some('+'), res1);
-    ///  let (res2, _) = parser.exec(&mut CharStream::new("a-"));
-    ///  assert_eq!(Some('-'), res2);
+    /// let (res1, _) = parser.exec(&mut CharStream::new("A+"));
+    /// assert_eq!(Some('+'), res1);
+    /// let (res2, _) = parser.exec(&mut CharStream::new("a-"));
+    /// assert_eq!(Some('-'), res2);
     /// ```
-    ///
-    /// ### Properties
-    ///
-    /// - **Left-identity**: `pure(x).bind(f) ~ f(x)`
-    /// - **Right-identity**: `pure(x).bind(f) ~ f(x)`
-    /// - **Associativity**: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
-    ///
-    /// Check out `test_bind` module in `bind.rs` for code examples.
     fn bind<B: 'f, P>(self, f: impl Fn(A) -> P + 'f) -> Parser<'f, B, S>
     where
         Self: Sized + 'f,
@@ -119,7 +120,7 @@ mod test_bind {
     use crate::primitives::{char, satisfy, CharStream};
 
     #[test]
-    fn ok() {
+    fn fail_with_grace() {
         let parser = satisfy(|_| true).bind(|ch| {
             if ch.is_uppercase() {
                 char('+')
@@ -128,20 +129,16 @@ mod test_bind {
             }
         });
 
-        let mut st1 = CharStream::new("A+");
-        let mut st2 = CharStream::new("a-");
-
-        let (res1, logs1) = parser.exec(&mut st1);
-        let (res2, logs2) = parser.exec(&mut st2);
-
-        assert_eq!((Some('+'), Some('-')), (res1, res2));
-        assert_eq!(("", ""), (st1.as_str(), st2.as_str()));
-        assert_eq!((0, 0), (logs1.len(), logs2.len()));
+        let mut st = CharStream::new("Awesome");
+        let (res, logs) = parser.exec(&mut st);
+        assert_eq!(None, res);
+        assert_eq!(1, logs.len());
     }
 
     #[test]
     fn left_identity() {
-        //! Left identity: `pure(x).bind(f) ~ f(x)`
+        //! `pure(x).bind(f) ~ f(x)`
+        //! Left identity law
         let f = |b| if b { char('1') } else { char('0') };
         let parser1 = pure::<bool, CharStream>(true).bind(f);
         let parser2 = f(true);
@@ -158,7 +155,8 @@ mod test_bind {
 
     #[test]
     fn right_identity() {
-        //! Right identity: `p.bind(|x| pure(x)) ~ p`
+        //! `p.bind(|x| pure(x)) ~ p`
+        //! Right identity law.
         let parser1 = char('0').bind(|x| pure(x));
         let parser2 = char('0');
 
@@ -173,8 +171,9 @@ mod test_bind {
     }
 
     #[test]
-    fn associativity() {
-        //! Right identity: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
+    fn associative() {
+        //! `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
+        //! Associative law.
         let f = |ch: char| if ch == '0' { char('a') } else { char('b') };
         let g = |ch: char| if ch == 'a' { char('A') } else { char('B') };
         let parser1 = char('0').bind(g.clone()).bind(f.clone());

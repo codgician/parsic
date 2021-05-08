@@ -36,12 +36,12 @@
 - ✨ **Enhancements**
     - [ ] ~~Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`~~
     - [ ] ~~Support returning multiple results~~
-    - [ ] Advanced error handling
+    - [ ] Advanced error handling **(Planning)**
 - 🩺 **Tests**
-    - [ ] Property tests **(WIP)**
+    - [x] Tests for laws of Functor, Applicative and Monad.
     - [x] Arthimetic calculator
-    - [ ] Markdown parser
+    - [ ] Some more real-world tests **(Planning)**
 - 📄 **Docs**
-    - [ ] Core **(WIP)**
-    - [ ] Combinators **(WIP)**
-    - [ ] Wrappers **(WIP)**
+    - [x] Core
+    - [x] Primitives
+    - [x] Combinators

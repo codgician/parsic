@@ -1,4 +1,4 @@
-use crate::core::{Parsable, Parser};
+use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `many` (function ver.)
 pub fn many<'f, A: 'f, S: Clone>(
@@ -51,9 +51,8 @@ pub fn optional<'f, A: 'f, S: Clone>(
         let (st, lg) = (stream.clone(), logger.clone());
         match p.parse(stream, logger) {
             None => {
-                *stream = st;
                 *logger = lg;
-                Some(None)
+                Some(return_none(stream, &st))
             }
             x => Some(x),
         }

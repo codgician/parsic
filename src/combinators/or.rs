@@ -1,4 +1,4 @@
-use crate::core::{Parsable, Parser};
+use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `or` (function ver.)
 /// Alternative combinator.
@@ -15,10 +15,7 @@ pub fn or<'f, A: 'f, S: Clone>(
                 *logger = lg;
                 match p2.parse(stream, logger) {
                     Some(x) => Some(x),
-                    None => {
-                        *stream = st;
-                        None
-                    }
+                    None => return_none(stream, &st),
                 }
             }
         }

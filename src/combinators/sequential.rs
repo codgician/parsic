@@ -1,5 +1,5 @@
 use crate::combinators::MapExt;
-use crate::core::{Parsable, Parser};
+use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `and` (function ver.)
 pub fn and<'f, A: 'f, B: 'f, S: Clone>(
@@ -10,16 +10,10 @@ pub fn and<'f, A: 'f, B: 'f, S: Clone>(
         let st = stream.clone();
         match p1.parse(stream, logger) {
             Some(x) => match p2.parse(stream, logger) {
-                None => {
-                    *stream = st;
-                    None
-                }
                 Some(y) => Some((x, y)),
+                None => return_none(stream, &st),
             },
-            None => {
-                *stream = st;
-                None
-            }
+            None => return_none(stream, &st),
         }
     })
 }
