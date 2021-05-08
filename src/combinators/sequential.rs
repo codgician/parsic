@@ -3,7 +3,7 @@ use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `and` (function ver.)
 ///
-/// Sequential parser that applys the first parser then the second.
+/// A sequential combinator that applys the first parser then the second.
 /// If both parsers succeed, returns a tuple containing their results,
 /// otherwise fail.
 ///
@@ -40,6 +40,27 @@ pub fn and<'f, A: 'f, B: 'f, S: Clone>(
 }
 
 /// ## Combinator: `left` (function ver.)
+///
+/// A sequential combinator that applys the first parser then the second.
+/// If both parsers succeed, returns the result of the first parser,
+/// otherwise fail.
+///
+/// ### Example
+/// ```
+/// use naive_parsec::combinators::*;
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::primitives::{char, CharStream};
+///
+/// // Consume a character 'A', then a character 'B'
+/// let parser = left(char('A'), char('B'));
+///
+/// let mut st = CharStream::new("ABC");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some('A'), res);
+/// assert_eq!("C", st.as_str());
+/// assert_eq!(0, logs.len());
+/// ```
 pub fn left<'f, A: 'f, B: 'f, S: Clone + 'f>(
     p1: impl Parsable<Stream = S, Result = A> + 'f,
     p2: impl Parsable<Stream = S, Result = B> + 'f,
@@ -48,6 +69,27 @@ pub fn left<'f, A: 'f, B: 'f, S: Clone + 'f>(
 }
 
 /// ## Combinator: `right` (function ver.)
+///
+/// A sequential combinator that applys the first parser then the second.
+/// If both parsers succeed, returns the result of the second parser,
+/// otherwise fail.
+///
+/// ### Example
+/// ```
+/// use naive_parsec::combinators::*;
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::primitives::{char, CharStream};
+///
+/// // Consume a character 'A', then a character 'B'
+/// let parser = right(char('A'), char('B'));
+///
+/// let mut st = CharStream::new("ABC");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some('B'), res);
+/// assert_eq!("C", st.as_str());
+/// assert_eq!(0, logs.len());
+/// ```
 pub fn right<'f, A: 'f, B: 'f, S: Clone + 'f>(
     p1: impl Parsable<Stream = S, Result = A> + 'f,
     p2: impl Parsable<Stream = S, Result = B> + 'f,
@@ -56,6 +98,27 @@ pub fn right<'f, A: 'f, B: 'f, S: Clone + 'f>(
 }
 
 /// ## Combinator: `mid` (function ver.)
+///
+/// A sequential combinator that applys three parsers one after another.
+/// If all parsers succeed, returns the result of the second parser,
+/// otherwise fail.
+///
+/// ### Example
+/// ```
+/// use naive_parsec::combinators::*;
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::primitives::{char, CharStream};
+///
+/// // Consume a character 'A', then a character 'B'
+/// let parser = mid(char('A'), char('B'), char('C'));
+///
+/// let mut st = CharStream::new("ABC");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some('B'), res);
+/// assert_eq!("", st.as_str());
+/// assert_eq!(0, logs.len());
+/// ```
 pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
     p1: impl Parsable<Stream = S, Result = A> + 'f,
     p2: impl Parsable<Stream = S, Result = B> + 'f,
@@ -68,7 +131,7 @@ pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
 pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `and` (function ver.)
     ///
-    /// Sequential parser that applys the first parser then the second.
+    /// A sequential combinator that applys the first parser then the second.
     /// If both parsers succeed, returns a tuple containing their results,
     /// otherwise fail.
     ///
@@ -97,6 +160,27 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 
     /// ## Combinator: `left`
+    ///
+    /// A sequential combinator that applys the first parser then the second.
+    /// If both parsers succeed, returns the result of the first parser,
+    /// otherwise fail.
+    ///
+    /// ### Example
+    /// ```
+    /// use naive_parsec::combinators::*;
+    /// use naive_parsec::core::Parsable;
+    /// use naive_parsec::primitives::{char, CharStream};
+    ///
+    /// // Consume a character 'A', then a character 'B'
+    /// let parser = char('A').left(char('B'));
+    ///
+    /// let mut st = CharStream::new("ABC");
+    /// let (res, logs) = parser.exec(&mut st);
+    ///
+    /// assert_eq!(Some('A'), res);
+    /// assert_eq!("C", st.as_str());
+    /// assert_eq!(0, logs.len());
+    /// ```
     fn left<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,
@@ -106,6 +190,27 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 
     /// ## Combinator: `right`
+    ///
+    /// A sequential combinator that applys the first parser then the second.
+    /// If both parsers succeed, returns the result of the second parser,
+    /// otherwise fail.
+    ///
+    /// ### Example
+    /// ```
+    /// use naive_parsec::combinators::*;
+    /// use naive_parsec::core::Parsable;
+    /// use naive_parsec::primitives::{char, CharStream};
+    ///
+    /// // Consume a character 'A', then a character 'B'
+    /// let parser = char('A').right(char('B'));
+    ///
+    /// let mut st = CharStream::new("ABC");
+    /// let (res, logs) = parser.exec(&mut st);
+    ///
+    /// assert_eq!(Some('B'), res);
+    /// assert_eq!("C", st.as_str());
+    /// assert_eq!(0, logs.len());
+    /// ```
     fn right<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, B, S>
     where
         Self: Sized + 'f,
@@ -115,6 +220,27 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 
     /// ## Combinator: `mid`
+    ///
+    /// A sequential combinator that applys three parsers one after another.
+    /// If all parsers succeed, returns the result of the second parser,
+    /// otherwise fail.
+    ///
+    /// ### Example
+    /// ```
+    /// use naive_parsec::combinators::*;
+    /// use naive_parsec::core::Parsable;
+    /// use naive_parsec::primitives::{char, CharStream};
+    ///
+    /// // Consume a character 'A', then a character 'B'
+    /// let parser = char('A').mid(char('B'), char('C'));
+    ///
+    /// let mut st = CharStream::new("ABC");
+    /// let (res, logs) = parser.exec(&mut st);
+    ///
+    /// assert_eq!(Some('B'), res);
+    /// assert_eq!("", st.as_str());
+    /// assert_eq!(0, logs.len());
+    /// ```
     fn mid<B: 'f, C: 'f>(
         self,
         p1: impl Parsable<Stream = S, Result = B> + 'f,
