@@ -5,9 +5,7 @@ pub fn map<'f, A: 'f, B: 'f, S>(
     p: impl Parsable<Stream = S, Result = A> + 'f,
     f: impl Fn(A) -> B + 'f,
 ) -> Parser<'f, B, S> {
-    Parser::new(move |stream, logger| {
-        p.parse(stream, logger).and_then(|x| Some(f(x)))
-    })
+    Parser::new(move |stream, logger| p.parse(stream, logger).and_then(|x| Some(f(x))))
 }
 
 /// ## Combinator: `map_option` (function ver.)
@@ -49,10 +47,7 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 
     /// ## Combinator: `map_option`
-    fn map_option<B: 'f>(
-        self,
-        f: impl Fn(A) -> Option<B> + 'f,
-    ) -> Parser<'f, B, S>
+    fn map_option<B: 'f>(self, f: impl Fn(A) -> Option<B> + 'f) -> Parser<'f, B, S>
     where
         Self: Sized + 'f,
     {
@@ -60,10 +55,7 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 
     /// ## Combinator: `map_result`
-    fn map_result<B: 'f, E>(
-        self,
-        f: impl Fn(A) -> Result<B, E> + 'f,
-    ) -> Parser<'f, B, S>
+    fn map_result<B: 'f, E>(self, f: impl Fn(A) -> Result<B, E> + 'f) -> Parser<'f, B, S>
     where
         Self: Sized + 'f,
         E: ToString,

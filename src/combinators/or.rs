@@ -29,10 +29,7 @@ pub fn or<'f, A: 'f, S: Clone>(
 pub trait OrExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `or`
     /// Alternative combinator.
-    fn or(
-        self,
-        p: impl Parsable<Stream = S, Result = A> + 'f,
-    ) -> Parser<'f, A, S>
+    fn or(self, p: impl Parsable<Stream = S, Result = A> + 'f) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,
         S: Clone,

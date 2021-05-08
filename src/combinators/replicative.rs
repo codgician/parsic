@@ -64,9 +64,7 @@ pub fn optional<'f, A: 'f, S: Clone>(
 /// - `many`
 /// - `some`
 /// - `optional`
-pub trait ReplicativeExt<'f, A: 'f, S>:
-    Parsable<Stream = S, Result = A>
-{
+pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `many`
     fn many(self) -> Parser<'f, Vec<A>, S>
     where
@@ -95,10 +93,7 @@ pub trait ReplicativeExt<'f, A: 'f, S>:
     }
 }
 
-impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ReplicativeExt<'f, A, S>
-    for P
-{
-}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ReplicativeExt<'f, A, S> for P {}
 
 #[cfg(test)]
 mod test_many {

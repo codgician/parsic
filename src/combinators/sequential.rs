@@ -54,14 +54,9 @@ pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
 /// - `left`
 /// - `right`
 /// - `mid`
-pub trait SequentialExt<'f, A: 'f, S>:
-    Parsable<Stream = S, Result = A>
-{
+pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `and`
-    fn and<B: 'f>(
-        self,
-        p: impl Parsable<Stream = S, Result = B> + 'f,
-    ) -> Parser<'f, (A, B), S>
+    fn and<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, (A, B), S>
     where
         Self: Sized + 'f,
         S: Clone,
@@ -70,10 +65,7 @@ pub trait SequentialExt<'f, A: 'f, S>:
     }
 
     /// ## Combinator: `left`
-    fn left<B: 'f>(
-        self,
-        p: impl Parsable<Stream = S, Result = B> + 'f,
-    ) -> Parser<'f, A, S>
+    fn left<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,
         S: Clone + 'f,
@@ -82,10 +74,7 @@ pub trait SequentialExt<'f, A: 'f, S>:
     }
 
     /// ## Combinator: `right`
-    fn right<B: 'f>(
-        self,
-        p: impl Parsable<Stream = S, Result = B> + 'f,
-    ) -> Parser<'f, B, S>
+    fn right<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, B, S>
     where
         Self: Sized + 'f,
         S: Clone + 'f,
@@ -107,10 +96,7 @@ pub trait SequentialExt<'f, A: 'f, S>:
     }
 }
 
-impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> SequentialExt<'f, A, S>
-    for P
-{
-}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> SequentialExt<'f, A, S> for P {}
 
 #[cfg(test)]
 mod test_and {

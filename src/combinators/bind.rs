@@ -110,10 +110,7 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 }
 
-impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> BindExt<'f, A, S>
-    for P
-{
-}
+impl<'f, A: 'f, S, P> BindExt<'f, A, S> for P where P: Parsable<Stream = S, Result = A> {}
 
 #[cfg(test)]
 mod test_bind {

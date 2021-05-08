@@ -45,10 +45,7 @@ pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     }
 }
 
-impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ComposeExt<'f, A, S>
-    for P
-{
-}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ComposeExt<'f, A, S> for P {}
 
 #[cfg(test)]
 mod test_compose {

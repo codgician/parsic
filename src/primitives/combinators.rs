@@ -4,9 +4,7 @@ use crate::primitives::CharStream;
 
 /// ## Combinator: `satisfy`
 /// Consumes a single character if given condition satisifies.
-pub fn satisfy<'f>(
-    f: impl Fn(&char) -> bool + 'f,
-) -> Parser<'f, char, CharStream<'f>> {
+pub fn satisfy<'f>(f: impl Fn(&char) -> bool + 'f) -> Parser<'f, char, CharStream<'f>> {
     Parser::new(move |stream: &mut CharStream<'f>, logger| {
         let st = stream.clone();
         match stream.next() {
@@ -14,8 +12,7 @@ pub fn satisfy<'f>(
             Some(ch) => {
                 *stream = st;
                 logger.with(Msg::Error(MsgBody::new(
-                    &format!("'{}' does not satisfy required conditions.", ch)
-                        [..],
+                    &format!("'{}' does not satisfy required conditions.", ch)[..],
                     Some(stream.pos()),
                 )));
                 None
@@ -92,9 +89,7 @@ pub fn trim<'f, A: 'f>(
     mid(space().many(), p, space().many())
 }
 
-pub trait PrimitiveExt<'f, A: 'f>:
-    Parsable<Stream = CharStream<'f>, Result = A>
-{
+pub trait PrimitiveExt<'f, A: 'f>: Parsable<Stream = CharStream<'f>, Result = A> {
     /// ## Combinator: `trim`
     /// Consumes as many whitespace characters (` `, `\n`, `\r` or `\t`)
     /// as possible surrounding given parser.
@@ -106,10 +101,7 @@ pub trait PrimitiveExt<'f, A: 'f>:
     }
 }
 
-impl<'f, A: 'f, P: Parsable<Stream = CharStream<'f>, Result = A>>
-    PrimitiveExt<'f, A> for P
-{
-}
+impl<'f, A: 'f, P: Parsable<Stream = CharStream<'f>, Result = A>> PrimitiveExt<'f, A> for P {}
 
 #[cfg(test)]
 mod test_char {

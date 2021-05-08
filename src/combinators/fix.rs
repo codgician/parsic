@@ -40,8 +40,7 @@ mod test {
     #[test]
     fn simple_recursive_syntax() {
         // expr := '1' expr | '0'
-        let parser =
-            fix(|parser| char('1').right(parser.clone()).or(char('0')));
+        let parser = fix(|parser| char('1').right(parser.clone()).or(char('0')));
 
         let mut st = CharStream::new("1110");
         let (res, logs) = parser.exec(&mut st);
@@ -62,8 +61,7 @@ mod test {
             .some()
             .map_result(|v| v.iter().collect::<String>().parse::<u64>());
         let expr = fix(move |expr| {
-            let factor =
-                char('(').mid(expr.clone(), char(')')).or(uint.clone());
+            let factor = char('(').mid(expr.clone(), char(')')).or(uint.clone());
 
             let term = fix(move |term| {
                 factor
