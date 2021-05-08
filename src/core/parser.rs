@@ -18,7 +18,7 @@ impl<'f, A: 'f, S> Parser<'f, A, S> {
 /// ## `Parsable` trait
 /// Anything that is parsable should implement `Parsable` trait,
 /// The return types of all the combinators and combinators in this library
-/// implements `Parsable` trait, meaning you can treat them as parsers
+/// Implement `Parsable` trait, meaning you can treat them as parsers
 /// and call `parse()` or `exec()` from them to parse given input.
 pub trait Parsable {
     type Stream; // Type of input stream

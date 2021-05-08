@@ -4,6 +4,17 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// Functional composition between parsers.
 ///
+/// ### Properties
+///
+/// Should satisfy [Applicative functor laws](https://wiki.haskell.org/Typeclassopedia#Laws_2).
+///
+/// - **Identity**: `compose(pure(id), p) ~ p`
+/// - **Homomorphism**: `compose(pure(f), pure(g)) ~ pure(|x| f(g(x)))`
+/// - **Interchange**: `compose(x, pure(y)) ~ compose(pure(|g| g(y)), x)`
+/// - **Composition**: `compose(x, compose(y, z)) ~ compose(pure(|f| |g| |x| f(g(x))), z)`
+///
+/// Check out `test_bind` module in the source code for naive examples of above laws.
+///
 /// ### Example
 /// ```
 /// use naive_parsec::combinators::*;
@@ -38,11 +49,22 @@ where
     })
 }
 
-/// Implements `compose` method for `Parsable<S>`.
+/// Implement `compose` method for `Parsable<S>`.
 pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     /// ## Combinator: `compose`
     ///
     /// Functional composition between parsers.
+    ///
+    /// ### Properties
+    ///
+    /// Should satisfy [Applicative functor laws](https://wiki.haskell.org/Typeclassopedia#Laws_2):
+    ///
+    /// - **Identity**: `pure(id).compose(p) ~ p`
+    /// - **Homomorphism**: `pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))`
+    /// - **Interchange**: `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`
+    /// - **Composition**: `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`
+    ///
+    /// Check out `test_bind` module in the source code for naive examples of above laws.
     ///
     /// ### Example
     /// ```
@@ -94,7 +116,7 @@ mod test_compose {
 
     #[test]
     fn identity() {
-        //! `(pure (id)).compose(p) ~ p`
+        //! `pure(id).compose(p) ~ p`
         //! Note: `id` is the identity function `|x| x`.
         let parser1 = pure(|x| x).compose(char('0'));
         let parser2 = char('0');
@@ -111,10 +133,10 @@ mod test_compose {
 
     #[test]
     fn homomorphism() {
-        //! `(pure(f)).compose(pure(g)) ~ pure(|x| f(g(x)))`
+        //! `pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))`
         //! Function application order does not matter.
-        let f = |ch: char| if ch == '0' { 'a' } else { 'b' };
-        let g = |ch: char| if ch == 'a' { 'A' } else { 'B' };
+        let f = |ch| if ch == '0' { 'a' } else { 'b' };
+        let g = |ch| if ch == 'a' { 'A' } else { 'B' };
         let parser1 = pure(f).compose(pure(g).compose(char('0')));
         let parser2 = pure(|x| f(g(x))).compose(char('0'));
 
@@ -129,9 +151,9 @@ mod test_compose {
     }
 
     #[test]
-    fn commutative() {
+    fn interchange() {
         //! `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`
-        //! Commutative law.
+        //! Interchange law.
         let (x, y) = (pure::<fn(u64) -> u64, _>(|x| x + 1), 1);
         let parser1 = x.clone().compose(pure(y));
         let parser2 = pure::<_, _>(|f: fn(u64) -> u64| f(y)).compose(x);
@@ -143,16 +165,17 @@ mod test_compose {
     }
 
     #[test]
-    fn associative() {
+    fn composition() {
         //! `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`
-        //! Associativity law
+        //! Composition law
         let x = pure::<fn(u64) -> u64, _>(|x| x + 3);
         let y = pure::<fn(u64) -> u64, _>(|x| x * 5);
         let z = pure(2);
         let parser1 = x.clone().compose(y.clone().compose(z.clone()));
-        let parser2 = (pure(
-            |f: fn(u64) -> u64| move |g: fn(u64) -> u64| move |x: u64| f(g(x))
-        ).compose(x).compose(y)).compose(z);
+        let parser2 = (pure(|f: fn(u64) -> u64| move |g: fn(u64) -> u64| move |x: u64| f(g(x)))
+            .compose(x)
+            .compose(y))
+        .compose(z);
 
         assert_eq!(
             parser1.exec(&mut CharStream::new("")),

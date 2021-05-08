@@ -1,7 +1,27 @@
 use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `or` (function ver.)
-/// Alternative combinator.
+///
+/// Alternative combinator. Accepts two parsers as arguments,
+/// if the first parser succeeds then its result is returned,
+/// otherwise the result of the second parser is returned.
+///
+/// ### Examples
+/// ```
+/// use naive_parsec::combinators::*;
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::primitives::{char, CharStream};
+///
+/// // Comsumes a character 'A' or a character 'B'
+/// let parser = or(char('B'), char('A'));
+///
+/// let mut st = CharStream::new("Ahhh");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some('A'), res);
+/// assert_eq!("hhh", st.as_str());
+/// assert_eq!(0, logs.len());
+/// ```
 pub fn or<'f, A: 'f, S: Clone>(
     p1: impl Parsable<Stream = S, Result = A> + 'f,
     p2: impl Parsable<Stream = S, Result = A> + 'f,
@@ -22,10 +42,30 @@ pub fn or<'f, A: 'f, S: Clone>(
     })
 }
 
-/// Implements `or` method for `Parsable<S>`.
+/// Implement `or` method for `Parsable<S>`.
 pub trait OrExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `or`
-    /// Alternative combinator.
+    /// ## Combinator: `or` (function ver.)
+    ///
+    /// Alternative combinator. Accepts two parsers as arguments,
+    /// if the first parser succeeds then its result is returned,
+    /// otherwise the result of the second parser is returned.
+    ///
+    /// ### Examples
+    /// ```
+    /// use naive_parsec::combinators::*;
+    /// use naive_parsec::core::Parsable;
+    /// use naive_parsec::primitives::{char, CharStream};
+    ///
+    /// // Comsumes a character 'A' or a character 'B'
+    /// let parser = char('B').or(char('A'));
+    ///
+    /// let mut st = CharStream::new("Ahhh");
+    /// let (res, logs) = parser.exec(&mut st);
+    ///
+    /// assert_eq!(Some('A'), res);
+    /// assert_eq!("hhh", st.as_str());
+    /// assert_eq!(0, logs.len());
+    /// ```
     fn or(self, p: impl Parsable<Stream = S, Result = A> + 'f) -> Parser<'f, A, S>
     where
         Self: Sized + 'f,

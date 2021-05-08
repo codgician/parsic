@@ -16,13 +16,31 @@ impl<'f, A: 'f, S> Parsable for Fix<'f, A, S> {
 
 /// ## Combinator: `fix`
 ///
-/// Fixed-point combinator (aka Y-Combinator), which is
-/// introduced to support recursive synatax using closures.
+/// In Rust, closures are anonymous functions, so there is no name for us to call
+/// when we want to make it recursive. Therefore, a Y-Combinator, or
+/// [fixed-point combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator) `fix`
+/// is introduced to address this issue, making it possible to write parsers that
+/// support recursive syntax using closures.
 ///
 /// ### Property
-///
 /// ```plain
 /// fix f = f (fix f)
+/// ```
+/// ### Example
+/// ```
+/// use naive_parsec::combinators::*;
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::primitives::{char, CharStream};
+///
+/// // expr := '1' expr | '0'
+/// let parser = fix(|parser| char('1').right(parser.clone()).or(char('0')));
+///
+/// let mut st = CharStream::new("1110");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some('0'), res);
+/// assert_eq!("", st.as_str());
+/// assert_eq!(0, logs.len());
 /// ```
 pub fn fix<'f, A: 'f, F, S>(fix: F) -> Fix<'f, A, S>
 where
@@ -38,23 +56,11 @@ mod test {
     use crate::primitives::{char, satisfy, CharStream};
 
     #[test]
-    fn simple_recursive_syntax() {
-        // expr := '1' expr | '0'
-        let parser = fix(|parser| char('1').right(parser.clone()).or(char('0')));
-
-        let mut st = CharStream::new("1110");
-        let (res, logs) = parser.exec(&mut st);
-
-        assert_eq!(Some('0'), res);
-        assert_eq!(0, logs.len());
-    }
-
-    #[test]
     fn mutual_recursive_syntax() {
         // expr     := term '+' expr | term
         // term     := factor '*' term | factor
         // factor   := '(' expr ')' | uint
-        // uint      := digit { digit }
+        // uint     := digit { digit }
         // digit    := '0' | '1' | ... | '9'
         let digit = satisfy(|&ch| ch.is_digit(10));
         let uint = digit

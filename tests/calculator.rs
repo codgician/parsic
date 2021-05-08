@@ -1,8 +1,12 @@
-/// # Arithmetic expression evaluator
+/// # Test: Calculator
 ///
-/// Supports `+`, `-`, `*`, `/` and `()`.
-///
-/// Production rules:
+/// A simple arithmetic expression evaluator that supports
+/// `+`, `-`, `*`, `/` and `()`. It accepts input with
+/// whitespaces.
+/// 
+/// This test contains two implementations: one is implemented
+/// with functions that returns a `Parser`, the other is implemented
+/// with closures.
 ///
 /// ```plain
 /// expr    := term ('+'|'-') expr | term
@@ -104,7 +108,7 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
     })
 }
 
-/// Helper function for testing calculator
+/// Helper function for testing
 fn test_helper(input: &str, expected: Option<f64>, rem_str: &str, log_size: usize) {
     let mut st1 = CharStream::new(input);
     let mut st2 = st1.clone();

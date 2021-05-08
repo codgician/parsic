@@ -2,6 +2,27 @@ use crate::combinators::MapExt;
 use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `and` (function ver.)
+///
+/// Sequential parser that applys the first parser then the second.
+/// If both parsers succeed, returns a tuple containing their results,
+/// otherwise fail.
+///
+/// ### Example
+/// ```
+/// use naive_parsec::combinators::*;
+/// use naive_parsec::core::Parsable;
+/// use naive_parsec::primitives::{char, CharStream};
+///
+/// // Consume a character 'A', then a character 'B'
+/// let parser = and(char('A'), char('B'));
+///
+/// let mut st = CharStream::new("ABC");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some(('A', 'B')), res);
+/// assert_eq!("C", st.as_str());
+/// assert_eq!(0, logs.len());
+/// ```
 pub fn and<'f, A: 'f, B: 'f, S: Clone>(
     p1: impl Parsable<Stream = S, Result = A> + 'f,
     p2: impl Parsable<Stream = S, Result = B> + 'f,
@@ -43,13 +64,34 @@ pub fn mid<'f, A: 'f, B: 'f, C: 'f, S: Clone + 'f>(
     p1.and(p2).and(p3).map(|((_, m), _)| m)
 }
 
-/// Implements following methods for `Parsable<S>`:
+/// Implement following methods for `Parsable<S>`:
 /// - `and`
 /// - `left`
 /// - `right`
 /// - `mid`
 pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// ## Combinator: `and`
+    /// ## Combinator: `and` (function ver.)
+    ///
+    /// Sequential parser that applys the first parser then the second.
+    /// If both parsers succeed, returns a tuple containing their results,
+    /// otherwise fail.
+    ///
+    /// ### Example
+    /// ```
+    /// use naive_parsec::combinators::*;
+    /// use naive_parsec::core::Parsable;
+    /// use naive_parsec::primitives::{char, CharStream};
+    ///
+    /// // Consume a character 'A', then a character 'B'
+    /// let parser = char('A').and(char('B'));
+    ///
+    /// let mut st = CharStream::new("ABC");
+    /// let (res, logs) = parser.exec(&mut st);
+    ///
+    /// assert_eq!(Some(('A', 'B')), res);
+    /// assert_eq!("C", st.as_str());
+    /// assert_eq!(0, logs.len());
+    /// ```
     fn and<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, (A, B), S>
     where
         Self: Sized + 'f,
@@ -97,18 +139,6 @@ mod test_and {
     use crate::combinators::*;
     use crate::core::Parsable;
     use crate::primitives::{char, satisfy, CharStream};
-
-    #[test]
-    fn same_type_ok() {
-        let parser = char('A').and(char('B'));
-
-        let mut st = CharStream::new("ABC");
-        let (res, logs) = parser.exec(&mut st);
-
-        assert_eq!(Some(('A', 'B')), res);
-        assert_eq!("C", st.as_str());
-        assert_eq!(0, logs.len());
-    }
 
     #[test]
     fn different_type_ok() {

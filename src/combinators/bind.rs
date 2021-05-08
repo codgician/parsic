@@ -2,30 +2,26 @@ use crate::core::{return_none, Parsable, Parser};
 
 /// ## Combinator: `bind` (function ver.)
 ///
-/// Monadic bind operator for context sensitive parsing.
-/// See the iterator-style variant `bind` in `BindPExt` trait
-/// for detailed introductions.
+/// Monadic bind operator `(>>=)` for context sensitive parsing.
 ///
 /// ### Properties
+///
+/// Should satisfy [Monad laws](https://wiki.haskell.org/Typeclassopedia#Laws_3):
 ///
 /// - **Left-identity**: `bind(pure(x), f) ~ f(x)`
 /// - **Right-identity**: `bind(p, |x| pure(x)) ~ p`
 /// - **Associativity**: `bind(bind(p, f), g) ~ bind(p, |x| bind(f(x), g))`
 ///
+/// Check out `test_bind` module in the source code for naive examples of above laws.
+///
 /// ### Example
-///
-/// The code example below parses `expr` with the following grammar:
-///
-/// ```plain
-/// <expr> := <uppercase_letter> '+'
-/// <expr> := <lowercase_letter> '-'
-/// ```
-///
 /// ```
 /// use naive_parsec::core::Parsable;
 /// use naive_parsec::combinators::bind;
 /// use naive_parsec::primitives::{ CharStream, char, satisfy };
 ///
+/// // <expr> := <uppercase_letter> '+'
+/// // <expr> := <lowercase_letter> '-'
 /// let parser = bind(
 ///                 satisfy(|_| true),
 ///                 |ch| if ch.is_uppercase() {
@@ -34,6 +30,7 @@ use crate::core::{return_none, Parsable, Parser};
 ///                     char('-')
 ///                 }
 ///              );
+///
 /// let (res1, _) = parser.exec(&mut CharStream::new("A+"));
 /// assert_eq!(Some('+'), res1);
 /// let (res2, _) = parser.exec(&mut CharStream::new("a-"));
@@ -55,40 +52,33 @@ where
     })
 }
 
-/// Implements `bind` method for `Parsable<S>`.
+/// Implement `bind` method for `Parsable<S>`.
 pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ## Combinator: `bind`
     ///
-    /// Monadic bind operator for context sensitive parsing.
-    ///
-    /// For parser `p: impl Parsable<S, Result = T1>` and
-    /// function `f: impl Fn(T1) -> impl Parsable<S, Result = T2>`,
-    /// `p.bind(f)` fails if the application of parser `p` to the
-    /// input fails, and otherwise applies the function `f` to the
-    /// result value of the parser (with type `T1`, denoted as `r1`)
-    /// to give another parser `f(r1)` and then applied to the remaining
-    /// part of the input to give the final result.
+    /// Monadic bind operator `(>>=)` for context sensitive parsing.
     ///
     /// ### Properties
+    ///
+    /// Should satisfy [Monad laws](https://wiki.haskell.org/Typeclassopedia#Laws_3):
     ///
     /// - **Left-identity**: `pure(x).bind(f) ~ f(x)`
     /// - **Right-identity**: `p.bind(|x| pure(x)) ~ p`
     /// - **Associativity**: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
     ///
+    /// Check out `test_bind` module in the source code for naive examples of above laws.
+    ///
     /// ### Example
     ///
     /// The code example below parses `expr` with the following grammar:
-    ///
-    /// ```plain
-    /// <expr> := <uppercase_letter> '+'
-    /// <expr> := <lowercase_letter> '-'
-    /// ```
     ///
     /// ```
     /// use naive_parsec::core::Parsable;
     /// use naive_parsec::combinators::BindExt;
     /// use naive_parsec::primitives::{ CharStream, char, satisfy };
     ///
+    /// // <expr> := <uppercase_letter> '+'
+    /// // <expr> := <lowercase_letter> '-'
     /// let parser = satisfy(|_| true)
     ///            .bind(|ch| if ch.is_uppercase() {
     ///                char('+')
@@ -174,8 +164,8 @@ mod test_bind {
     fn associative() {
         //! `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
         //! Associative law.
-        let f = |ch: char| if ch == '0' { char('a') } else { char('b') };
-        let g = |ch: char| if ch == 'a' { char('A') } else { char('B') };
+        let f = |ch| if ch == '0' { char('a') } else { char('b') };
+        let g = |ch| if ch == 'a' { char('A') } else { char('B') };
         let parser1 = char('0').bind(g.clone()).bind(f.clone());
         let parser2 = char('0').bind(|x| f(x).bind(g));
 

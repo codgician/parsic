@@ -1,7 +1,9 @@
 use std::fmt::{Display, Formatter, Result};
 
+/// ## Struct `Pos`
+/// Data structure for parsing position.
 #[derive(Clone, Copy, Default, Debug, Eq, PartialEq)]
-pub struct Pos(usize, usize); // (row, colum)
+pub struct Pos(usize, usize);
 
 impl Pos {
     pub fn new(row: usize, col: usize) -> Self {
@@ -18,6 +20,8 @@ impl Pos {
     }
 }
 
+// ## Enum `Msg`
+/// Data structure for log messages.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Msg {
     Info(MsgBody),
@@ -42,6 +46,8 @@ impl Display for Msg {
     }
 }
 
+/// ## Struct `MsgBody`
+/// Data structure for error message body.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MsgBody {
     pub msg: String,
@@ -57,35 +63,42 @@ impl MsgBody {
     }
 }
 
+/// ## Struct `ParseLogger`
+/// An implementation of parse logger that stores logs.
 #[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub struct ParseLogger {
     pub stack: Vec<Msg>,
 }
 
 impl ParseLogger {
+    /// Insert a new log message
     pub fn add(&mut self, msg: Msg) {
         self.stack.push(msg);
     }
 
+    /// Clear all existing logs
     pub fn clear(&mut self) {
         self.stack.clear();
     }
 
+    /// Intialize a new instance with provided log message
     pub fn with(&mut self, msg: Msg) {
         self.clear();
         self.add(msg);
     }
 
+    /// Return number of logs
     pub fn len(&self) -> usize {
         self.stack.len()
     }
 
+    /// Check if logger is empty
     pub fn is_empty(&self) -> bool {
         self.stack.is_empty()
     }
 }
 
-// Implement IntoInterator for ParseLogger
+/// Implement IntoInterator for ParseLogger
 impl IntoIterator for ParseLogger {
     type Item = Msg;
     type IntoIter = std::vec::IntoIter<Msg>;
@@ -95,7 +108,7 @@ impl IntoIterator for ParseLogger {
     }
 }
 
-// Implement IntoInterator for &'a ParseLogger
+/// Implement IntoInterator for &'a ParseLogger
 impl<'a> IntoIterator for &'a ParseLogger {
     type Item = &'a Msg;
     type IntoIter = std::slice::Iter<'a, Msg>;
@@ -105,7 +118,7 @@ impl<'a> IntoIterator for &'a ParseLogger {
     }
 }
 
-// Implement IntoInterator for &'a mut ParseLogger
+/// Implement IntoInterator for &'a mut ParseLogger
 impl<'a> IntoIterator for &'a mut ParseLogger {
     type Item = &'a mut Msg;
     type IntoIter = std::slice::IterMut<'a, Msg>;

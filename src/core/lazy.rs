@@ -1,7 +1,8 @@
 use crate::core::{Parsable, ParseLogger};
 
 /// ## Trait: `Lazy`
-/// Wraps anything that implements `Parsable` to support lazy evaluation.
+/// Wraps anything that implements `Parsable` to
+/// support lazy evaluation.
 #[derive(Clone)]
 pub struct Lazy<F>(F);
 

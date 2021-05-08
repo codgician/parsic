@@ -57,7 +57,7 @@ fn recover<'f, A: Clone + 'f, S: Clone>(
     Parser::new(move |stream, logger| p.parse(stream, logger).or_else(|| Some(x.clone())))
 }
 
-/// Implements following method for `Parsable<S>`:
+/// Implement following method for `Parsable<S>`:
 /// - `info`
 /// - `warn`
 /// - `error`
