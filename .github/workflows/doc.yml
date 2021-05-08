@@ -2,7 +2,7 @@ name: Generate doc
 on:
   push:
     branches: [ main ]
-  pull-request:
+  pull_request:
 
 env:
   CARGO_TERM_COLOR: always
