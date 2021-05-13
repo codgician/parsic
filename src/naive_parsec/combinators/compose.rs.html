@@ -275,9 +275,9 @@
         <span class="ident">px</span>: <span class="kw">impl</span> <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">compose</span>(<span class="self">self</span>, <span class="ident">px</span>)
     }

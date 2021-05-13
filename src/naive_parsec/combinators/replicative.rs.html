@@ -400,8 +400,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">many</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">many</span>(<span class="self">self</span>)
     }
@@ -433,8 +433,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">some</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">some</span>(<span class="self">self</span>)
     }
@@ -466,8 +466,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">optional</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">optional</span>(<span class="self">self</span>)
     }

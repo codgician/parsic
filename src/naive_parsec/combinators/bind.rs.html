@@ -202,7 +202,7 @@
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use naive_parsec::core::Parsable;</span>
-<span class="doccomment">/// use naive_parsec::combinators::bind;</span>
+<span class="doccomment">/// use naive_parsec::combinators::*;</span>
 <span class="doccomment">/// use naive_parsec::primitives::{ CharStream, char, satisfy };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // &lt;expr&gt; := &lt;uppercase_letter&gt; &#39;+&#39;</span>
@@ -278,9 +278,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="lifetime">&#39;f</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">P</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">P</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">bind</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }

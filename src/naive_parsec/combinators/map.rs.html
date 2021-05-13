@@ -324,9 +324,6 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Msg</span>, <span class="ident">MsgBody</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
@@ -365,7 +362,7 @@
     <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">logger</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">st</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">clone</span>();
         <span class="ident">p</span>.<span class="ident">parse</span>(<span class="ident">stream</span>, <span class="ident">logger</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>(<span class="ident">x</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">x</span>))
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">return_none</span>(<span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">st</span>))
     })
 }
@@ -398,16 +395,13 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">logger</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">st</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">clone</span>();
-        <span class="ident">p</span>.<span class="ident">parse</span>(<span class="ident">stream</span>, <span class="ident">logger</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">x</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">logger</span>.<span class="ident">add</span>(<span class="ident">Msg</span>::<span class="ident">Error</span>(<span class="ident">MsgBody</span>::<span class="ident">new</span>(
-                    <span class="string">&quot;map_option recieved a function that yielded None.&quot;</span>,
-                    <span class="prelude-val">None</span>,
-                )));
-                <span class="ident">return_none</span>(<span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">st</span>)
-            })
+        <span class="ident">p</span>.<span class="ident">parse</span>(<span class="ident">stream</span>, <span class="ident">logger</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">x</span>)).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">logger</span>.<span class="ident">add</span>(<span class="ident">Msg</span>::<span class="ident">Error</span>(<span class="ident">MsgBody</span>::<span class="ident">new</span>(
+                <span class="string">&quot;map_option recieved a function that yielded None.&quot;</span>,
+                <span class="prelude-val">None</span>,
+            )));
+            <span class="ident">return_none</span>(<span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">st</span>)
+        })
     })
 }
 
@@ -487,8 +481,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="lifetime">&#39;f</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">map</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
@@ -517,8 +511,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">map_option</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="lifetime">&#39;f</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">map_option</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
@@ -550,9 +544,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">map_result</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="lifetime">&#39;f</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
         <span class="ident">E</span>: <span class="ident">ToString</span>,
         <span class="ident">S</span>: <span class="ident">Clone</span>,
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
     {
         <span class="ident">map_result</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
