@@ -2,14 +2,16 @@ use crate::core::{Parsable, Parser};
 use std::rc::Rc;
 
 /// Data structure for `fix` combinator.
-#[derive(Clone)]
 pub struct Fix<'f, A, S>(Rc<dyn Fn(Parser<'f, A, S>) -> Parser<'f, A, S> + 'f>);
 
+impl<'f, A, S> Clone for Fix<'f, A, S> {
+    fn clone(&self) -> Self {
+        Fix(self.0.clone())
+    }
+}
+
 impl<'f, A: 'f, S: 'f> Fix<'f, A, S> {
-    pub fn into_parser(self) -> Parser<'f, A, S>
-    where
-        Self: Clone + 'f,
-    {
+    pub fn into_parser(self) -> Parser<'f, A, S> {
         Parser::new(move |stream: &mut S, logger| {
             (self.0)(self.to_owned().into_parser()).parse(stream, logger)
         })
@@ -44,7 +46,7 @@ impl<'f, A: 'f, S: 'f> Fix<'f, A, S> {
 /// assert_eq!("", st.as_str());
 /// assert_eq!(0, logs.len());
 /// ```
-pub fn fix<'f, A: Clone + 'f, F, S: Clone + 'f>(fix: F) -> Parser<'f, A, S>
+pub fn fix<'f, A: 'f, F, S: 'f>(fix: F) -> Parser<'f, A, S>
 where
     F: Fn(Parser<'f, A, S>) -> Parser<'f, A, S> + 'f,
 {

@@ -96,9 +96,9 @@ where
 }
 
 /// # Overload operator `&` to `and` combinator
-/// 
+///
 /// `p1 & p2` ~ `p1.and(p2)`
-/// 
+///
 /// ## Example
 /// ```
 /// use naive_parsec::combinators::*;
@@ -128,9 +128,9 @@ where
 }
 
 /// # Overload operator `*` to `compose` combinator
-/// 
+///
 /// `p1 * p2` ~ `p1.compose(p2)`
-/// 
+///
 /// ## Example
 /// ```
 /// use naive_parsec::combinators::*;
@@ -175,10 +175,13 @@ mod test_ops {
         // digit    := '0' | '1' | ... | '9'
         let expr = fix(move |expr| {
             let digit = satisfy(|&ch| ch.is_digit(10));
-            let uint = digit.some().map(|v| v.iter().collect::<String>().parse::<u64>().unwrap());
+            let uint = digit
+                .some()
+                .map(|v| v.iter().collect::<String>().parse::<u64>().unwrap());
             let factor = char('(') >> expr.clone() << char(')') | uint;
             let term = fix(move |term| {
-                (factor.clone() << char('*') & term.clone()).map(|(v1, v2)| v1 * v2) | factor.clone()
+                (factor.clone() << char('*') & term.clone()).map(|(v1, v2)| v1 * v2)
+                    | factor.clone()
             });
             (term.clone() << char('+') & expr).map(|(v1, v2)| v1 + v2) | term
         });
