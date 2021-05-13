@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["naive_parsec"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"naive_parsec/core/struct.Pos.html\" title=\"struct naive_parsec::core::Pos\">Pos</a>","synthetic":false,"types":["naive_parsec::core::logger::Pos"]}];
+implementors["parsic"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"parsic/core/struct.Pos.html\" title=\"struct parsic::core::Pos\">Pos</a>","synthetic":false,"types":["parsic::core::logger::Pos"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

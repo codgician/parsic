@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["naive_parsec"];
+window.ALL_CRATES = ["parsic"];
