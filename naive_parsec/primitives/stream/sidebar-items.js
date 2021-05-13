@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["CharStream","Struct: `CharStream`An implementation for parse stream consisting of characters."]]});
+initSidebarItems({"struct":[["CharStream","Struct: `CharStream`"]]});
