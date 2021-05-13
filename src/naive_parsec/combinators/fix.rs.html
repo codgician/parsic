@@ -97,19 +97,23 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
 <span class="doccomment">/// Data structure for `fix` combinator.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Fix</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;f</span><span class="op">&gt;</span>);
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Fix</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">Fix</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span>: <span class="lifetime">&#39;f</span><span class="op">&gt;</span> <span class="ident">Fix</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parser</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
-    {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parser</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>, <span class="ident">logger</span><span class="op">|</span> {
             (<span class="self">self</span>.<span class="number">0</span>)(<span class="self">self</span>.<span class="ident">to_owned</span>().<span class="ident">into_parser</span>()).<span class="ident">parse</span>(<span class="ident">stream</span>, <span class="ident">logger</span>)
         })
@@ -144,7 +148,7 @@
 <span class="doccomment">/// assert_eq!(&quot;&quot;, st.as_str());</span>
 <span class="doccomment">/// assert_eq!(0, logs.len());</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fix</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>, <span class="ident">F</span>, <span class="ident">S</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;f</span><span class="op">&gt;</span>(<span class="ident">fix</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fix</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">F</span>, <span class="ident">S</span>: <span class="lifetime">&#39;f</span><span class="op">&gt;</span>(<span class="ident">fix</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;f</span>,
 {
