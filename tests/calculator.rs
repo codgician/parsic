@@ -16,9 +16,9 @@
 /// uint    := digit { digit }
 /// digit   := '0' | '1' | ... | '9'
 /// ```
-use naive_parsec::combinators::*;
-use naive_parsec::core::{lazy, Parsable, Parser};
-use naive_parsec::primitives::*;
+use parsic::combinators::*;
+use parsic::core::{lazy, Parsable, Parser};
+use parsic::primitives::*;
 
 /// digit := '0' | '1' | ... | '9'
 fn digit<'f>() -> Parser<'f, char, CharStream<'f>> {
@@ -47,7 +47,7 @@ fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
 
 /// factor := '(' expr ')' | float
 fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    mid(char('(').trim(), lazy(expr), char(')').trim()).or(float())
+    char('(').trim() >> lazy(expr) << char(')').trim() | float()
 }
 
 /// term := factor ('*'|'/') term | factor

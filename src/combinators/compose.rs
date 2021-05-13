@@ -17,9 +17,9 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = compose(pure(|x| x == 'H'), char('H'));
 ///
@@ -68,9 +68,9 @@ pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// let parser = pure(|x| x == 'H').compose(char('H'));
     ///

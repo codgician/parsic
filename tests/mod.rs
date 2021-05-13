@@ -1,4 +1,4 @@
-extern crate naive_parsec;
+extern crate parsic;
 
 /// Arithmetic expression evaluator
 pub mod calculator;

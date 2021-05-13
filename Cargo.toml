@@ -2,8 +2,8 @@
 authors = ["codgician <15964984+codgician@users.noreply.github.com>"]
 description = "A naive parser combinator written while learning Rust"
 edition = "2018"
-name = "naive-parsec"
-repository = "https://github.com/codgician/naive-parsec"
+name = "parsic"
+repository = "https://github.com/codgician/parsic"
 version = "0.1.0"
 [dependencies]
 regex = "*"

@@ -16,9 +16,9 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::primitives::{ CharStream, char, satisfy };
+/// use parsic::core::Parsable;
+/// use parsic::combinators::*;
+/// use parsic::primitives::{ CharStream, char, satisfy };
 ///
 /// // <expr> := <uppercase_letter> '+'
 /// // <expr> := <lowercase_letter> '-'
@@ -73,9 +73,9 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// The code example below parses `expr` with the following grammar:
     ///
     /// ```
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::combinators::BindExt;
-    /// use naive_parsec::primitives::{ CharStream, char, satisfy };
+    /// use parsic::core::Parsable;
+    /// use parsic::combinators::BindExt;
+    /// use parsic::primitives::{ CharStream, char, satisfy };
     ///
     /// // <expr> := <uppercase_letter> '+'
     /// // <expr> := <lowercase_letter> '-'

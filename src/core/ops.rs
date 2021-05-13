@@ -8,9 +8,9 @@ use std::ops::{BitAnd, BitOr, Mul, Shl, Shr};
 ///
 /// ## Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::{Parsable, Parser};
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::{Parsable, Parser};
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = char('A') >> char('B');
 ///
@@ -39,9 +39,9 @@ where
 ///
 /// ## Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::{Parsable, Parser};
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::{Parsable, Parser};
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = char('A') << char('B');
 ///
@@ -70,9 +70,9 @@ where
 ///
 /// ## Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::{Parsable, Parser};
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::{Parsable, Parser};
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = char('A') | char('B');
 ///
@@ -101,9 +101,9 @@ where
 ///
 /// ## Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::{Parsable, Parser};
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::{Parsable, Parser};
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = char('A') & char('B');
 ///
@@ -133,9 +133,9 @@ where
 ///
 /// ## Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::{Parsable, Parser};
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::{Parsable, Parser};
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = pure(|x| x == 'A') * char('A');
 ///

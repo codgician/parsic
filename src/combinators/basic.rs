@@ -6,9 +6,9 @@ use crate::core::Parser;
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::*;
-/// use naive_parsec::primitives::CharStream;
+/// use parsic::combinators::*;
+/// use parsic::core::*;
+/// use parsic::primitives::CharStream;
 ///
 /// let parser = empty::<char, CharStream>();
 ///
@@ -30,9 +30,9 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
 /// # Examples
 /// # Injects a value
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::*;
-/// use naive_parsec::primitives::CharStream;
+/// use parsic::combinators::*;
+/// use parsic::core::*;
+/// use parsic::primitives::CharStream;
 /// let parser = pure(true);
 ///
 /// let mut st = CharStream::new("Hello");
@@ -45,9 +45,9 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
 /// ```
 /// # Injects a function
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::*;
-/// use naive_parsec::primitives::CharStream;
+/// use parsic::combinators::*;
+/// use parsic::core::*;
+/// use parsic::primitives::CharStream;
 ///
 /// let parser = pure(|_| true);
 /// let mut st = CharStream::new("Hello");

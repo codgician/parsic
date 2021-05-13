@@ -9,9 +9,9 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume a character 'A', then a character 'B'
 /// let parser = and(char('A'), char('B'));
@@ -47,9 +47,9 @@ pub fn and<'f, A: 'f, B: 'f, S: Clone>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume a character 'A', then a character 'B'
 /// let parser = left(char('A'), char('B'));
@@ -76,9 +76,9 @@ pub fn left<'f, A: 'f, B: 'f, S: Clone + 'f>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume a character 'A', then a character 'B'
 /// let parser = right(char('A'), char('B'));
@@ -105,9 +105,9 @@ pub fn right<'f, A: 'f, B: 'f, S: Clone + 'f>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume a character 'A', then a character 'B'
 /// let parser = mid(char('A'), char('B'), char('C'));
@@ -137,9 +137,9 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume a character 'A', then a character 'B'
     /// let parser = char('A').and(char('B'));
@@ -167,9 +167,9 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume a character 'A', then a character 'B'
     /// let parser = char('A').left(char('B'));
@@ -197,9 +197,9 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume a character 'A', then a character 'B'
     /// let parser = char('A').right(char('B'));
@@ -227,9 +227,9 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume a character 'A', then a character 'B'
     /// let parser = char('A').mid(char('B'), char('C'));

@@ -15,9 +15,9 @@ use crate::core::{return_none, Msg, MsgBody, Parsable, Parser};
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// let parser = map(or(char('H'), char('W')), |ch: char| ch == 'H');
 ///
@@ -49,9 +49,9 @@ pub fn map<'f, A: 'f, B: 'f, S: Clone>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, satisfy};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, satisfy};
 ///
 /// let parser = map_option(satisfy(|_| true), |ch: char| ch.to_digit(10));
 ///
@@ -88,9 +88,9 @@ pub fn map_option<'f, A: 'f, B: 'f, S: Clone>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, satisfy};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, satisfy};
 ///
 /// // A parser that consumes a natural number
 /// let parser = map_result(
@@ -138,9 +138,9 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::*;
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::*;
     ///
     /// let parser = char('H').or(char('W'))
     ///                       .map(|ch: char| ch == 'H');
@@ -169,9 +169,9 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{CharStream, satisfy};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{CharStream, satisfy};
     ///
     /// let parser = satisfy(|_| true).map_option(|ch: char| ch.to_digit(10));
     ///
@@ -200,9 +200,9 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{CharStream, satisfy};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{CharStream, satisfy};
     ///
     /// // A parser that consumes a natural number
     /// let parser = satisfy(|&ch| ch.is_digit(10)).some()

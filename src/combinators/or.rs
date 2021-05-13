@@ -8,9 +8,9 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// # Examples
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Comsumes a character 'A' or a character 'B'
 /// let parser = or(char('B'), char('A'));
@@ -52,9 +52,9 @@ pub trait OrExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Examples
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Comsumes a character 'A' or a character 'B'
     /// let parser = char('B').or(char('A'));

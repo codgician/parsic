@@ -33,9 +33,9 @@ impl<'f, A: 'f, S: 'f> Parsable for Fix<'f, A, S> {
 /// ```
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // expr := '1' expr | '0'
 /// let parser = fix(|parser| char('1').right(parser.clone()).or(char('0')));

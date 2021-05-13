@@ -9,8 +9,8 @@ use crate::primitives::CharStream;
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, satisfy};
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, satisfy};
 ///
 /// // Consume a uppercase letter
 /// let parser = satisfy(|&ch| ch.is_uppercase());
@@ -53,8 +53,8 @@ pub fn satisfy<'f>(f: impl Fn(&char) -> bool + 'f) -> Parser<'f, char, CharStrea
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume a single character 'H'
 /// let parser = char('H');
@@ -76,8 +76,8 @@ pub fn char<'f>(ch: char) -> Parser<'f, char, CharStream<'f>> {
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, literal};
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, literal};
 ///
 /// // Consume literal string "Hello"
 /// let parser = literal("Hello");
@@ -111,8 +111,8 @@ pub fn literal<'f>(s: &'f str) -> Parser<'f, &'f str, CharStream> {
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, regex};
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, regex};
 ///
 /// // Consume a date string
 /// let parser = regex(r"^\d{2}/\d{2}/\d{4}");
@@ -151,8 +151,8 @@ pub fn regex<'f>(re: &'f str) -> Parser<'f, &'f str, CharStream> {
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, space};
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, space};
 ///
 /// // Consume a whitespace character
 /// let parser = space();
@@ -176,8 +176,8 @@ pub fn space<'f>() -> Parser<'f, char, CharStream<'f>> {
 ///
 /// # Example
 /// ```
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{CharStream, literal, trim};
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{CharStream, literal, trim};
 ///
 /// // Consume a whitespace character
 /// let parser = trim(literal("Hello"));
@@ -205,8 +205,8 @@ pub trait PrimitiveExt<'f, A: 'f>: Parsable<Stream = CharStream<'f>, Result = A>
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{CharStream, literal, PrimitiveExt, trim};
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{CharStream, literal, PrimitiveExt, trim};
     ///
     /// // Consume a whitespace character
     /// let parser = literal("Hello").trim();

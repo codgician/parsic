@@ -8,9 +8,9 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume character 't' zero or more times
 /// let parser = many(char('t'));
@@ -51,9 +51,9 @@ pub fn many<'f, A: 'f, S: Clone>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume character 't' one or more times
 /// let parser = some(char('t'));
@@ -99,9 +99,9 @@ pub fn some<'f, A: 'f, S: Clone>(
 ///
 /// # Example
 /// ```
-/// use naive_parsec::combinators::*;
-/// use naive_parsec::core::Parsable;
-/// use naive_parsec::primitives::{char, CharStream};
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
 ///
 /// // Consume character 't' at most one time
 /// let parser = char('t').optional();
@@ -141,9 +141,9 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume character 't' zero or more times
     /// let parser = char('t').many();
@@ -174,9 +174,9 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume character 't' one or more time
     /// let parser = char('t').some();
@@ -207,9 +207,9 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// # Example
     /// ```
-    /// use naive_parsec::combinators::*;
-    /// use naive_parsec::core::Parsable;
-    /// use naive_parsec::primitives::{char, CharStream};
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
     ///
     /// // Consume character 't' at most one time
     /// let parser = char('t').optional();
