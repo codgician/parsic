@@ -86,8 +86,8 @@ pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `inspect`
     fn inspect(self) -> Parser<'f, (Option<A>, S), S>
     where
-        Self: Sized + 'f,
         S: Clone + 'f,
+        Self: Sized + 'f,
     {
         inspect(self)
     }
@@ -95,9 +95,9 @@ pub trait LogExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `recover`
     fn recover(self, x: A) -> Parser<'f, A, S>
     where
-        Self: Sized + 'f,
         A: Clone,
         S: Clone,
+        Self: Sized + 'f,
     {
         recover(self, x)
     }

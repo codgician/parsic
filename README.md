@@ -35,7 +35,7 @@
     - [x] `inspect`: returns parser result alongwith current parsing state
     - [x] `recover`: returns a fallback value is given parser fails
 - ✨ **Enhancements**
-    - [ ] ~~Overload operators: `>>`, `<<`, `/`, `|`, `&`, `*`~~
+    - [x] Overload operators: `>>`, `<<`, `/`, `&`, `*`
     - [ ] ~~Support returning multiple results~~
     - [ ] Advanced error handling **(Planning)**
 - 🩺 **Tests**

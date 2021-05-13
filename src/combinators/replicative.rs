@@ -160,8 +160,8 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn many(self) -> Parser<'f, Vec<A>, S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         many(self)
     }
@@ -193,8 +193,8 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn some(self) -> Parser<'f, Vec<A>, S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         some(self)
     }
@@ -226,8 +226,8 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn optional(self) -> Parser<'f, Option<A>, S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         optional(self)
     }

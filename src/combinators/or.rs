@@ -68,8 +68,8 @@ pub trait OrExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn or(self, p: impl Parsable<Stream = S, Result = A> + 'f) -> Parser<'f, A, S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         or(self, p)
     }

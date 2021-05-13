@@ -35,7 +35,7 @@ pub fn map<'f, A: 'f, B: 'f, S: Clone>(
     Parser::new(move |stream: &mut S, logger| {
         let st = stream.clone();
         p.parse(stream, logger)
-            .and_then(|x| Some(f(x)))
+            .map(|x| f(x))
             .or_else(|| return_none(stream, &st))
     })
 }
@@ -68,16 +68,13 @@ pub fn map_option<'f, A: 'f, B: 'f, S: Clone>(
 ) -> Parser<'f, B, S> {
     Parser::new(move |stream: &mut S, logger| {
         let st = stream.clone();
-        p.parse(stream, logger)
-            .and_then(|x| f(x))
-            .and_then(|x| Some(x))
-            .or_else(|| {
-                logger.add(Msg::Error(MsgBody::new(
-                    "map_option recieved a function that yielded None.",
-                    None,
-                )));
-                return_none(stream, &st)
-            })
+        p.parse(stream, logger).and_then(|x| f(x)).or_else(|| {
+            logger.add(Msg::Error(MsgBody::new(
+                "map_option recieved a function that yielded None.",
+                None,
+            )));
+            return_none(stream, &st)
+        })
     })
 }
 
@@ -157,8 +154,8 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn map<B: 'f>(self, f: impl Fn(A) -> B + 'f) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         map(self, f)
     }
@@ -187,8 +184,8 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn map_option<B: 'f>(self, f: impl Fn(A) -> Option<B> + 'f) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         map_option(self, f)
     }
@@ -220,9 +217,9 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn map_result<B: 'f, E>(self, f: impl Fn(A) -> Result<B, E> + 'f) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         E: ToString,
         S: Clone,
+        Self: Sized + 'f,
     {
         map_result(self, f)
     }

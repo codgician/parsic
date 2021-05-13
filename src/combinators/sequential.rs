@@ -153,8 +153,8 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn and<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, (A, B), S>
     where
-        Self: Sized + 'f,
         S: Clone,
+        Self: Sized + 'f,
     {
         and(self, p)
     }
@@ -183,8 +183,8 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn left<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, A, S>
     where
-        Self: Sized + 'f,
         S: Clone + 'f,
+        Self: Sized + 'f,
     {
         left(self, p)
     }
@@ -213,8 +213,8 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn right<B: 'f>(self, p: impl Parsable<Stream = S, Result = B> + 'f) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         S: Clone + 'f,
+        Self: Sized + 'f,
     {
         right(self, p)
     }
@@ -247,8 +247,8 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         p2: impl Parsable<Stream = S, Result = C> + 'f,
     ) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         S: Clone + 'f,
+        Self: Sized + 'f,
     {
         mid(self, p1, p2)
     }

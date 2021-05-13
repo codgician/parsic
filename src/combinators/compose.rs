@@ -86,9 +86,9 @@ pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
         px: impl Parsable<Stream = S, Result = A> + 'f,
     ) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         F: Fn(A) -> B,
         S: Clone,
+        Self: Sized + 'f,
     {
         compose(self, px)
     }

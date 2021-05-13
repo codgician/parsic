@@ -17,7 +17,7 @@ use crate::core::{return_none, Parsable, Parser};
 /// # Example
 /// ```
 /// use naive_parsec::core::Parsable;
-/// use naive_parsec::combinators::bind;
+/// use naive_parsec::combinators::*;
 /// use naive_parsec::primitives::{ CharStream, char, satisfy };
 ///
 /// // <expr> := <uppercase_letter> '+'
@@ -93,9 +93,9 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// ```
     fn bind<B: 'f, P>(self, f: impl Fn(A) -> P + 'f) -> Parser<'f, B, S>
     where
-        Self: Sized + 'f,
         P: Parsable<Stream = S, Result = B>,
         S: Clone,
+        Self: Sized + 'f,
     {
         bind(self, f)
     }

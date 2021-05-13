@@ -1,16 +1,18 @@
-use crate::core::{Parsable, ParseLogger, Parser};
+use crate::core::{Parsable, Parser};
 use std::rc::Rc;
 
 /// Data structure for `fix` combinator.
 #[derive(Clone)]
-pub struct Fix<'f, A, S>(Rc<dyn Fn(&Fix<'f, A, S>) -> Parser<'f, A, S> + 'f>);
+pub struct Fix<'f, A, S>(Rc<dyn Fn(Parser<'f, A, S>) -> Parser<'f, A, S> + 'f>);
 
-impl<'f, A: 'f, S> Parsable for Fix<'f, A, S> {
-    type Stream = S;
-    type Result = A;
-    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<A> {
-        //! fix f = f (fix f)
-        (self.0)(self).parse(stream, logger)
+impl<'f, A: 'f, S: 'f> Fix<'f, A, S> {
+    pub fn into_parser(self) -> Parser<'f, A, S>
+    where
+        Self: Clone + 'f,
+    {
+        Parser::new(move |stream: &mut S, logger| {
+            (self.0)(self.to_owned().into_parser()).parse(stream, logger)
+        })
     }
 }
 
@@ -42,11 +44,11 @@ impl<'f, A: 'f, S> Parsable for Fix<'f, A, S> {
 /// assert_eq!("", st.as_str());
 /// assert_eq!(0, logs.len());
 /// ```
-pub fn fix<'f, A: 'f, F, S>(fix: F) -> Fix<'f, A, S>
+pub fn fix<'f, A: Clone + 'f, F, S: Clone + 'f>(fix: F) -> Parser<'f, A, S>
 where
-    F: Fn(&Fix<'f, A, S>) -> Parser<'f, A, S> + 'f,
+    F: Fn(Parser<'f, A, S>) -> Parser<'f, A, S> + 'f,
 {
-    Fix(Rc::new(fix))
+    Fix(Rc::new(fix)).into_parser()
 }
 
 #[cfg(test)]
@@ -62,11 +64,11 @@ mod test {
         // factor   := '(' expr ')' | uint
         // uint     := digit { digit }
         // digit    := '0' | '1' | ... | '9'
-        let digit = satisfy(|&ch| ch.is_digit(10));
-        let uint = digit
-            .some()
-            .map_result(|v| v.iter().collect::<String>().parse::<u64>());
         let expr = fix(move |expr| {
+            let digit = satisfy(|&ch| ch.is_digit(10));
+            let uint = digit
+                .some()
+                .map_result(|v| v.iter().collect::<String>().parse::<u64>());
             let factor = char('(').mid(expr.clone(), char(')')).or(uint.clone());
 
             let term = fix(move |term| {
@@ -80,9 +82,9 @@ mod test {
 
             term.clone()
                 .left(char('+'))
-                .and(expr.clone())
+                .and(expr)
                 .map(|(v1, v2)| v1 + v2)
-                .or(term.clone())
+                .or(term)
         });
 
         let mut st = CharStream::new("1+2*(3+4)");
