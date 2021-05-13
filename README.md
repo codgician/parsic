@@ -9,8 +9,9 @@
 
 - 💖 **Core**
     - [x] `Parser`: wrapper for parser function
-    - [x] `Parsable`: anything that could be parsed
     - [x] `ParseLogger`: logger for parser
+    - [x] `Parsable`: anything that could be parsed
+    - [x] `IntoParser`: anything that could be converted into `Parser`
 - 🐣 **Primitives**
     - [x] `CharStream`: parse state for `&str`
     - [x] `char`: consumes one char at a time from parse stream

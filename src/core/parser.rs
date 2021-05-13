@@ -15,14 +15,24 @@ impl<'f, A: 'f, S> Parser<'f, A, S> {
     }
 }
 
+/// # `IntoParser` trait
+/// Anything that could be converted into a Parser
+pub trait IntoParser<'f> {
+    type Stream;
+    type Result;
+
+    /// Convert into a Parser
+    fn into_parser(self) -> Parser<'f, Self::Result, Self::Stream>;
+}
+
 /// # `Parsable` trait
 /// Anything that is parsable should implement `Parsable` trait,
 /// The return types of all the combinators and combinators in this library
 /// Implement `Parsable` trait, meaning you can treat them as parsers
 /// and call `parse()` or `exec()` from them to parse given input.
 pub trait Parsable {
-    type Stream; // Type of input stream
-    type Result; // Type of parse result
+    type Stream;
+    type Result;
 
     /// Parse function
     fn parse(&self, stream: &mut Self::Stream, logger: &mut ParseLogger) -> Option<Self::Result>;
@@ -31,6 +41,16 @@ pub trait Parsable {
     fn exec(&self, stream: &mut Self::Stream) -> (Option<Self::Result>, ParseLogger) {
         let mut logger = ParseLogger::default();
         (self.parse(stream, &mut logger), logger)
+    }
+}
+
+/// Implement `IntoParser` trait for `Parsable`
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A> + 'f> IntoParser<'f> for P {
+    type Stream = S;
+    type Result = A;
+
+    fn into_parser(self) -> Parser<'f, Self::Result, Self::Stream> {
+        Parser::new(move |stream: &mut S, logger| self.parse(stream, logger))
     }
 }
 

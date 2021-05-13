@@ -1,4 +1,4 @@
-use crate::core::{Parsable, Parser};
+use crate::core::{IntoParser, Parsable, ParseLogger, Parser};
 use std::rc::Rc;
 
 /// Data structure for `fix` combinator.
@@ -10,11 +10,12 @@ impl<'f, A, S> Clone for Fix<'f, A, S> {
     }
 }
 
-impl<'f, A: 'f, S: 'f> Fix<'f, A, S> {
-    pub fn into_parser(self) -> Parser<'f, A, S> {
-        Parser::new(move |stream: &mut S, logger| {
-            (self.0)(self.to_owned().into_parser()).parse(stream, logger)
-        })
+impl<'f, A: 'f, S: 'f> Parsable for Fix<'f, A, S> {
+    type Stream = S;
+    type Result = A;
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<A> {
+        //! fix f = f (fix f)
+        (self.0)(self.clone().into_parser()).parse(stream, logger)
     }
 }
 

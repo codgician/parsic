@@ -1,4 +1,4 @@
-use crate::core::{Parsable, ParseLogger};
+use crate::core::{IntoParser, Parsable, ParseLogger, Parser};
 
 /// # Trait: `Lazy`
 /// Wraps anything that implements `Parsable` to
@@ -13,15 +13,15 @@ where
 {
     type Stream = S;
     type Result = A;
-    fn parse<'s>(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<A> {
+    fn parse(&self, stream: &mut S, logger: &mut ParseLogger) -> Option<A> {
         (self.0)().parse(stream, logger)
     }
 }
 
-pub fn lazy<'f, A: 'f, S, F, P>(f: F) -> Lazy<F>
+pub fn lazy<'f, A: 'f, F, S, P>(f: F) -> Parser<'f, A, S>
 where
-    F: Fn() -> P,
+    F: Fn() -> P + 'f,
     P: Parsable<Stream = S, Result = A>,
 {
-    Lazy(f)
+    Lazy(f).into_parser()
 }
