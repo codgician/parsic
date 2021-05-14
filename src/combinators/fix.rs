@@ -1,4 +1,4 @@
-use crate::core::{IntoParser, Parsable, ParseLogger, Parser};
+use crate::core::{Parsable, ParseLogger, Parser};
 use std::rc::Rc;
 
 /// Data structure for `fix` combinator.
