@@ -34,9 +34,9 @@ pub trait Parsable {
     }
 
     /// Convert into a Parser
-    fn into_parser<'f>(self) -> Parser<'f, Self::Result, Self::Stream> 
+    fn into_parser<'f>(self) -> Parser<'f, Self::Result, Self::Stream>
     where
-        Self: Sized + 'f
+        Self: Sized + 'f,
     {
         Parser::new(move |stream: &mut Self::Stream, logger| self.parse(stream, logger))
     }

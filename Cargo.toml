@@ -4,6 +4,6 @@ description = "A naive parser combinator written while learning Rust"
 edition = "2018"
 name = "parsic"
 repository = "https://github.com/codgician/parsic"
-version = "0.1.0"
+version = "0.1.1"
 [dependencies]
 regex = "*"
