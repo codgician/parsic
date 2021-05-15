@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Msg","Data structure for log messages."]],"fn":[["lazy",""]],"struct":[["Lazy","Trait: `Lazy`"],["MsgBody","Struct `MsgBody`"],["ParseLogger","Struct `ParseLogger`"],["Parser","`Parser` struct"],["Pos","Struct `Pos`"]],"trait":[["Parsable","`Parsable` trait"]]});
+initSidebarItems({"enum":[["Msg","Data structure for log messages."]],"struct":[["MsgBody","Struct `MsgBody`"],["ParseLogger","Struct `ParseLogger`"],["Parser","`Parser` struct"],["Pos","Struct `Pos`"]],"trait":[["Parsable","`Parsable` trait"]]});
