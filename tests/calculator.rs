@@ -17,7 +17,7 @@
 /// digit   := '0' | '1' | ... | '9'
 /// ```
 use parsic::combinators::*;
-use parsic::core::{lazy, Parsable, Parser};
+use parsic::core::{Parsable, Parser};
 use parsic::primitives::*;
 
 /// digit := '0' | '1' | ... | '9'

@@ -2,7 +2,8 @@ use crate::core::{Parsable, ParseLogger, Parser};
 use std::rc::Rc;
 
 /// Data structure for `fix` combinator.
-pub struct Fix<'f, A, S>(Rc<dyn Fn(Parser<'f, A, S>) -> Parser<'f, A, S> + 'f>);
+type FixFn<'f, A, S> = dyn Fn(Parser<'f, A, S>) -> Parser<'f, A, S> + 'f;
+pub struct Fix<'f, A, S>(Rc<FixFn<'f, A, S>>);
 
 impl<'f, A, S> Clone for Fix<'f, A, S> {
     fn clone(&self) -> Self {
