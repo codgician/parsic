@@ -1,15 +1,14 @@
-mod basic;
-mod bind;
-mod compose;
+mod alternative;
+mod applicative;
 mod error;
 mod fix;
+mod functor;
 mod lazy;
-mod map;
-mod or;
+mod monad;
 mod replicative;
 mod sequential;
 
 pub use crate::combinators::{
-    self, basic::*, bind::*, compose::*, error::*, fix::*, lazy::*, map::*, or::*, replicative::*,
-    sequential::*,
+    self, alternative::*, applicative::*, error::*, fix::*, functor::*, lazy::*, monad::*,
+    replicative::*, sequential::*,
 };

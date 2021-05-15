@@ -11,7 +11,7 @@ use crate::core::{return_none, Msg, MsgBody, Parsable, Parser};
 /// - **Identity**: `map(p, |x| x) ~ p`
 /// - **Composition**: `map(p, |x| f(g(x))) ~ map(map(p, f), g)`
 ///
-/// Check out `test_map` module in the source code for naive examples of above laws.
+/// Check out `test_functor` module in the source code for naive examples of above laws.
 ///
 /// # Example
 /// ```
@@ -122,7 +122,7 @@ pub fn map_result<'f, A: 'f, B: 'f, E: ToString, S: Clone>(
 }
 
 /// Implement `map` and related combinators for `Parsable`.
-pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
+pub trait FunctorExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `map`
     ///
     /// Maps the result of current parser to another value.
@@ -134,7 +134,7 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// - **Identity**: `p.map(|x| x) ~ p`
     /// - **Composition**: `p.map(|x| f(g(x))) ~ p.map(f).map(g)`
     ///
-    /// Check out `test_map` module in the source code for naive examples of above laws.
+    /// Check out `test_functor` module in the source code for naive examples of above laws.
     ///
     /// # Example
     /// ```
@@ -225,16 +225,16 @@ pub trait MapExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 }
 
-impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> MapExt<'f, A, S> for P {}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> FunctorExt<'f, A, S> for P {}
 
 #[cfg(test)]
-mod test_map {
+mod test_functor {
     use crate::combinators::*;
     use crate::core::Parsable;
     use crate::primitives::*;
 
     #[test]
-    fn fail_with_grace() {
+    fn map_fail_with_grace() {
         let parser = char('-').and(char('1')).map(|(_, x)| x);
 
         let mut st = CharStream::new("+1");
@@ -242,6 +242,32 @@ mod test_map {
 
         assert_eq!(None, res);
         assert_eq!("+1", st.as_str());
+        assert_eq!(1, logs.len());
+    }
+
+    #[test]
+    fn map_option_fail_with_grace() {
+        let parser = satisfy(|_| true).map_option(|ch: char| ch.to_digit(10));
+
+        let mut st = CharStream::new("naive");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
+        assert_eq!("naive", st.as_str());
+        assert_eq!(1, logs.len());
+    }
+
+    #[test]
+    fn map_result_fail_with_grace() {
+        let parser = satisfy(|&ch| ch.is_digit(10))
+            .some()
+            .map_result(|v| v.into_iter().collect::<String>().parse::<i64>());
+
+        let mut st = CharStream::new("naive");
+        let (res, logs) = parser.exec(&mut st);
+
+        assert_eq!(None, res);
+        assert_eq!("naive", st.as_str());
         assert_eq!(1, logs.len());
     }
 
@@ -279,45 +305,5 @@ mod test_map {
             parser1.exec(&mut CharStream::new("10")),
             parser2.exec(&mut CharStream::new("10"))
         );
-    }
-}
-
-#[cfg(test)]
-mod test_map_option {
-    use crate::combinators::*;
-    use crate::core::Parsable;
-    use crate::primitives::{satisfy, CharStream};
-
-    #[test]
-    fn fail_with_grace() {
-        let parser = satisfy(|_| true).map_option(|ch: char| ch.to_digit(10));
-
-        let mut st = CharStream::new("naive");
-        let (res, logs) = parser.exec(&mut st);
-
-        assert_eq!(None, res);
-        assert_eq!("naive", st.as_str());
-        assert_eq!(1, logs.len());
-    }
-}
-
-#[cfg(test)]
-mod test_map_result {
-    use crate::combinators::*;
-    use crate::core::Parsable;
-    use crate::primitives::{satisfy, CharStream};
-
-    #[test]
-    fn fail_with_grace() {
-        let parser = satisfy(|&ch| ch.is_digit(10))
-            .some()
-            .map_result(|v| v.into_iter().collect::<String>().parse::<i64>());
-
-        let mut st = CharStream::new("naive");
-        let (res, logs) = parser.exec(&mut st);
-
-        assert_eq!(None, res);
-        assert_eq!("naive", st.as_str());
-        assert_eq!(1, logs.len());
     }
 }

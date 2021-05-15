@@ -1,4 +1,4 @@
-use crate::combinators::MapExt;
+use crate::combinators::FunctorExt;
 use crate::core::{return_none, Parsable, Parser};
 
 /// # Combinator: `and` (function ver.)
@@ -257,7 +257,7 @@ pub trait SequentialExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
 impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> SequentialExt<'f, A, S> for P {}
 
 #[cfg(test)]
-mod test_and {
+mod test_sequential {
     use crate::combinators::*;
     use crate::core::Parsable;
     use crate::primitives::{char, satisfy, CharStream};

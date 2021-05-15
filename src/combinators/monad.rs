@@ -12,7 +12,7 @@ use crate::core::{return_none, Parsable, Parser};
 /// - **Right-identity**: `bind(p, |x| pure(x)) ~ p`
 /// - **Associativity**: `bind(bind(p, f), g) ~ bind(p, |x| bind(f(x), g))`
 ///
-/// Check out `test_bind` module in the source code for naive examples of above laws.
+/// Check out `test_monad` module in the source code for naive examples of above laws.
 ///
 /// # Example
 /// ```
@@ -53,7 +53,7 @@ where
 }
 
 /// Implement `bind` combinator for `Parsable<S>`.
-pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
+pub trait MonadExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `bind`
     ///
     /// Monadic bind operator `(>>=)` for context sensitive parsing.
@@ -66,7 +66,7 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// - **Right-identity**: `p.bind(|x| pure(x)) ~ p`
     /// - **Associativity**: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
     ///
-    /// Check out `test_bind` module in the source code for naive examples of above laws.
+    /// Check out `test_monad` module in the source code for naive examples of above laws.
     ///
     /// # Example
     ///
@@ -74,7 +74,7 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     ///
     /// ```
     /// use parsic::core::Parsable;
-    /// use parsic::combinators::BindExt;
+    /// use parsic::combinators::*;
     /// use parsic::primitives::{ CharStream, char, satisfy };
     ///
     /// // <expr> := <uppercase_letter> '+'
@@ -101,10 +101,10 @@ pub trait BindExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     }
 }
 
-impl<'f, A: 'f, S, P> BindExt<'f, A, S> for P where P: Parsable<Stream = S, Result = A> {}
+impl<'f, A: 'f, S, P> MonadExt<'f, A, S> for P where P: Parsable<Stream = S, Result = A> {}
 
 #[cfg(test)]
-mod test_bind {
+mod test_monad {
     use crate::combinators::*;
     use crate::core::Parsable;
     use crate::primitives::{char, satisfy, CharStream};

@@ -1,5 +1,43 @@
 use crate::core::{return_none, Parsable, Parser};
 
+/// # Combinator: `pure`
+///
+/// Injects a value into an identity parser.
+///
+/// # Examples
+/// # Injects a value
+/// ```
+/// use parsic::combinators::*;
+/// use parsic::core::*;
+/// use parsic::primitives::CharStream;
+/// let parser = pure(true);
+///
+/// let mut st = CharStream::new("Hello");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(Some(true), res);
+/// assert_eq!("Hello", st.as_str());
+/// assert_eq!(0, logs.len());
+///
+/// ```
+/// # Injects a function
+/// ```
+/// use parsic::combinators::*;
+/// use parsic::core::*;
+/// use parsic::primitives::CharStream;
+///
+/// let parser = pure(|_| true);
+/// let mut st = CharStream::new("Hello");
+/// let (res, logs) = parser.exec(&mut st);
+///
+/// assert_eq!(true, res.unwrap()(1));
+/// assert_eq!("Hello", st.as_str());
+/// assert_eq!(0, logs.len());
+/// ```
+pub fn pure<'f, A: Clone + 'f, S: 'f>(x: A) -> Parser<'f, A, S> {
+    Parser::new(move |_, _| Some(x.clone()))
+}
+
 /// # Combinator: `compose` (function ver.)
 ///
 /// Functional composition between parsers.
@@ -13,7 +51,7 @@ use crate::core::{return_none, Parsable, Parser};
 /// - **Interchange**: `compose(x, pure(y)) ~ compose(pure(|g| g(y)), x)`
 /// - **Composition**: `compose(x, compose(y, z)) ~ compose(pure(|f| |g| |x| f(g(x))), z)`
 ///
-/// Check out `test_bind` module in the source code for naive examples of above laws.
+/// Check out `test_applicative` module in the source code for naive examples of above laws.
 ///
 /// # Example
 /// ```
@@ -50,7 +88,7 @@ where
 }
 
 /// Implement `compose` combinator for `Parsable<S>`.
-pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
+pub trait ApplicativeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     /// # Combinator: `compose`
     ///
     /// Functional composition between parsers.
@@ -64,7 +102,7 @@ pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     /// - **Interchange**: `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`
     /// - **Composition**: `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`
     ///
-    /// Check out `test_bind` module in the source code for naive examples of above laws.
+    /// Check out `test_applicative` module in the source code for naive examples of above laws.
     ///
     /// # Example
     /// ```
@@ -94,10 +132,10 @@ pub trait ComposeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     }
 }
 
-impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ComposeExt<'f, A, S> for P {}
+impl<'f, A: 'f, S, P: Parsable<Stream = S, Result = A>> ApplicativeExt<'f, A, S> for P {}
 
 #[cfg(test)]
-mod test_compose {
+mod test_applicative {
     use crate::combinators::*;
     use crate::core::Parsable;
     use crate::primitives::{char, CharStream};
