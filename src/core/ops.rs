@@ -167,7 +167,7 @@ mod test_ops {
     use crate::primitives::{char, satisfy, CharStream};
 
     #[test]
-    fn mutual_recursive_syntax() {
+    fn mutual_recursive_grammar() {
         // expr     := term '+' expr | term
         // term     := factor '*' term | factor
         // factor   := '(' expr ')' | uint

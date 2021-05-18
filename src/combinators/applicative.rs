@@ -154,8 +154,8 @@ mod test_applicative {
 
     #[test]
     fn identity() {
-        //! `pure(id).compose(p) ~ p`
-        //! Note: `id` is the identity function `|x| x`.
+        //! `pure(|x| x).compose(p) ~ p`
+        //! Identity law.
         let parser1 = pure(|x| x).compose(char('0'));
         let parser2 = char('0');
 
@@ -172,7 +172,7 @@ mod test_applicative {
     #[test]
     fn homomorphism() {
         //! `pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))`
-        //! Function application order does not matter.
+        //! Homomorphism, function application order does not matter.
         let f = |ch| if ch == '0' { 'a' } else { 'b' };
         let g = |ch| if ch == 'a' { 'A' } else { 'B' };
         let parser1 = pure(f).compose(pure(g).compose(char('0')));

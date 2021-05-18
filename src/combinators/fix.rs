@@ -39,7 +39,7 @@ impl<'f, A: 'f, S: 'f> Parsable for Fix<'f, A, S> {
 /// use parsic::primitives::{char, CharStream};
 ///
 /// // expr := '1' expr | '0'
-/// let parser = fix(|parser| char('1').right(parser.clone()).or(char('0')));
+/// let parser = fix(|parser| char('1').right(parser).or(char('0')));
 ///
 /// let mut st = CharStream::new("1110");
 /// let (res, logs) = parser.exec(&mut st);
@@ -62,7 +62,7 @@ mod test {
     use crate::primitives::{char, satisfy, CharStream};
 
     #[test]
-    fn mutual_recursive_syntax() {
+    fn mutual_recursive_grammar() {
         // expr     := term '+' expr | term
         // term     := factor '*' term | factor
         // factor   := '(' expr ')' | uint

@@ -12,7 +12,7 @@
 /// expr    := term ('+'|'-') expr | term
 /// term    := factor ('*'|'/') term | factor
 /// factor  := '(' expr ')' | float
-/// float   := uint {'.' uint}
+/// float   := uint ['.' uint]
 /// uint    := digit { digit }
 /// digit   := '0' | '1' | ... | '9'
 /// ```
@@ -30,7 +30,7 @@ fn uint<'f>() -> Parser<'f, String, CharStream<'f>> {
     digit().some().map(|v| v.iter().collect::<String>())
 }
 
-/// float := uint {'.' uint}
+/// float := uint ['.' uint]
 fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
     uint()
         .and(char('.').and(lazy(uint)).optional())
@@ -75,7 +75,7 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
         let digit = satisfy(|&ch| ch.is_digit(10));
         // uint := digit { digit }
         let uint = digit.some().map(|v| v.iter().collect::<String>());
-        // float := uint {'.' uint}
+        // float := uint ['.' uint]
         let float = uint
             .clone()
             .and(char('.').and(uint).optional())

@@ -176,7 +176,7 @@ mod test_alternative {
 
     #[test]
     fn left_zero() {
-        //! empty().compose(x) ~ empty()
+        //! `empty().compose(x) ~ empty()`
         //! Left zero law.
         let parser1 = empty::<fn(u64) -> u64, _>().compose(pure(1));
         let parser2 = empty();
@@ -218,7 +218,7 @@ mod test_alternative {
 
     #[test]
     fn right_distribution() {
-        //! `pf.compose(px.or(py)) ~ (pf.compose(px)).or(pf.compose(py))
+        //! `pf.compose(px.or(py)) ~ (pf.compose(px)).or(pf.compose(py))`
         //! Right distribution law.
         let pf = pure::<fn(u64) -> u64, CharStream>(|x| x + 3);
         let px = pure::<u64, CharStream>(5);
