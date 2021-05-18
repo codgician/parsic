@@ -143,7 +143,7 @@
 <span class="doccomment">/// use parsic::primitives::{char, CharStream};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // expr := &#39;1&#39; expr | &#39;0&#39;</span>
-<span class="doccomment">/// let parser = fix(|parser| char(&#39;1&#39;).right(parser.clone()).or(char(&#39;0&#39;)));</span>
+<span class="doccomment">/// let parser = fix(|parser| char(&#39;1&#39;).right(parser).or(char(&#39;0&#39;)));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let mut st = CharStream::new(&quot;1110&quot;);</span>
 <span class="doccomment">/// let (res, logs) = parser.exec(&amp;mut st);</span>
@@ -166,7 +166,7 @@
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">primitives</span>::{<span class="ident">char</span>, <span class="ident">satisfy</span>, <span class="ident">CharStream</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mutual_recursive_syntax</span>() {
+    <span class="kw">fn</span> <span class="ident">mutual_recursive_grammar</span>() {
         <span class="comment">// expr     := term &#39;+&#39; expr | term</span>
         <span class="comment">// term     := factor &#39;*&#39; term | factor</span>
         <span class="comment">// factor   := &#39;(&#39; expr &#39;)&#39; | uint</span>

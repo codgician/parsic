@@ -427,7 +427,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">left_zero</span>() {
-        <span class="doccomment">//! empty().compose(x) ~ empty()</span>
+        <span class="doccomment">//! `empty().compose(x) ~ empty()`</span>
         <span class="doccomment">//! Left zero law.</span>
         <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">empty</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>().<span class="ident">compose</span>(<span class="ident">pure</span>(<span class="number">1</span>));
         <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">empty</span>();
@@ -469,7 +469,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">right_distribution</span>() {
-        <span class="doccomment">//! `pf.compose(px.or(py)) ~ (pf.compose(px)).or(pf.compose(py))</span>
+        <span class="doccomment">//! `pf.compose(px.or(py)) ~ (pf.compose(px)).or(pf.compose(py))`</span>
         <span class="doccomment">//! Right distribution law.</span>
         <span class="kw">let</span> <span class="ident">pf</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="ident">CharStream</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">3</span>);
         <span class="kw">let</span> <span class="ident">px</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">CharStream</span><span class="op">&gt;</span>(<span class="number">5</span>);

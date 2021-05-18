@@ -381,8 +381,8 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">identity</span>() {
-        <span class="doccomment">//! `pure(id).compose(p) ~ p`</span>
-        <span class="doccomment">//! Note: `id` is the identity function `|x| x`.</span>
+        <span class="doccomment">//! `pure(|x| x).compose(p) ~ p`</span>
+        <span class="doccomment">//! Identity law.</span>
         <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">pure</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>).<span class="ident">compose</span>(<span class="ident">char</span>(<span class="string">&#39;0&#39;</span>));
         <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">char</span>(<span class="string">&#39;0&#39;</span>);
 
@@ -399,7 +399,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">homomorphism</span>() {
         <span class="doccomment">//! `pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))`</span>
-        <span class="doccomment">//! Function application order does not matter.</span>
+        <span class="doccomment">//! Homomorphism, function application order does not matter.</span>
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">ch</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;0&#39;</span> { <span class="string">&#39;a&#39;</span> } <span class="kw">else</span> { <span class="string">&#39;b&#39;</span> };
         <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="op">|</span><span class="ident">ch</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;a&#39;</span> { <span class="string">&#39;A&#39;</span> } <span class="kw">else</span> { <span class="string">&#39;B&#39;</span> };
         <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">pure</span>(<span class="ident">f</span>).<span class="ident">compose</span>(<span class="ident">pure</span>(<span class="ident">g</span>).<span class="ident">compose</span>(<span class="ident">char</span>(<span class="string">&#39;0&#39;</span>)));
