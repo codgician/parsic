@@ -51,17 +51,12 @@ pub fn or<'f, A: 'f, S: Clone>(
 ) -> Parser<'f, A, S> {
     Parser::new(move |stream: &mut S, logger| {
         let (st, lg) = (stream.clone(), logger.clone());
-        match p1.parse(stream, logger) {
-            Some(x) => Some(x),
-            None => {
-                *stream = st.clone();
-                *logger = lg;
-                match p2.parse(stream, logger) {
-                    Some(x) => Some(x),
-                    None => return_none(stream, &st),
-                }
-            }
-        }
+        p1.parse(stream, logger).or_else(|| {
+            *stream = st.clone();
+            *logger = lg;
+            p2.parse(stream, logger)
+                .or_else(|| return_none(stream, &st))
+        })
     })
 }
 

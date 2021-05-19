@@ -29,13 +29,9 @@ pub fn and<'f, A: 'f, B: 'f, S: Clone>(
 ) -> Parser<'f, (A, B), S> {
     Parser::new(move |stream: &mut S, logger| {
         let st = stream.clone();
-        match p1.parse(stream, logger) {
-            Some(x) => match p2.parse(stream, logger) {
-                Some(y) => Some((x, y)),
-                None => return_none(stream, &st),
-            },
-            None => return_none(stream, &st),
-        }
+        p1.parse(stream, logger)
+            .and_then(|x| p2.parse(stream, logger).map(|y| (x, y)))
+            .or_else(|| return_none(stream, &st))
     })
 }
 

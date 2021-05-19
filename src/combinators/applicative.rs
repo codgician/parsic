@@ -77,13 +77,9 @@ where
 {
     Parser::new(move |stream: &mut S, logger| {
         let st = stream.clone();
-        match pf.parse(stream, logger) {
-            Some(f) => match px.parse(stream, logger) {
-                Some(x) => Some(f(x)),
-                None => return_none(stream, &st),
-            },
-            None => return_none(stream, &st),
-        }
+        pf.parse(stream, logger)
+            .and_then(|f| px.parse(stream, logger).map(|x| f(x)))
+            .or_else(|| return_none(stream, &st))
     })
 }
 

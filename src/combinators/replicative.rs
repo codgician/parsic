@@ -36,7 +36,6 @@ pub fn many<'f, A: 'f, S: Clone>(
             st = stream.clone();
             lg = logger.clone();
         }
-
         *stream = st;
         *logger = lg;
         Some(res)
@@ -79,14 +78,12 @@ pub fn some<'f, A: 'f, S: Clone>(
             st = stream.clone();
             lg = logger.clone();
         }
-
         *stream = st;
-        match res {
-            v if v.is_empty() => None,
-            _ => {
-                *logger = lg;
-                Some(res)
-            }
+        if res.is_empty() {
+            None
+        } else {
+            *logger = lg;
+            Some(res)
         }
     })
 }
@@ -121,13 +118,10 @@ pub fn optional<'f, A: 'f, S: Clone>(
 ) -> Parser<'f, Option<A>, S> {
     Parser::new(move |stream: &mut S, logger| {
         let (st, lg) = (stream.clone(), logger.clone());
-        match p.parse(stream, logger) {
-            None => {
-                *logger = lg;
-                Some(return_none(stream, &st))
-            }
-            x => Some(x),
-        }
+        p.parse(stream, logger).map(Some).or_else(|| {
+            *logger = lg;
+            Some(return_none(stream, &st))
+        })
     })
 }
 
