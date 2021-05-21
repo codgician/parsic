@@ -14,7 +14,7 @@
 <li><strong>Right-identity</strong>: <code>p.bind(|x| pure(x)) ~ p</code></li>
 <li><strong>Associativity</strong>: <code>p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))</code></li>
 </ul>
-<p>Check out <code>test_monad</code> module in the source code for naive examples of above laws.</p>
+<p>Check out <code>test_monad</code> module for naive examples of above laws.</p>
 <h1 id="example" class="section-header"><a href="#example">Example</a></h1>
 <p>The code example below parses <code>expr</code> with the following grammar:</p>
 

@@ -10,7 +10,7 @@
 <li><strong>Right-identity</strong>: <code>bind(p, |x| pure(x)) ~ p</code></li>
 <li><strong>Associativity</strong>: <code>bind(bind(p, f), g) ~ bind(p, |x| bind(f(x), g))</code></li>
 </ul>
-<p>Check out <code>test_monad</code> module in the source code for naive examples of above laws.</p>
+<p>Check out <code>test_monad</code> module for naive examples of above laws.</p>
 <h1 id="example" class="section-header"><a href="#example">Example</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">parsic</span>::<span class="ident">core</span>::<span class="ident">Parsable</span>;

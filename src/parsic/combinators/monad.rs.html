@@ -197,7 +197,7 @@
 <span class="doccomment">/// - **Right-identity**: `bind(p, |x| pure(x)) ~ p`</span>
 <span class="doccomment">/// - **Associativity**: `bind(bind(p, f), g) ~ bind(p, |x| bind(f(x), g))`</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Check out `test_monad` module in the source code for naive examples of above laws.</span>
+<span class="doccomment">/// Check out `test_monad` module for naive examples of above laws.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
@@ -251,7 +251,7 @@
     <span class="doccomment">/// - **Right-identity**: `p.bind(|x| pure(x)) ~ p`</span>
     <span class="doccomment">/// - **Associativity**: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Check out `test_monad` module in the source code for naive examples of above laws.</span>
+    <span class="doccomment">/// Check out `test_monad` module for naive examples of above laws.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
@@ -315,16 +315,16 @@
         <span class="doccomment">//! `pure(x).bind(f) ~ f(x)`</span>
         <span class="doccomment">//! Left identity law</span>
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">b</span> { <span class="ident">char</span>(<span class="string">&#39;1&#39;</span>) } <span class="kw">else</span> { <span class="ident">char</span>(<span class="string">&#39;0&#39;</span>) };
-        <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">CharStream</span><span class="op">&gt;</span>(<span class="bool-val">true</span>).<span class="ident">bind</span>(<span class="ident">f</span>);
+        <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">pure</span>(<span class="bool-val">true</span>).<span class="ident">bind</span>(<span class="ident">f</span>);
         <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">f</span>(<span class="bool-val">true</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;0&quot;</span>)),
-            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;0&quot;</span>))
+            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;01&quot;</span>)),
+            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;01&quot;</span>))
         );
         <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;1&quot;</span>)),
-            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;1&quot;</span>))
+            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;10&quot;</span>)),
+            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;10&quot;</span>))
         );
     }
 
@@ -336,12 +336,12 @@
         <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">char</span>(<span class="string">&#39;0&#39;</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;0&quot;</span>)),
-            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;0&quot;</span>))
+            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;01&quot;</span>)),
+            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;01&quot;</span>))
         );
         <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;1&quot;</span>)),
-            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;1&quot;</span>))
+            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;10&quot;</span>)),
+            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;10&quot;</span>))
         );
     }
 
@@ -355,12 +355,12 @@
         <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">char</span>(<span class="string">&#39;0&#39;</span>).<span class="ident">bind</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">x</span>).<span class="ident">bind</span>(<span class="ident">g</span>));
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;0&quot;</span>)),
-            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;0&quot;</span>))
+            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;01&quot;</span>)),
+            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;01&quot;</span>))
         );
         <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;1&quot;</span>)),
-            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;1&quot;</span>))
+            <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;10&quot;</span>)),
+            <span class="ident">parser2</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;10&quot;</span>))
         );
     }
 }

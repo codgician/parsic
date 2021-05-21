@@ -12,10 +12,10 @@
 <ul>
 <li><strong>Identity</strong>: <code>pure(id).compose(p) ~ p</code></li>
 <li><strong>Homomorphism</strong>: <code>pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))</code></li>
-<li><strong>Interchange</strong>: <code>x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)</code></li>
-<li><strong>Composition</strong>: <code>x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)</code></li>
+<li><strong>Interchange</strong>: <code>pf.compose(pure(x)) ~ pure(|f| f(x)).compose(pf)</code></li>
+<li><strong>Composition</strong>: <code>pf.compose(pg.compose(px)) ~ pure(|f| |g| |x| f(g(x))).compose(px)</code></li>
 </ul>
-<p>Check out <code>test_applicative</code> module in the source code for naive examples of above laws.</p>
+<p>Check out <code>test_applicative</code> module for naive examples of above laws.</p>
 <h1 id="example" class="section-header"><a href="#example">Example</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">parsic</span>::<span class="ident">combinators</span>::<span class="kw-2">*</span>;

@@ -228,7 +228,7 @@
 <span class="doccomment">/// Injects a value into an identity parser.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
-<span class="doccomment">/// # Injects a value</span>
+<span class="doccomment">/// ## Injects a value</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use parsic::combinators::*;</span>
 <span class="doccomment">/// use parsic::core::*;</span>
@@ -243,7 +243,7 @@
 <span class="doccomment">/// assert_eq!(0, logs.len());</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # Injects a function</span>
+<span class="doccomment">/// ## Injects a function</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use parsic::combinators::*;</span>
 <span class="doccomment">/// use parsic::core::*;</span>
@@ -271,10 +271,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// - **Identity**: `compose(pure(id), p) ~ p`</span>
 <span class="doccomment">/// - **Homomorphism**: `compose(pure(f), pure(g)) ~ pure(|x| f(g(x)))`</span>
-<span class="doccomment">/// - **Interchange**: `compose(x, pure(y)) ~ compose(pure(|g| g(y)), x)`</span>
-<span class="doccomment">/// - **Composition**: `compose(x, compose(y, z)) ~ compose(pure(|f| |g| |x| f(g(x))), z)`</span>
+<span class="doccomment">/// - **Interchange**: `compose(pf, pure(x)) ~ compose(pure(|f| f(x)), pf)`</span>
+<span class="doccomment">/// - **Composition**: `compose(pf, pg.compose(px)) ~ compose(pure(|f| |g| |x| f(g(x))), px)`</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Check out `test_applicative` module in the source code for naive examples of above laws.</span>
+<span class="doccomment">/// Check out `test_applicative` module for naive examples of above laws.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
@@ -318,10 +318,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// - **Identity**: `pure(id).compose(p) ~ p`</span>
     <span class="doccomment">/// - **Homomorphism**: `pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))`</span>
-    <span class="doccomment">/// - **Interchange**: `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`</span>
-    <span class="doccomment">/// - **Composition**: `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`</span>
+    <span class="doccomment">/// - **Interchange**: `pf.compose(pure(x)) ~ pure(|f| f(x)).compose(pf)`</span>
+    <span class="doccomment">/// - **Composition**: `pf.compose(pg.compose(px)) ~ pure(|f| |g| |x| f(g(x))).compose(px)`</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Check out `test_applicative` module in the source code for naive examples of above laws.</span>
+    <span class="doccomment">/// Check out `test_applicative` module for naive examples of above laws.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
@@ -409,11 +409,11 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">interchange</span>() {
-        <span class="doccomment">//! `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`</span>
+        <span class="doccomment">//! `pf.compose(pure(x)) ~ pure(|f| f(x)).compose(pf)`</span>
         <span class="doccomment">//! Interchange law.</span>
-        <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> (<span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>), <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">clone</span>().<span class="ident">compose</span>(<span class="ident">pure</span>(<span class="ident">y</span>));
-        <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">y</span>)).<span class="ident">compose</span>(<span class="ident">x</span>);
+        <span class="kw">let</span> (<span class="ident">pf</span>, <span class="ident">x</span>) <span class="op">=</span> (<span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>), <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">pf</span>.<span class="ident">clone</span>().<span class="ident">compose</span>(<span class="ident">pure</span>(<span class="ident">x</span>));
+        <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> <span class="ident">pure</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">x</span>)).<span class="ident">compose</span>(<span class="ident">pf</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(
             <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;&quot;</span>)),
@@ -423,16 +423,16 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">composition</span>() {
-        <span class="doccomment">//! `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`</span>
+        <span class="doccomment">//! `pf.compose(pg.compose(px)) ~ pure(|f| |g| |x| f(g(x))).compose(px)`</span>
         <span class="doccomment">//! Composition law</span>
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">*</span> <span class="number">5</span>);
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">pure</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">clone</span>().<span class="ident">compose</span>(<span class="ident">y</span>.<span class="ident">clone</span>().<span class="ident">compose</span>(<span class="ident">z</span>.<span class="ident">clone</span>()));
+        <span class="kw">let</span> <span class="ident">pf</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">3</span>);
+        <span class="kw">let</span> <span class="ident">pg</span> <span class="op">=</span> <span class="ident">pure</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">*</span> <span class="number">5</span>);
+        <span class="kw">let</span> <span class="ident">px</span> <span class="op">=</span> <span class="ident">pure</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="ident">parser1</span> <span class="op">=</span> <span class="ident">pf</span>.<span class="ident">clone</span>().<span class="ident">compose</span>(<span class="ident">pg</span>.<span class="ident">clone</span>().<span class="ident">compose</span>(<span class="ident">px</span>.<span class="ident">clone</span>()));
         <span class="kw">let</span> <span class="ident">parser2</span> <span class="op">=</span> (<span class="ident">pure</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span><span class="op">|</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">g</span>: <span class="kw">fn</span>(<span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span><span class="op">|</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">u64</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">g</span>(<span class="ident">x</span>)))
-            .<span class="ident">compose</span>(<span class="ident">x</span>)
-            .<span class="ident">compose</span>(<span class="ident">y</span>))
-        .<span class="ident">compose</span>(<span class="ident">z</span>);
+            .<span class="ident">compose</span>(<span class="ident">pf</span>)
+            .<span class="ident">compose</span>(<span class="ident">pg</span>))
+        .<span class="ident">compose</span>(<span class="ident">px</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(
             <span class="ident">parser1</span>.<span class="ident">exec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CharStream</span>::<span class="ident">new</span>(<span class="string">&quot;&quot;</span>)),
