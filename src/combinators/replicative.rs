@@ -1,4 +1,4 @@
-use crate::core::{return_none, Parsable, Parser};
+use crate::core::{Parsable, Parser};
 
 /// # Combinator: `many` (function ver.)
 ///
@@ -88,43 +88,6 @@ pub fn some<'f, A: 'f, S: Clone>(
     })
 }
 
-/// # Combinator: `optional` (function ver.)
-///
-/// Apply given parser **at most one time**. Denote the result
-/// of the given parser `p` as `x`, then the result of `optional(p)`
-/// would be `Some(x)`.
-///
-/// # Example
-/// ```
-/// use parsic::combinators::*;
-/// use parsic::core::Parsable;
-/// use parsic::primitives::{char, CharStream};
-///
-/// // Consume character 't' at most one time
-/// let parser = char('t').optional();
-///
-/// let mut st1 = CharStream::new("tttql");
-/// let mut st2 = CharStream::new("ql");
-/// let (res1, logs1) = parser.exec(&mut st1);
-/// let (res2, logs2) = parser.exec(&mut st2);
-///
-/// assert_eq!(Some(Some('t')), res1);
-/// assert_eq!(Some(None), res2);
-/// assert_eq!(("ttql", "ql") ,(st1.as_str(), st2.as_str()));
-/// assert_eq!((0, 0), (logs1.len(), logs2.len()));
-/// ```
-pub fn optional<'f, A: 'f, S: Clone>(
-    p: impl Parsable<Stream = S, Result = A> + 'f,
-) -> Parser<'f, Option<A>, S> {
-    Parser::new(move |stream: &mut S, logger| {
-        let (st, lg) = (stream.clone(), logger.clone());
-        p.parse(stream, logger).map(Some).or_else(|| {
-            *logger = lg;
-            Some(return_none(stream, &st))
-        })
-    })
-}
-
 /// Implement replicative combinators for `Parsable<S>`.
 pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `many`
@@ -191,39 +154,6 @@ pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         Self: Sized + 'f,
     {
         some(self)
-    }
-
-    /// # Combinator: `optional`
-    ///
-    /// Apply given parser **at most one time**. Denote the result
-    /// of the given parser `p` as `x`, then the result of `p.optional()`
-    /// would be `Some(x)`.
-    ///
-    /// # Example
-    /// ```
-    /// use parsic::combinators::*;
-    /// use parsic::core::Parsable;
-    /// use parsic::primitives::{char, CharStream};
-    ///
-    /// // Consume character 't' at most one time
-    /// let parser = char('t').optional();
-    ///
-    /// let mut st1 = CharStream::new("tttql");
-    /// let mut st2 = CharStream::new("ql");
-    /// let (res1, logs1) = parser.exec(&mut st1);
-    /// let (res2, logs2) = parser.exec(&mut st2);
-    ///
-    /// assert_eq!(Some(Some('t')), res1);
-    /// assert_eq!(Some(None), res2);
-    /// assert_eq!(("ttql", "ql") ,(st1.as_str(), st2.as_str()));
-    /// assert_eq!((0, 0), (logs1.len(), logs2.len()));
-    /// ```
-    fn optional(self) -> Parser<'f, Option<A>, S>
-    where
-        S: Clone,
-        Self: Sized + 'f,
-    {
-        optional(self)
     }
 }
 

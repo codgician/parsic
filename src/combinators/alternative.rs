@@ -1,11 +1,12 @@
+use crate::combinators::{map, pure};
 use crate::core::{return_none, Parsable, Parser};
 
 /// # Combinator: `empty`
 ///
 /// A parser that consumes no item and always fails.
-/// 
+///
 /// # Properties
-/// 
+///
 /// Should satisfy [Alternative laws](https://wiki.haskell.org/Typeclassopedia#Laws_6).
 ///
 /// Instances of `Parser` and `or` forms a monoid:
@@ -13,15 +14,15 @@ use crate::core::{return_none, Parsable, Parser};
 /// - **Left identity**: `or(empty(), p) ~ p`
 /// - **Right identity**: `or(p, empty()) ~ p`
 /// - **Associative**: `or(or(px, py), pz) ~ or(px, or(py, pz))`
-/// 
+///
 /// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:
-/// 
+///
 /// - **Left zero**: `compose(empty(), x) ~ empty()`
 /// - **Right zero**: `compose(pf, empty()) ~ empty()`
 /// - **Left distribution**: `compose(or(pf, pg), px) ~ or(compose(pf, px), pg.compose(px))`
 /// - **Right distribution**: `compose(pf, or(px, py)) ~ or(compose(pf, px), pf.compose(py))`
 /// - **Left catch**: `or(pure(a), x) ~ pure(a)`
-/// 
+///
 /// Check out `test_alternative` module for naive examples of above laws.
 ///
 /// # Example
@@ -48,9 +49,9 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
 /// Alternative combinator. Accepts two parsers as arguments,
 /// if the first parser succeeds then its result is returned,
 /// otherwise the result of the second parser is returned.
-/// 
+///
 /// # Properties
-/// 
+///
 /// Should satisfy [Alternative laws](https://wiki.haskell.org/Typeclassopedia#Laws_6).
 ///
 /// Instances of `Parser` and `or` forms a monoid:
@@ -58,15 +59,15 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
 /// - **Left identity**: `empty().or(p) ~ p`
 /// - **Right identity**: `p.or(empty()) ~ p`
 /// - **Associative**: `px.or(py).or(pz) ~ px.or(py.or(pz))`
-/// 
+///
 /// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:
-/// 
+///
 /// - **Left zero**: `empty().compose(x) ~ empty()`
 /// - **Right zero**: `pf.compose(empty()) ~ empty()`
 /// - **Left distribution**: `pf.or(pg).compose(px) ~ pf.compose(px).or(pg.compose(px))`
 /// - **Right distribution**: `pf.compose(px.or(py)) ~ pf.compose(px).or(pf.compose(py))`
 /// - **Left catch**: `pure(a).or(x) ~ pure(a)`
-/// 
+///
 /// Check out `test_alternative` module for naive examples of above laws.
 ///
 /// # Examples
@@ -100,6 +101,37 @@ pub fn or<'f, A: 'f, S: Clone>(
     })
 }
 
+/// # Combinator: `optional` (function ver.)
+///
+/// Apply given parser **at most one time**. Denote the result
+/// of the given parser `p` as `x`, then the result of `optional(p)`
+/// would be `Some(x)`.
+///
+/// # Example
+/// ```
+/// use parsic::combinators::*;
+/// use parsic::core::Parsable;
+/// use parsic::primitives::{char, CharStream};
+///
+/// // Consume character 't' at most one time
+/// let parser = char('t').optional();
+///
+/// let mut st1 = CharStream::new("tttql");
+/// let mut st2 = CharStream::new("ql");
+/// let (res1, logs1) = parser.exec(&mut st1);
+/// let (res2, logs2) = parser.exec(&mut st2);
+///
+/// assert_eq!(Some(Some('t')), res1);
+/// assert_eq!(Some(None), res2);
+/// assert_eq!(("ttql", "ql") ,(st1.as_str(), st2.as_str()));
+/// assert_eq!((0, 0), (logs1.len(), logs2.len()));
+/// ```
+pub fn optional<'f, A: Clone + 'f, S: Clone + 'f>(
+    p: impl Parsable<Stream = S, Result = A> + 'f,
+) -> Parser<'f, Option<A>, S> {
+    or(map(p, Some), pure(None))
+}
+
 /// Implement `or` combinator for `Parsable<S>`.
 pub trait AlternativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `or` (function ver.)
@@ -130,6 +162,40 @@ pub trait AlternativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
         Self: Sized + 'f,
     {
         or(self, p)
+    }
+
+    /// # Combinator: `optional`
+    ///
+    /// Apply given parser **at most one time**. Denote the result
+    /// of the given parser `p` as `x`, then the result of `p.optional()`
+    /// would be `Some(x)`.
+    ///
+    /// # Example
+    /// ```
+    /// use parsic::combinators::*;
+    /// use parsic::core::Parsable;
+    /// use parsic::primitives::{char, CharStream};
+    ///
+    /// // Consume character 't' at most one time
+    /// let parser = char('t').optional();
+    ///
+    /// let mut st1 = CharStream::new("tttql");
+    /// let mut st2 = CharStream::new("ql");
+    /// let (res1, logs1) = parser.exec(&mut st1);
+    /// let (res2, logs2) = parser.exec(&mut st2);
+    ///
+    /// assert_eq!(Some(Some('t')), res1);
+    /// assert_eq!(Some(None), res2);
+    /// assert_eq!(("ttql", "ql") ,(st1.as_str(), st2.as_str()));
+    /// assert_eq!((0, 0), (logs1.len(), logs2.len()));
+    /// ```
+    fn optional(self) -> Parser<'f, Option<A>, S>
+    where
+        A: Clone,
+        S: Clone + 'f,
+        Self: Sized + 'f,
+    {
+        optional(self)
     }
 }
 

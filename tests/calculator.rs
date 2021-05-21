@@ -9,8 +9,8 @@
 /// with closures.
 ///
 /// ```plain
-/// expr    := term ('+'|'-') expr | term
-/// term    := factor ('*'|'/') term | factor
+/// expr    := term [('+'|'-') expr]
+/// term    := factor [('*'|'/') term]
 /// factor  := '(' expr ')' | float
 /// float   := uint ['.' uint]
 /// uint    := digit { digit }
@@ -47,25 +47,29 @@ fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
 
 /// factor := '(' expr ')' | float
 fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    char('(').trim() >> lazy(expr) << char(')').trim() | float()
+    mid(char('(').trim(), lazy(expr), char(')').trim()).or(float())
 }
 
-/// term := factor ('*'|'/') term | factor
+/// term := factor [('*'|'/') term]
 fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
     factor()
-        .and(char('*').or(char('/').trim()))
-        .and(lazy(term))
-        .map(|((v1, op), v2)| if op == '*' { v1 * v2 } else { v1 / v2 })
-        .or(lazy(factor))
+        .and(char('*').or(char('/').trim()).and(lazy(term)).optional())
+        .map(|(v1, r)| match r {
+            Some(('*', v2)) => v1 * v2,
+            Some(('/', v2)) => v1 / v2,
+            _ => v1,
+        })
 }
 
-/// expr := term ('+'|'-') expr | term
+/// expr := term [('+'|'-') expr]
 fn expr<'f>() -> Parser<'f, f64, CharStream<'f>> {
     term()
-        .and(char('+').or(char('-')).trim())
-        .and(lazy(expr))
-        .map(|((v1, op), v2)| if op == '+' { v1 + v2 } else { v1 - v2 })
-        .or(lazy(term))
+        .and(char('+').or(char('-')).trim().and(lazy(expr)).optional())
+        .map(|(v1, r)| match r {
+            Some(('+', v2)) => v1 + v2,
+            Some(('-', v2)) => v1 - v2,
+            _ => v1,
+        })
 }
 
 /// Another equivlent implementation using closures
@@ -90,21 +94,24 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
             .trim();
         // factor := '(' expr ')' | float
         let factor = mid(char('(').trim(), expr.clone(), char(')').trim()).or(float);
-        // term := factor ('*'|'/') term | factor
+        // term := factor [('*'|'/') term]
         let term = fix(move |term| {
             factor
                 .clone()
-                .and(char('*').or(char('/').trim()))
-                .and(term.clone())
-                .map(|((v1, op), v2)| if op == '*' { v1 * v2 } else { v1 / v2 })
-                .or(factor.clone())
+                .and(char('*').or(char('/').trim()).and(term).optional())
+                .map(|(v1, r)| match r {
+                    Some(('*', v2)) => v1 * v2,
+                    Some(('/', v2)) => v1 / v2,
+                    _ => v1,
+                })
         });
-        // expr := term ('+'|'-') expr | term
-        term.clone()
-            .and(char('+').or(char('-')).trim())
-            .and(expr.clone())
-            .map(|((v1, op), v2)| if op == '+' { v1 + v2 } else { v1 - v2 })
-            .or(term.clone())
+        // expr := term [('+'|'-') expr]
+        term.and(char('+').or(char('-')).trim().and(expr).optional())
+            .map(|(v1, r)| match r {
+                Some(('+', v2)) => v1 + v2,
+                Some(('-', v2)) => v1 - v2,
+                _ => v1,
+            })
     })
 }
 
