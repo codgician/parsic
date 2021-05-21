@@ -42,18 +42,18 @@ fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
             }
             res.parse::<f64>()
         })
-        .trim()
 }
 
 /// factor := '(' expr ')' | float
 fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    mid(char('(').trim(), lazy(expr), char(')').trim()).or(float())
+    mid(char('('), lazy(expr), char(')')).or(float()).trim()
 }
 
 /// term := factor [('*'|'/') term]
 fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
     factor()
-        .and(char('*').or(char('/').trim()).and(lazy(term)).optional())
+        .and(char('*').or(char('/')).and(lazy(term)).optional())
+        .trim()
         .map(|(v1, r)| match r {
             Some(('*', v2)) => v1 * v2,
             Some(('/', v2)) => v1 / v2,
@@ -64,7 +64,8 @@ fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
 /// expr := term [('+'|'-') expr]
 fn expr<'f>() -> Parser<'f, f64, CharStream<'f>> {
     term()
-        .and(char('+').or(char('-')).trim().and(lazy(expr)).optional())
+        .and(char('+').or(char('-')).and(lazy(expr)).optional())
+        .trim()
         .map(|(v1, r)| match r {
             Some(('+', v2)) => v1 + v2,
             Some(('-', v2)) => v1 - v2,
@@ -90,15 +91,15 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
                     res.push_str(&frac[..])
                 }
                 res.parse::<f64>()
-            })
-            .trim();
+            });
         // factor := '(' expr ')' | float
-        let factor = mid(char('(').trim(), expr.clone(), char(')').trim()).or(float);
+        let factor = mid(char('('), expr.clone(), char(')')).or(float).trim();
         // term := factor [('*'|'/') term]
         let term = fix(move |term| {
             factor
                 .clone()
-                .and(char('*').or(char('/').trim()).and(term).optional())
+                .and(char('*').or(char('/')).and(term).optional())
+                .trim()
                 .map(|(v1, r)| match r {
                     Some(('*', v2)) => v1 * v2,
                     Some(('/', v2)) => v1 / v2,
@@ -106,7 +107,8 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
                 })
         });
         // expr := term [('+'|'-') expr]
-        term.and(char('+').or(char('-')).trim().and(expr).optional())
+        term.and(char('+').or(char('-')).and(expr).optional())
+            .trim()
             .map(|(v1, r)| match r {
                 Some(('+', v2)) => v1 + v2,
                 Some(('-', v2)) => v1 - v2,
@@ -142,7 +144,7 @@ fn int_expr() {
 #[test]
 fn int_expr_with_whitespace() {
     test_helper(
-        " 2 + 4 * ( 6 + 0 ) / 1 ",
+        "  2  +  4  *  (  6  +  0  )  /  1  ",
         Some((2 + 4 * (6 + 0) / 1) as f64),
         "",
         0,
@@ -157,7 +159,7 @@ fn float_expr() {
 #[test]
 fn float_expr_with_whitespace() {
     test_helper(
-        "1.9 / ( 2.6 + 0.8 ) + 1.7 ",
+        "  1.9  /  (  2.6  +  0.8  )  +  1.7  ",
         Some(1.9 / (2.6 + 0.8) + 1.7),
         "",
         0,
