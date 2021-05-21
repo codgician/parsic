@@ -12,7 +12,7 @@ use crate::core::{return_none, Parsable, Parser};
 /// - **Right-identity**: `bind(p, |x| pure(x)) ~ p`
 /// - **Associativity**: `bind(bind(p, f), g) ~ bind(p, |x| bind(f(x), g))`
 ///
-/// Check out `test_monad` module in the source code for naive examples of above laws.
+/// Check out `test_monad` module for naive examples of above laws.
 ///
 /// # Example
 /// ```
@@ -66,7 +66,7 @@ pub trait MonadExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// - **Right-identity**: `p.bind(|x| pure(x)) ~ p`
     /// - **Associativity**: `p.bind(f).bind(g) ~ p.bind(|x| f(x).bind(g))`
     ///
-    /// Check out `test_monad` module in the source code for naive examples of above laws.
+    /// Check out `test_monad` module for naive examples of above laws.
     ///
     /// # Example
     ///
@@ -130,16 +130,16 @@ mod test_monad {
         //! `pure(x).bind(f) ~ f(x)`
         //! Left identity law
         let f = |b| if b { char('1') } else { char('0') };
-        let parser1 = pure::<bool, CharStream>(true).bind(f);
+        let parser1 = pure(true).bind(f);
         let parser2 = f(true);
 
         assert_eq!(
-            parser1.exec(&mut CharStream::new("0")),
-            parser2.exec(&mut CharStream::new("0"))
+            parser1.exec(&mut CharStream::new("01")),
+            parser2.exec(&mut CharStream::new("01"))
         );
         assert_eq!(
-            parser1.exec(&mut CharStream::new("1")),
-            parser2.exec(&mut CharStream::new("1"))
+            parser1.exec(&mut CharStream::new("10")),
+            parser2.exec(&mut CharStream::new("10"))
         );
     }
 
@@ -151,12 +151,12 @@ mod test_monad {
         let parser2 = char('0');
 
         assert_eq!(
-            parser1.exec(&mut CharStream::new("0")),
-            parser2.exec(&mut CharStream::new("0"))
+            parser1.exec(&mut CharStream::new("01")),
+            parser2.exec(&mut CharStream::new("01"))
         );
         assert_eq!(
-            parser1.exec(&mut CharStream::new("1")),
-            parser2.exec(&mut CharStream::new("1"))
+            parser1.exec(&mut CharStream::new("10")),
+            parser2.exec(&mut CharStream::new("10"))
         );
     }
 
@@ -170,12 +170,12 @@ mod test_monad {
         let parser2 = char('0').bind(|x| f(x).bind(g));
 
         assert_eq!(
-            parser1.exec(&mut CharStream::new("0")),
-            parser2.exec(&mut CharStream::new("0"))
+            parser1.exec(&mut CharStream::new("01")),
+            parser2.exec(&mut CharStream::new("01"))
         );
         assert_eq!(
-            parser1.exec(&mut CharStream::new("1")),
-            parser2.exec(&mut CharStream::new("1"))
+            parser1.exec(&mut CharStream::new("10")),
+            parser2.exec(&mut CharStream::new("10"))
         );
     }
 }

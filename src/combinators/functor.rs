@@ -11,7 +11,7 @@ use crate::core::{return_none, Msg, MsgBody, Parsable, Parser};
 /// - **Identity**: `map(p, |x| x) ~ p`
 /// - **Composition**: `map(p, |x| f(g(x))) ~ map(map(p, f), g)`
 ///
-/// Check out `test_functor` module in the source code for naive examples of above laws.
+/// Check out `test_functor` module for naive examples of above laws.
 ///
 /// # Example
 /// ```
@@ -134,7 +134,7 @@ pub trait FunctorExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// - **Identity**: `p.map(|x| x) ~ p`
     /// - **Composition**: `p.map(|x| f(g(x))) ~ p.map(f).map(g)`
     ///
-    /// Check out `test_functor` module in the source code for naive examples of above laws.
+    /// Check out `test_functor` module for naive examples of above laws.
     ///
     /// # Example
     /// ```

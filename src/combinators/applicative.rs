@@ -5,7 +5,7 @@ use crate::core::{return_none, Parsable, Parser};
 /// Injects a value into an identity parser.
 ///
 /// # Examples
-/// # Injects a value
+/// ## Injects a value
 /// ```
 /// use parsic::combinators::*;
 /// use parsic::core::*;
@@ -20,7 +20,7 @@ use crate::core::{return_none, Parsable, Parser};
 /// assert_eq!(0, logs.len());
 ///
 /// ```
-/// # Injects a function
+/// ## Injects a function
 /// ```
 /// use parsic::combinators::*;
 /// use parsic::core::*;
@@ -48,10 +48,10 @@ pub fn pure<'f, A: Clone + 'f, S: 'f>(x: A) -> Parser<'f, A, S> {
 ///
 /// - **Identity**: `compose(pure(id), p) ~ p`
 /// - **Homomorphism**: `compose(pure(f), pure(g)) ~ pure(|x| f(g(x)))`
-/// - **Interchange**: `compose(x, pure(y)) ~ compose(pure(|g| g(y)), x)`
-/// - **Composition**: `compose(x, compose(y, z)) ~ compose(pure(|f| |g| |x| f(g(x))), z)`
+/// - **Interchange**: `compose(pf, pure(x)) ~ compose(pure(|f| f(x)), pf)`
+/// - **Composition**: `compose(pf, pg.compose(px)) ~ compose(pure(|f| |g| |x| f(g(x))), px)`
 ///
-/// Check out `test_applicative` module in the source code for naive examples of above laws.
+/// Check out `test_applicative` module for naive examples of above laws.
 ///
 /// # Example
 /// ```
@@ -95,10 +95,10 @@ pub trait ApplicativeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     ///
     /// - **Identity**: `pure(id).compose(p) ~ p`
     /// - **Homomorphism**: `pure(f).compose(pure(g)) ~ pure(|x| f(g(x)))`
-    /// - **Interchange**: `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`
-    /// - **Composition**: `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`
+    /// - **Interchange**: `pf.compose(pure(x)) ~ pure(|f| f(x)).compose(pf)`
+    /// - **Composition**: `pf.compose(pg.compose(px)) ~ pure(|f| |g| |x| f(g(x))).compose(px)`
     ///
-    /// Check out `test_applicative` module in the source code for naive examples of above laws.
+    /// Check out `test_applicative` module for naive examples of above laws.
     ///
     /// # Example
     /// ```
@@ -186,11 +186,11 @@ mod test_applicative {
 
     #[test]
     fn interchange() {
-        //! `x.compose(pure(y)) ~ pure(|g| g(y)).compose(x)`
+        //! `pf.compose(pure(x)) ~ pure(|f| f(x)).compose(pf)`
         //! Interchange law.
-        let (x, y) = (pure::<fn(u64) -> u64, _>(|x| x + 1), 1);
-        let parser1 = x.clone().compose(pure(y));
-        let parser2 = pure::<_, _>(|f: fn(u64) -> u64| f(y)).compose(x);
+        let (pf, x) = (pure::<fn(u64) -> u64, _>(|x| x + 1), 1);
+        let parser1 = pf.clone().compose(pure(x));
+        let parser2 = pure(|f: fn(u64) -> u64| f(x)).compose(pf);
 
         assert_eq!(
             parser1.exec(&mut CharStream::new("")),
@@ -200,16 +200,16 @@ mod test_applicative {
 
     #[test]
     fn composition() {
-        //! `x.compose(y.compose(z)) ~ pure(|f| |g| |x| f(g(x))).compose(z)`
+        //! `pf.compose(pg.compose(px)) ~ pure(|f| |g| |x| f(g(x))).compose(px)`
         //! Composition law
-        let x = pure::<fn(u64) -> u64, _>(|x| x + 3);
-        let y = pure::<fn(u64) -> u64, _>(|x| x * 5);
-        let z = pure(2);
-        let parser1 = x.clone().compose(y.clone().compose(z.clone()));
+        let pf = pure::<fn(u64) -> u64, _>(|x| x + 3);
+        let pg = pure::<fn(u64) -> u64, _>(|x| x * 5);
+        let px = pure(2);
+        let parser1 = pf.clone().compose(pg.clone().compose(px.clone()));
         let parser2 = (pure(|f: fn(u64) -> u64| move |g: fn(u64) -> u64| move |x: u64| f(g(x)))
-            .compose(x)
-            .compose(y))
-        .compose(z);
+            .compose(pf)
+            .compose(pg))
+        .compose(px);
 
         assert_eq!(
             parser1.exec(&mut CharStream::new("")),
