@@ -27,13 +27,12 @@ fn digit<'f>() -> Parser<'f, char, CharStream<'f>> {
 
 /// uint := digit { digit }
 fn uint<'f>() -> Parser<'f, String, CharStream<'f>> {
-    digit().some().map(|v| v.iter().collect::<String>())
+    digit.some().map(|v| v.iter().collect::<String>())
 }
 
 /// float := uint ['.' uint]
 fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    uint()
-        .and(char('.').and(uint).optional())
+    uint.and(char('.').and(uint).optional())
         .map_result(|(s, r)| {
             let mut res = s;
             if let Some((dot, frac)) = r {
@@ -46,7 +45,7 @@ fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
 
 /// factor := '(' expr ')' | float
 fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    mid(char('('), expr, char(')')).or(float()).trim()
+    mid(char('('), expr, char(')')).or(float).trim()
 }
 
 /// term := factor [('*'|'/') term]
@@ -122,8 +121,8 @@ fn test_helper(input: &str, expected: Option<f64>, rem_str: &str, log_size: usiz
     let mut st1 = CharStream::new(input);
     let mut st2 = st1.clone();
 
-    let (res1, logs1) = expr().exec(&mut st1);
-    let (res2, logs2) = expr_().exec(&mut st2);
+    let (res1, logs1) = expr.exec(&mut st1);
+    let (res2, logs2) = expr_.exec(&mut st2);
 
     // `expr` and `expr_` should be equivalent
     assert_eq!(res1, res2);
