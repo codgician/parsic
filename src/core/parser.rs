@@ -42,7 +42,6 @@ pub trait Parsable {
     }
 }
 
-/// Implement `Parsable` trait for `Parser`
 impl<'f, A: 'f, S> Parsable for Parser<'f, A, S> {
     type Stream = S;
     type Result = A;
@@ -51,34 +50,6 @@ impl<'f, A: 'f, S> Parsable for Parser<'f, A, S> {
     }
 }
 
-/// Implement `Parsable` trait for any `&P` where `P: Parsable`
-impl<P: Parsable> Parsable for &P {
-    type Stream = P::Stream;
-    type Result = P::Result;
-    fn parse(&self, stream: &mut Self::Stream, logger: &mut ParseLogger) -> Option<Self::Result> {
-        (**self).parse(stream, logger)
-    }
-}
-
-/// Implement `Parsable` trait for any `&mut P` where `P: Parsable`
-impl<P: Parsable> Parsable for &mut P {
-    type Stream = P::Stream;
-    type Result = P::Result;
-    fn parse(&self, stream: &mut Self::Stream, logger: &mut ParseLogger) -> Option<Self::Result> {
-        (**self).parse(stream, logger)
-    }
-}
-
-/// Implement `Parsable` trait for any `Box<P>` where `P: Parsable`
-impl<P: Parsable> Parsable for Box<P> {
-    type Stream = P::Stream;
-    type Result = P::Result;
-    fn parse(&self, stream: &mut Self::Stream, logger: &mut ParseLogger) -> Option<Self::Result> {
-        (**self).parse(stream, logger)
-    }
-}
-
-/// Implement `Parsable` trait for any `Rc<P>` where `P: Parsable`
 impl<P: Parsable> Parsable for Rc<P> {
     type Stream = P::Stream;
     type Result = P::Result;
@@ -87,9 +58,10 @@ impl<P: Parsable> Parsable for Rc<P> {
     }
 }
 
-/// Implement `Parsable` trait for any `fn() -> P` where `P: Parsable`
-/// This enables lazy evaluation when defining recursive parsers.
-impl<P: Parsable> Parsable for fn() -> P {
+impl<F, P: Parsable> Parsable for F
+where
+    F: Fn() -> P 
+{
     type Stream = P::Stream;
     type Result = P::Result;
     fn parse(&self, stream: &mut Self::Stream, logger: &mut ParseLogger) -> Option<Self::Result> {

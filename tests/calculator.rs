@@ -33,7 +33,7 @@ fn uint<'f>() -> Parser<'f, String, CharStream<'f>> {
 /// float := uint ['.' uint]
 fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
     uint()
-        .and(char('.').and(lazy(uint)).optional())
+        .and(char('.').and(uint).optional())
         .map_result(|(s, r)| {
             let mut res = s;
             if let Some((dot, frac)) = r {
@@ -46,13 +46,13 @@ fn float<'f>() -> Parser<'f, f64, CharStream<'f>> {
 
 /// factor := '(' expr ')' | float
 fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    mid(char('('), lazy(expr), char(')')).or(float()).trim()
+    mid(char('('), expr, char(')')).or(float()).trim()
 }
 
 /// term := factor [('*'|'/') term]
 fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
     factor()
-        .and(char('*').or(char('/')).and(lazy(term)).optional())
+        .and(char('*').or(char('/')).and(term).optional())
         .trim()
         .map(|(v1, r)| match r {
             Some(('*', v2)) => v1 * v2,
@@ -64,7 +64,7 @@ fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
 /// expr := term [('+'|'-') expr]
 fn expr<'f>() -> Parser<'f, f64, CharStream<'f>> {
     term()
-        .and(char('+').or(char('-')).and(lazy(expr)).optional())
+        .and(char('+').or(char('-')).and(expr).optional())
         .trim()
         .map(|(v1, r)| match r {
             Some(('+', v2)) => v1 + v2,
