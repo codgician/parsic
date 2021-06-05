@@ -60,7 +60,7 @@ impl<P: Parsable> Parsable for Rc<P> {
 
 impl<F, P: Parsable> Parsable for F
 where
-    F: Fn() -> P 
+    F: Fn() -> P,
 {
     type Stream = P::Stream;
     type Result = P::Result;

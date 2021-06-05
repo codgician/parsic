@@ -8,6 +8,6 @@ mod replicative;
 mod sequential;
 
 pub use crate::combinators::{
-    self, alternative::*, applicative::*, error::*, fix::*, functor::*, monad::*,
-    replicative::*, sequential::*,
+    self, alternative::*, applicative::*, error::*, fix::*, functor::*, monad::*, replicative::*,
+    sequential::*,
 };

@@ -9,8 +9,8 @@
 /// with closures.
 ///
 /// ```plain
-/// expr    := term [('+'|'-') expr]
-/// term    := factor [('*'|'/') term]
+/// expr    := term {('+'|'-') term}
+/// term    := factor {('*'|'/') factor}
 /// factor  := '(' expr ')' | float
 /// float   := uint ['.' uint]
 /// uint    := digit { digit }
@@ -48,27 +48,29 @@ fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
     mid(char('('), expr, char(')')).or(float).trim()
 }
 
-/// term := factor [('*'|'/') term]
+/// term := factor {('*'|'/') factor}
 fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
     factor()
-        .and(char('*').or(char('/')).and(term).optional())
+        .and(char('*').or(char('/')).and(factor).many())
         .trim()
-        .map(|(v1, r)| match r {
-            Some(('*', v2)) => v1 * v2,
-            Some(('/', v2)) => v1 / v2,
-            _ => v1,
+        .map(|(v1, r)| {
+            r.iter().fold(v1, |acc, (op, v2)| match op {
+                '*' => acc * v2,
+                _ => acc / v2,
+            })
         })
 }
 
-/// expr := term [('+'|'-') expr]
+/// expr := term {('+'|'-') term}
 fn expr<'f>() -> Parser<'f, f64, CharStream<'f>> {
     term()
-        .and(char('+').or(char('-')).and(expr).optional())
+        .and(char('+').or(char('-')).and(term).many())
         .trim()
-        .map(|(v1, r)| match r {
-            Some(('+', v2)) => v1 + v2,
-            Some(('-', v2)) => v1 - v2,
-            _ => v1,
+        .map(|(v1, r)| {
+            r.iter().fold(v1, |acc, (op, v2)| match op {
+                '+' => acc + v2,
+                _ => acc - v2,
+            })
         })
 }
 
@@ -93,25 +95,27 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
             });
         // factor := '(' expr ')' | float
         let factor = mid(char('('), expr.clone(), char(')')).or(float).trim();
-        // term := factor [('*'|'/') term]
-        let term = fix(move |term| {
-            factor
-                .clone()
-                .and(char('*').or(char('/')).and(term).optional())
-                .trim()
-                .map(|(v1, r)| match r {
-                    Some(('*', v2)) => v1 * v2,
-                    Some(('/', v2)) => v1 / v2,
-                    _ => v1,
-                })
-        });
-        // expr := term [('+'|'-') expr]
-        term.and(char('+').or(char('-')).and(expr).optional())
+        // term := factor {('*'|'/') factor}
+        let term = factor
+            .clone()
+            .and(char('*').or(char('/')).and(factor).many())
             .trim()
-            .map(|(v1, r)| match r {
-                Some(('+', v2)) => v1 + v2,
-                Some(('-', v2)) => v1 - v2,
-                _ => v1,
+            .map(|(v1, r)| {
+                r.iter().fold(v1, |acc, (op, v2)| match op {
+                    '*' => acc * v2,
+                    _ => acc / v2,
+                })
+            });
+
+        // expr := term {('+'|'-') expr}
+        term.clone()
+            .and(char('+').or(char('-')).and(term).many())
+            .trim()
+            .map(|(v1, r)| {
+                r.iter().fold(v1, |acc, (op, v2)| match op {
+                    '+' => acc + v2,
+                    _ => acc - v2,
+                })
             })
     })
 }
@@ -152,7 +156,12 @@ fn int_expr_with_whitespace() {
 
 #[test]
 fn float_expr() {
-    test_helper("1.9/(2.6+0.8)+1.7", Some(1.9 / (2.6 + 0.8) + 1.7), "", 0);
+    test_helper(
+        "1.0/((2.0+3.0)+4.0)*(5.0+(1.0*2.0))",
+        Some(1.0 / ((2.0 + 3.0) + 4.0) * (5.0 + (1.0 * 2.0))),
+        "",
+        0,
+    );
 }
 
 #[test]
