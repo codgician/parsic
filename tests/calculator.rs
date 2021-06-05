@@ -50,26 +50,25 @@ fn factor<'f>() -> Parser<'f, f64, CharStream<'f>> {
 
 /// term := factor {('*'|'/') factor}
 fn term<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    factor()
+    factor
         .and(char('*').or(char('/')).and(factor).many())
         .trim()
-        .map(|(v1, r)| {
-            r.iter().fold(v1, |acc, (op, v2)| match op {
-                '*' => acc * v2,
-                _ => acc / v2,
+        .map(|(v0, r)| {
+            r.iter().fold(v0, |acc, (op, v)| match op {
+                '*' => acc * v,
+                _ => acc / v,
             })
         })
 }
 
 /// expr := term {('+'|'-') term}
 fn expr<'f>() -> Parser<'f, f64, CharStream<'f>> {
-    term()
-        .and(char('+').or(char('-')).and(term).many())
+    term.and(char('+').or(char('-')).and(term).many())
         .trim()
-        .map(|(v1, r)| {
-            r.iter().fold(v1, |acc, (op, v2)| match op {
-                '+' => acc + v2,
-                _ => acc - v2,
+        .map(|(v0, r)| {
+            r.iter().fold(v0, |acc, (op, v)| match op {
+                '+' => acc + v,
+                _ => acc - v,
             })
         })
 }
@@ -100,10 +99,10 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
             .clone()
             .and(char('*').or(char('/')).and(factor).many())
             .trim()
-            .map(|(v1, r)| {
-                r.iter().fold(v1, |acc, (op, v2)| match op {
-                    '*' => acc * v2,
-                    _ => acc / v2,
+            .map(|(v0, r)| {
+                r.iter().fold(v0, |acc, (op, v)| match op {
+                    '*' => acc * v,
+                    _ => acc / v,
                 })
             });
 
@@ -111,8 +110,8 @@ fn expr_<'s>() -> impl Parsable<Stream = CharStream<'s>, Result = f64> {
         term.clone()
             .and(char('+').or(char('-')).and(term).many())
             .trim()
-            .map(|(v1, r)| {
-                r.iter().fold(v1, |acc, (op, v2)| match op {
+            .map(|(v0, r)| {
+                r.iter().fold(v0, |acc, (op, v2)| match op {
                     '+' => acc + v2,
                     _ => acc - v2,
                 })
@@ -157,8 +156,8 @@ fn int_expr_with_whitespace() {
 #[test]
 fn float_expr() {
     test_helper(
-        "1.0/((2.0+3.0)+4.0)*(5.0+(1.0*2.0))",
-        Some(1.0 / ((2.0 + 3.0) + 4.0) * (5.0 + (1.0 * 2.0))),
+        "1.1/((2.2+3.3)+4.4)*(5.5+(6.6*7.7))",
+        Some(1.1 / ((2.2 + 3.3) + 4.4) * (5.5 + (6.6 * 7.7))),
         "",
         0,
     );
@@ -167,8 +166,8 @@ fn float_expr() {
 #[test]
 fn float_expr_with_whitespace() {
     test_helper(
-        "  1.9  /  (  2.6  +  0.8  )  +  1.7  ",
-        Some(1.9 / (2.6 + 0.8) + 1.7),
+        "  1.1  /  (  (  2.2  +  3.3  )  +  4.4  )  *  (  5.5  +  (  6.6  *  7.7  )  )  ",
+        Some(1.1 / ((2.2 + 3.3) + 4.4) * (5.5 + (6.6 * 7.7))),
         "",
         0,
     );
