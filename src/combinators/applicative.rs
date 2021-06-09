@@ -83,7 +83,6 @@ where
     })
 }
 
-/// Implement `compose` combinator for `Parsable<S>`.
 pub trait ApplicativeExt<'f, F: 'f, S>: Parsable<Stream = S, Result = F> {
     /// # Combinator: `compose`
     ///

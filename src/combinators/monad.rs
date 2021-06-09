@@ -52,7 +52,6 @@ where
     })
 }
 
-/// Implement `bind` combinator for `Parsable<S>`.
 pub trait MonadExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `bind`
     ///

@@ -88,7 +88,6 @@ pub fn some<'f, A: 'f, S: Clone>(
     })
 }
 
-/// Implement replicative combinators for `Parsable<S>`.
 pub trait ReplicativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
     /// # Combinator: `many`
     ///

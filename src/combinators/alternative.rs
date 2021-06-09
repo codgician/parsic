@@ -5,26 +5,6 @@ use crate::core::{return_none, Parsable, Parser};
 ///
 /// A parser that consumes no item and always fails.
 ///
-/// # Properties
-///
-/// Should satisfy [Alternative laws](https://wiki.haskell.org/Typeclassopedia#Laws_6).
-///
-/// Instances of `Parser` and `or` forms a monoid:
-///  
-/// - **Left identity**: `or(empty(), p) ~ p`
-/// - **Right identity**: `or(p, empty()) ~ p`
-/// - **Associative**: `or(or(px, py), pz) ~ or(px, or(py, pz))`
-///
-/// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:
-///
-/// - **Left zero**: `compose(empty(), x) ~ empty()`
-/// - **Right zero**: `compose(pf, empty()) ~ empty()`
-/// - **Left distribution**: `compose(or(pf, pg), px) ~ or(compose(pf, px), pg.compose(px))`
-/// - **Right distribution**: `compose(pf, or(px, py)) ~ or(compose(pf, px), pf.compose(py))`
-/// - **Left catch**: `or(pure(a), x) ~ pure(a)`
-///
-/// Check out `test_alternative` module for naive examples of above laws.
-///
 /// # Example
 /// ```
 /// use parsic::combinators::*;
@@ -56,17 +36,17 @@ pub fn empty<'f, A: 'f, S: 'f>() -> Parser<'f, A, S> {
 ///
 /// Instances of `Parser` and `or` forms a monoid:
 ///  
-/// - **Left identity**: `empty().or(p) ~ p`
-/// - **Right identity**: `p.or(empty()) ~ p`
-/// - **Associative**: `px.or(py).or(pz) ~ px.or(py.or(pz))`
+/// - **Left identity**: `or(empty(), p) ~ p`
+/// - **Right identity**: `or(p, empty()) ~ p`
+/// - **Associative**: `or(or(px, py), pz) ~ or(px, or(py, pz))`
 ///
 /// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:
 ///
-/// - **Left zero**: `empty().compose(x) ~ empty()`
-/// - **Right zero**: `pf.compose(empty()) ~ empty()`
-/// - **Left distribution**: `pf.or(pg).compose(px) ~ pf.compose(px).or(pg.compose(px))`
-/// - **Right distribution**: `pf.compose(px.or(py)) ~ pf.compose(px).or(pf.compose(py))`
-/// - **Left catch**: `pure(a).or(x) ~ pure(a)`
+/// - **Left zero**: `compose(empty(), x) ~ empty()`
+/// - **Right zero**: `compose(pf, empty()) ~ empty()`
+/// - **Left distribution**: `compose(or(pf, pg), px) ~ or(compose(pf, px), pg.compose(px))`
+/// - **Right distribution**: `compose(pf, or(px, py)) ~ or(compose(pf, px), pf.compose(py))`
+/// - **Left catch**: `or(pure(a), x) ~ pure(a)`
 ///
 /// Check out `test_alternative` module for naive examples of above laws.
 ///
@@ -132,13 +112,32 @@ pub fn optional<'f, A: Clone + 'f, S: Clone + 'f>(
     or(map(p, Some), pure(None))
 }
 
-/// Implement `or` combinator for `Parsable<S>`.
 pub trait AlternativeExt<'f, A: 'f, S>: Parsable<Stream = S, Result = A> {
-    /// # Combinator: `or` (function ver.)
+    /// # Combinator: `or`
     ///
     /// Alternative combinator. Accepts two parsers as arguments,
     /// if the first parser succeeds then its result is returned,
     /// otherwise the result of the second parser is returned.
+    ///
+    /// # Properties
+    ///
+    /// Should satisfy [Alternative laws](https://wiki.haskell.org/Typeclassopedia#Laws_6).
+    ///
+    /// Instances of `Parser` and `or` forms a monoid:
+    ///  
+    /// - **Left identity**: `empty().or(p) ~ p`
+    /// - **Right identity**: `p.or(empty()) ~ p`
+    /// - **Associative**: `px.or(py).or(pz) ~ px.or(py.or(pz))`
+    ///
+    /// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:
+    ///
+    /// - **Left zero**: `empty().compose(x) ~ empty()`
+    /// - **Right zero**: `pf.compose(empty()) ~ empty()`
+    /// - **Left distribution**: `pf.or(pg).compose(px) ~ pf.compose(px).or(pg.compose(px))`
+    /// - **Right distribution**: `pf.compose(px.or(py)) ~ pf.compose(px).or(pf.compose(py))`
+    /// - **Left catch**: `pure(a).or(x) ~ pure(a)`
+    ///
+    /// Check out `test_alternative` module for naive examples of above laws.
     ///
     /// # Examples
     /// ```
