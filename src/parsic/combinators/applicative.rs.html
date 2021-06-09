@@ -219,7 +219,6 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-<span id="219">219</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
 
@@ -306,7 +305,6 @@
     })
 }
 
-<span class="doccomment">/// Implement `compose` combinator for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ApplicativeExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">F</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// # Combinator: `compose`</span>
     <span class="doccomment">///</span>

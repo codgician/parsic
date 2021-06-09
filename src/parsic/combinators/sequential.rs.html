@@ -310,7 +310,6 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-<span id="310">310</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">combinators</span>::<span class="ident">FunctorExt</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
@@ -437,9 +436,8 @@
     <span class="ident">p1</span>.<span class="ident">and</span>(<span class="ident">p2</span>).<span class="ident">and</span>(<span class="ident">p3</span>).<span class="ident">map</span>(<span class="op">|</span>((<span class="kw">_</span>, <span class="ident">m</span>), <span class="kw">_</span>)<span class="op">|</span> <span class="ident">m</span>)
 }
 
-<span class="doccomment">/// Implement sequential combinators for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SequentialExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// # Combinator: `and` (function ver.)</span>
+    <span class="doccomment">/// # Combinator: `and`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A sequential combinator that applys the first parser then the second.</span>
     <span class="doccomment">/// If both parsers succeed, returns a tuple containing their results,</span>

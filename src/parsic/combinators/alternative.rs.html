@@ -347,7 +347,6 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
-<span id="347">347</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">combinators</span>::{<span class="ident">map</span>, <span class="ident">pure</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">return_none</span>, <span class="ident">Parsable</span>, <span class="ident">Parser</span>};
@@ -355,26 +354,6 @@
 <span class="doccomment">/// # Combinator: `empty`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A parser that consumes no item and always fails.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Properties</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Should satisfy [Alternative laws](https://wiki.haskell.org/Typeclassopedia#Laws_6).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instances of `Parser` and `or` forms a monoid:</span>
-<span class="doccomment">///  </span>
-<span class="doccomment">/// - **Left identity**: `or(empty(), p) ~ p`</span>
-<span class="doccomment">/// - **Right identity**: `or(p, empty()) ~ p`</span>
-<span class="doccomment">/// - **Associative**: `or(or(px, py), pz) ~ or(px, or(py, pz))`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - **Left zero**: `compose(empty(), x) ~ empty()`</span>
-<span class="doccomment">/// - **Right zero**: `compose(pf, empty()) ~ empty()`</span>
-<span class="doccomment">/// - **Left distribution**: `compose(or(pf, pg), px) ~ or(compose(pf, px), pg.compose(px))`</span>
-<span class="doccomment">/// - **Right distribution**: `compose(pf, or(px, py)) ~ or(compose(pf, px), pf.compose(py))`</span>
-<span class="doccomment">/// - **Left catch**: `or(pure(a), x) ~ pure(a)`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Check out `test_alternative` module for naive examples of above laws.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
@@ -407,17 +386,17 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Instances of `Parser` and `or` forms a monoid:</span>
 <span class="doccomment">///  </span>
-<span class="doccomment">/// - **Left identity**: `empty().or(p) ~ p`</span>
-<span class="doccomment">/// - **Right identity**: `p.or(empty()) ~ p`</span>
-<span class="doccomment">/// - **Associative**: `px.or(py).or(pz) ~ px.or(py.or(pz))`</span>
+<span class="doccomment">/// - **Left identity**: `or(empty(), p) ~ p`</span>
+<span class="doccomment">/// - **Right identity**: `or(p, empty()) ~ p`</span>
+<span class="doccomment">/// - **Associative**: `or(or(px, py), pz) ~ or(px, or(py, pz))`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// - **Left zero**: `empty().compose(x) ~ empty()`</span>
-<span class="doccomment">/// - **Right zero**: `pf.compose(empty()) ~ empty()`</span>
-<span class="doccomment">/// - **Left distribution**: `pf.or(pg).compose(px) ~ pf.compose(px).or(pg.compose(px))`</span>
-<span class="doccomment">/// - **Right distribution**: `pf.compose(px.or(py)) ~ pf.compose(px).or(pf.compose(py))`</span>
-<span class="doccomment">/// - **Left catch**: `pure(a).or(x) ~ pure(a)`</span>
+<span class="doccomment">/// - **Left zero**: `compose(empty(), x) ~ empty()`</span>
+<span class="doccomment">/// - **Right zero**: `compose(pf, empty()) ~ empty()`</span>
+<span class="doccomment">/// - **Left distribution**: `compose(or(pf, pg), px) ~ or(compose(pf, px), pg.compose(px))`</span>
+<span class="doccomment">/// - **Right distribution**: `compose(pf, or(px, py)) ~ or(compose(pf, px), pf.compose(py))`</span>
+<span class="doccomment">/// - **Left catch**: `or(pure(a), x) ~ pure(a)`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Check out `test_alternative` module for naive examples of above laws.</span>
 <span class="doccomment">///</span>
@@ -483,13 +462,32 @@
     <span class="ident">or</span>(<span class="ident">map</span>(<span class="ident">p</span>, <span class="prelude-val">Some</span>), <span class="ident">pure</span>(<span class="prelude-val">None</span>))
 }
 
-<span class="doccomment">/// Implement `or` combinator for `Parsable&lt;S&gt;`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AlternativeExt</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span>, <span class="ident">A</span>: <span class="lifetime">&#39;f</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">Parsable</span><span class="op">&lt;</span><span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>, <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// # Combinator: `or` (function ver.)</span>
+    <span class="doccomment">/// # Combinator: `or`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Alternative combinator. Accepts two parsers as arguments,</span>
     <span class="doccomment">/// if the first parser succeeds then its result is returned,</span>
     <span class="doccomment">/// otherwise the result of the second parser is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Properties</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Should satisfy [Alternative laws](https://wiki.haskell.org/Typeclassopedia#Laws_6).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Instances of `Parser` and `or` forms a monoid:</span>
+    <span class="doccomment">///  </span>
+    <span class="doccomment">/// - **Left identity**: `empty().or(p) ~ p`</span>
+    <span class="doccomment">/// - **Right identity**: `p.or(empty()) ~ p`</span>
+    <span class="doccomment">/// - **Associative**: `px.or(py).or(pz) ~ px.or(py.or(pz))`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Following properties exist when `empty` and `or` interacts with `pure` and `compose`:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// - **Left zero**: `empty().compose(x) ~ empty()`</span>
+    <span class="doccomment">/// - **Right zero**: `pf.compose(empty()) ~ empty()`</span>
+    <span class="doccomment">/// - **Left distribution**: `pf.or(pg).compose(px) ~ pf.compose(px).or(pg.compose(px))`</span>
+    <span class="doccomment">/// - **Right distribution**: `pf.compose(px.or(py)) ~ pf.compose(px).or(pf.compose(py))`</span>
+    <span class="doccomment">/// - **Left catch**: `pure(a).or(x) ~ pure(a)`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Check out `test_alternative` module for naive examples of above laws.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">/// ```</span>
