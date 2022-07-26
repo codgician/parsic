@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["parsic"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"enum\" href=\"parsic/core/enum.Msg.html\" title=\"enum parsic::core::Msg\">Msg</a>","synthetic":false,"types":["parsic::core::logger::Msg"]}];
+implementors["parsic"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.62.1/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"enum\" href=\"parsic/core/enum.Msg.html\" title=\"enum parsic::core::Msg\">Msg</a>","synthetic":false,"types":["parsic::core::logger::Msg"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
